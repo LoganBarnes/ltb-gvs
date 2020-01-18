@@ -97,6 +97,8 @@ if (LTB_ENABLE_GVS_DISPLAY)
             ltb_gvs_core
             )
 
+    target_link_libraries(ltb_gvs INTERFACE ltb_gvs_display)
+
 endif (LTB_ENABLE_GVS_DISPLAY)
 
 if (LTB_BUILD_GVS_EXAMPLES)

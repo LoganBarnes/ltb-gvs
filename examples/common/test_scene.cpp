@@ -23,13 +23,14 @@
 #include "test_scene.hpp"
 
 // project
-#include "gvs/scene/log_params.hpp"
-#include "gvs/scene/scene.hpp"
+#include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/core/scene.hpp"
 
 // standard
 #include <cmath>
 #include <random>
 
+namespace ltb {
 namespace example {
 namespace {
 
@@ -40,7 +41,7 @@ constexpr gvs::vec3 orange   = {1.f, 0.5f, 0.1f};
 
 } // namespace
 
-auto build_test_scene(gvs::scene::Scene* scene, gvs::SceneId const& root_id) -> void {
+auto build_test_scene(gvs::Scene* scene, gvs::SceneId const& root_id) -> void {
     {
         scene->add_item(gvs::SetReadableId("Axes"),
                         gvs::SetPositions3d({0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}),
@@ -125,7 +126,7 @@ auto build_test_scene(gvs::scene::Scene* scene, gvs::SceneId const& root_id) -> 
                     gvs::SetParent(root_id));
 }
 
-auto build_primitive_scene(gvs::scene::Scene* scene, gvs::SceneId const& root_id) -> void {
+auto build_primitive_scene(gvs::Scene* scene, gvs::SceneId const& root_id) -> void {
     scene->add_item(gvs::SetReadableId("Axes"), gvs::SetPrimitive(gvs::Axes{}), gvs::SetParent(root_id));
 
     gvs::SceneId cube;
@@ -197,3 +198,4 @@ auto build_primitive_scene(gvs::scene::Scene* scene, gvs::SceneId const& root_id
 }
 
 } // namespace example
+} // namespace ltb

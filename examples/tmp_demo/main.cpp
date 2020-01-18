@@ -21,11 +21,11 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 // project
-#include "gvs/display/display_scene.hpp"
-#include "gvs/display/local_scene.hpp"
-#include "gvs/net/client_scene.hpp"
-#include "gvs/scene/log_params.hpp"
-#include "gvs/scene/nil_scene.hpp"
+#include "ltb/gvs/display/display_scene.hpp"
+#include "ltb/gvs/display/local_scene.hpp"
+#include "ltb/gvs/net/client_scene.hpp"
+#include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/core/nil_scene.hpp"
 
 // examples
 #include "../common/test_scene.hpp"
@@ -37,14 +37,14 @@ int main(int argc, char* argv[]) {
         server_address = argv[1];
     }
 
-    std::unique_ptr<gvs::scene::Scene> scene;
+    std::unique_ptr<gvs::Scene> scene;
 
 #define SCENE 1
 
 #if SCENE == 0
-    scene = std::make_unique<gvs::display::LocalScene>(gvs::display::BackendType::Empty);
+    scene = std::make_unique<gvs::LocalScene>(gvs::BackendType::Empty);
 #elif SCENE == 1
-    scene = std::make_unique<gvs::display::DisplayScene>();
+    scene = std::make_unique<gvs::DisplayScene>();
 #elif SCENE == 2
     scene = std::make_unique<gvs::net::ClientScene>(server_address);
 #else
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         scene = std::move(client_scene);
     } else {
         std::cerr << "Falling back to NilScene" << std::endl;
-        scene = std::make_unique<gvs::scene::NilScene>();
+        scene = std::make_unique<gvs::NilScene>();
     }
 #endif
 

@@ -26,6 +26,7 @@
 #include <mapbox/variant.hpp> // C++11 variant
 
 namespace ltb {
+namespace gvs {
 
 /// \brief A set of unit length axes at the origin.
 ///        <R,G,B> corresponds to <X,Y,Z>
@@ -78,4 +79,5 @@ struct Primitive : detail::PrimitiveBase {
     Primitive(Sphere shape) : detail::PrimitiveBase(shape) {}
 };
 
+} // namespace gvs
 } // namespace ltb

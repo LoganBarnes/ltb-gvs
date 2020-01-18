@@ -21,7 +21,7 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 // project
-#include "gvs/display/display_scene.hpp"
+#include "ltb/gvs/display/display_scene.hpp"
 
 // examples
 #include "../common/test_scene.hpp"
@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) {
         server_address = argv[1];
     }
 
-    auto scene = gvs::display::DisplayScene();
-    example::build_test_scene(&scene);
+    auto scene = ltb::gvs::DisplayScene();
+    ltb::example::build_test_scene(&scene);
 
     std::cout << "This process will block until the window is closed." << std::endl;
     scene.block_until_window_is_closed();

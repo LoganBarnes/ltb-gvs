@@ -23,20 +23,20 @@
 #pragma once
 
 // project
-#include "gvs/display/local_scene.hpp"
-#include "gvs/gui/error_alert.hpp"
-#include "gvs/vis-client/app/imgui_magnum_application.hpp"
+#include "ltb/gvs/display/local_scene.hpp"
+#include "ltb/gvs/display/gui/error_alert.hpp"
+#include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
 
-namespace example {
+namespace ltb::example {
 
-class MainWindow : public gvs::vis::ImGuiMagnumApplication {
+class MainWindow : public gvs::ImGuiMagnumApplication {
 public:
     explicit MainWindow(const Arguments& arguments);
     ~MainWindow() override;
 
 private:
     void update() override;
-    void render(const gvs::display::CameraPackage& camera_package) const override;
+    void render(const gvs::CameraPackage& camera_package) const override;
     void configure_gui() override;
 
     void resize(const Magnum::Vector2i& viewport) override;
@@ -84,10 +84,10 @@ private:
     } sphere_;
 
     // Errors
-    gvs::gui::ErrorAlert error_alert_;
+    gvs::ErrorAlert error_alert_;
 
     // Scene
-    gvs::display::LocalScene scene_;
+    gvs::LocalScene scene_;
 
     auto reset_axes() -> void;
     auto reset_cone() -> void;
@@ -97,4 +97,4 @@ private:
     auto reset_sphere() -> void;
 };
 
-} // namespace example
+} // namespace ltb::example

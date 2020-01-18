@@ -23,9 +23,9 @@
 #include "main_window.hpp"
 
 // project
-#include "gvs/display/magnum_conversions.hpp"
-#include "gvs/gui/scene_gui.hpp"
-#include "gvs/scene/log_params.hpp"
+#include "ltb/gvs/display/magnum_conversions.hpp"
+#include "ltb/gvs/display/gui/scene_gui.hpp"
+#include "ltb/gvs/core/log_params.hpp"
 
 // external
 #include <Magnum/GL/Context.h>
@@ -39,10 +39,10 @@
 
 using namespace Magnum;
 
-namespace example {
+namespace ltb::example {
 
 MainWindow::MainWindow(const Arguments& arguments)
-    : gvs::vis::ImGuiMagnumApplication(arguments,
+    : gvs::ImGuiMagnumApplication(arguments,
                                        Configuration{}
                                            .setTitle("Machine Emulator")
                                            .setSize({1280, 720})
@@ -132,7 +132,7 @@ void MainWindow::update() {
     // Nothing to do
 }
 
-void MainWindow::render(const gvs::display::CameraPackage& camera_package) const {
+void MainWindow::render(const gvs::CameraPackage& camera_package) const {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     scene_.render(camera_package);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -253,7 +253,7 @@ void MainWindow::configure_gui() {
     }
 
     if (ImGui::CollapsingHeader("Scene")) {
-        gvs::gui::configure_gui(&scene_);
+        gvs::configure_gui(&scene_);
     }
 
     ImGui::End();
@@ -280,7 +280,7 @@ auto MainWindow::reset_axes() -> void {
                        gvs::SetPositions3d(axes.positions(0)),
                        gvs::SetVertexColors3d(vertex_colors),
                        gvs::SetIndices(axes.indices()),
-                       gvs::SetGeometryFormat(gvs::display::from_magnum(axes.primitive())));
+                       gvs::SetGeometryFormat(gvs::from_magnum(axes.primitive())));
 }
 
 auto MainWindow::reset_cone() -> void {
@@ -304,9 +304,9 @@ auto MainWindow::reset_sphere() -> void {
     scene_.update_item(sphere_.scene_id, gvs::SetPrimitive(gvs::Sphere{sphere_.rings, sphere_.segments}));
 }
 
-} // namespace example
+} // namespace ltb::example
 
 auto main(int argc, char* argv[]) -> int {
-    example::MainWindow app({argc, argv});
+    ltb::example::MainWindow app({argc, argv});
     return app.exec();
 }

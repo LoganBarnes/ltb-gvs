@@ -21,8 +21,8 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 // project
-#include "gvs/net/client_scene.hpp"
-#include "gvs/scene/nil_scene.hpp"
+#include "ltb/gvs/net/client_scene.hpp"
+#include "ltb/gvs/core/nil_scene.hpp"
 
 // examples
 #include "../common/test_scene.hpp"
@@ -34,14 +34,14 @@ int main(int argc, char* argv[]) {
         server_address = argv[1];
     }
 
-    std::unique_ptr<gvs::scene::Scene> scene;
+    std::unique_ptr<gvs::Scene> scene;
 
     {
         auto client_scene = std::make_unique<gvs::net::ClientScene>(server_address);
         if (client_scene->connected()) {
             scene = std::move(client_scene);
         } else {
-            scene = std::make_unique<gvs::scene::NilScene>();
+            scene = std::make_unique<gvs::NilScene>();
         }
     }
 

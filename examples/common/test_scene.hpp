@@ -26,14 +26,14 @@
 #include "ltb/gvs/core/forward_declarations.hpp"
 #include "ltb/gvs/core/scene_id.hpp"
 
+namespace ltb {
 namespace example {
-
-using gvs = ltb::gvs;
 
 constexpr auto pi = 3.14159265358979323846264338327950288f;
 
-auto build_test_scene(gvs::scene::Scene* scene, gvs::SceneId const& root_id = gvs::nil_id()) -> void;
+auto build_test_scene(gvs::Scene* scene, gvs::SceneId const& root_id = gvs::nil_id()) -> void;
 
-auto build_primitive_scene(gvs::scene::Scene* scene, gvs::SceneId const& root_id = gvs::nil_id()) -> void;
+auto build_primitive_scene(gvs::Scene* scene, gvs::SceneId const& root_id = gvs::nil_id()) -> void;
 
-}
+} // namespace example
+} // namespace ltb

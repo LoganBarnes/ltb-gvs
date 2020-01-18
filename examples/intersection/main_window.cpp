@@ -23,9 +23,9 @@
 #include "main_window.hpp"
 
 // project
-#include "gvs/display/magnum_conversions.hpp"
-#include "gvs/gui/scene_gui.hpp"
-#include "gvs/scene/log_params.hpp"
+#include "ltb/gvs/display/magnum_conversions.hpp"
+#include "ltb/gvs/display/gui/scene_gui.hpp"
+#include "ltb/gvs/core/log_params.hpp"
 
 // external
 #include <Magnum/GL/Context.h>
@@ -39,7 +39,7 @@
 
 using namespace Magnum;
 
-namespace example {
+namespace ltb::example {
 namespace {
 
 constexpr gvs::vec3 blueish  = {0.3f, 0.3f, 1.f};
@@ -50,7 +50,7 @@ constexpr gvs::vec3 orange   = {1.f, 0.5f, 0.1f};
 } // namespace
 
 MainWindow::MainWindow(const Arguments& arguments)
-    : gvs::vis::ImGuiMagnumApplication(arguments,
+    : gvs::ImGuiMagnumApplication(arguments,
                                        Configuration{}
                                            .setTitle("Machine Emulator")
                                            .setSize({1280, 720})
@@ -150,7 +150,7 @@ void MainWindow::update() {
     // Nothing to do
 }
 
-void MainWindow::render(const gvs::display::CameraPackage& camera_package) const {
+void MainWindow::render(const gvs::CameraPackage& camera_package) const {
     scene_.render(camera_package);
 }
 
@@ -182,7 +182,7 @@ void MainWindow::configure_gui() {
         scene_.update_item(shapes_root_, gvs::SetTransformation(shapes_transform_));
     }
 
-    gvs::gui::configure_gui(&scene_);
+    gvs::configure_gui(&scene_);
 
     ImGui::End();
 
@@ -193,9 +193,9 @@ void MainWindow::resize(const Vector2i& viewport) {
     scene_.resize(viewport);
 }
 
-} // namespace example
+} // namespace ltb::example
 
 auto main(int argc, char* argv[]) -> int {
-    example::MainWindow app({argc, argv});
+    ltb::example::MainWindow app({argc, argv});
     return app.exec();
 }
