@@ -23,7 +23,7 @@
 #pragma once
 
 // project
-#include "gvs/display/camera_package.hpp"
+#include "camera_package.hpp"
 
 // external
 #include <Magnum/Magnum.h>
@@ -32,7 +32,7 @@
 // standard
 #include <memory>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 class SceneDisplay {
 public:
@@ -48,4 +48,4 @@ public:
 
 inline SceneDisplay::~SceneDisplay() = default;
 
-} // namespace gvs::display
+} // namespace ltb::gvs

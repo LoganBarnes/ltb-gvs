@@ -27,7 +27,7 @@
 #include <Magnum/Math/Functions.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 using namespace Magnum;
 using namespace Math::Literals;
@@ -70,4 +70,4 @@ void OrbitCameraPackage::update_object() {
                              * zoom_object.transformation());
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs

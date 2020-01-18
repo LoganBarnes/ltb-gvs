@@ -25,27 +25,27 @@
 // project
 #include "backends/empty_backend.hpp"
 #include "backends/opengl_backend.hpp"
-#include "gvs/util/container_util.hpp"
+#include "ltb/util/container_utils.hpp"
 #include "scene_core.hpp"
 #include "scene_info_helpers.hpp"
 
 // standard
 #include <algorithm>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 LocalScene::LocalScene(BackendType backend_type) {
     switch (backend_type) {
 
     case BackendType::Empty: {
-        auto backend = std::make_unique<backends::EmptyBackend>();
+        auto backend = std::make_unique<EmptyBackend>();
         core_scene_  = std::make_unique<SceneCore>(*backend);
         display_     = std::move(backend);
         break;
     }
 
     case BackendType::OpenGL: {
-        auto backend = std::make_unique<backends::OpenglBackend>();
+        auto backend = std::make_unique<OpenglBackend>();
         core_scene_  = std::make_unique<SceneCore>(*backend);
         display_     = std::move(backend);
         break;
@@ -102,7 +102,7 @@ auto LocalScene::actually_append_to_item(SceneId const& item_id, SparseSceneItem
     return util11::success();
 }
 
-auto LocalScene::actually_get_item_info(const gvs::SceneId& item_id, gvs::scene::InfoGetterFunc info_getter) const
+auto LocalScene::actually_get_item_info(const gvs::SceneId& item_id, InfoGetterFunc info_getter) const
     -> util11::Error {
     if (core_scene_->items().find(item_id) == core_scene_->items().end()) {
         return util11::Error{"Item '" + gvs::to_string(item_id) + "' does not exist in the scene"};
@@ -111,4 +111,4 @@ auto LocalScene::actually_get_item_info(const gvs::SceneId& item_id, gvs::scene:
     return util11::success();
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs

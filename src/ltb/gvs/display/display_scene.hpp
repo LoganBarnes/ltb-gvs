@@ -24,18 +24,18 @@
 
 // project
 #include "display_window.hpp"
-#include "gvs/scene/scene.hpp"
-#include "gvs/scene/scene_update_handler.hpp"
-#include "gvs/util/atomic_data.hpp"
+#include "ltb/gvs/core/scene.hpp"
+#include "ltb/gvs/core/scene_update_handler.hpp"
+#include "ltb/util/atomic_data.hpp"
 #include "scene_core.hpp"
 
 // standard
 #include <mutex>
 #include <thread>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
-class DisplayScene : public scene::Scene, public scene::SceneUpdateHandler {
+class DisplayScene : public Scene, public SceneUpdateHandler {
 public:
     explicit DisplayScene();
     ~DisplayScene() override;
@@ -54,7 +54,7 @@ public:
     auto actually_update_item(SceneId const& item_id, SparseSceneItemInfo&& info) -> util11::Error override;
     auto actually_append_to_item(SceneId const& item_id, SparseSceneItemInfo&& info) -> util11::Error override;
 
-    auto actually_get_item_info(SceneId const& item_id, scene::InfoGetterFunc info_getter) const
+    [[nodiscard]] auto actually_get_item_info(SceneId const& item_id, InfoGetterFunc info_getter) const
         -> util11::Error override;
     /*
      * End `Scene` functions
@@ -65,17 +65,17 @@ private:
      * Start `SceneUpdater` functions
      */
     void added(SceneId const& item_id, SceneItemInfo const& item) override;
-    void updated(SceneId const& item_id, scene::UpdatedInfo const& updated, SceneItemInfo const& item) override;
+    void updated(SceneId const& item_id, UpdatedInfo const& updated, SceneItemInfo const& item) override;
     void removed(SceneId const& item_id) override;
     void reset_items(SceneItems const& items) override;
     /*
      * End `SceneUpdater` functions
      */
 
-    std::unique_ptr<gvs::display::DisplayWindow> display_window_; ///< Used to display the scene in a window
+    std::unique_ptr<ltb::gvs::DisplayWindow>     display_window_{}; ///< Used to display the scene in a window
     std::unique_ptr<util::AtomicData<SceneCore>> core_scene_; ///< Handles all the scene logic
 
     std::thread display_thread_; ///< Runs the display window
 };
 
-} // namespace gvs::display
+} // namespace ltb::gvs

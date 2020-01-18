@@ -25,7 +25,7 @@
 // project
 #include "error_alert.hpp"
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 ErrorAlertRecorder::ErrorAlertRecorder(const std::shared_ptr<ErrorAlert>& popup) : error_alert_(popup) {}
 
@@ -45,4 +45,4 @@ auto ErrorAlertRecorder::record_warning(util::Error error) const -> bool {
     return false;
 }
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

@@ -23,19 +23,19 @@
 #pragma once
 
 // project
-#include "gvs/util/error.hpp"
+#include "ltb/util/error.hpp"
 
 // standard
 #include <list>
 #include <string>
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 enum class LogToConsole { yes, no };
 
 class ErrorAlert {
 public:
-    explicit ErrorAlert(const std::string& unique_label, LogToConsole log_debug_errors_to_console = LogToConsole::yes);
+    explicit ErrorAlert(const std::string& unique_label, LogToConsole log_errors_to_console = LogToConsole::yes);
 
     /**
      * @brief Display an ImGui window popup with the oldest error message (if one exists)
@@ -64,4 +64,4 @@ private:
     auto display(const Type& type, const std::string& error_message) -> bool;
 };
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

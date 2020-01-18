@@ -24,12 +24,12 @@
 
 // project
 #include "general_shader_3d.hpp"
-#include "gvs/scene/types.hpp"
+#include "ltb/gvs/core/types.hpp"
 
 // external
 #include <Magnum/SceneGraph/Drawable.h>
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 class OpaqueDrawable : public Magnum::SceneGraph::Drawable3D {
 public:
@@ -57,4 +57,4 @@ private:
     GeneralShader3d& shader_;
 };
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

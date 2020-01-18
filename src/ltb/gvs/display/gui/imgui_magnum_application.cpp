@@ -23,7 +23,7 @@
 #include "imgui_magnum_application.hpp"
 
 // project
-#include "gvs/vis-client/app/imgui_theme.hpp"
+#include "imgui_theme.hpp"
 
 // external
 #include <Corrade/Utility/Resource.h>
@@ -41,17 +41,17 @@
 #include <algorithm>
 
 static void initialize_resources() {
-    CORRADE_RESOURCE_INITIALIZE(gvs_client_RESOURCES)
+    CORRADE_RESOURCE_INITIALIZE(ltb_gvs_display_RESOURCES)
 }
 
-namespace gvs::vis {
+namespace ltb::gvs {
 
 using namespace Magnum;
 
 namespace {
 
 // 'p' is a point on a plane
-float intersect_plane(display::Ray const& ray, Vector3 p, const Vector3& plane_normal) {
+float intersect_plane(Ray const& ray, Vector3 p, const Vector3& plane_normal) {
     // plane ray intersection
     float const denom = Math::dot(ray.direction, plane_normal);
 
@@ -77,9 +77,9 @@ ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const
     IMGUI_CHECKVERSION();
 
     // Some fonts are loaded in the theme class but we might also want the default so it's loaded here
-    theme_ = std::make_unique<detail::Theme>();
+    theme_ = std::make_unique<GuiTheme>();
 
-    theme_->set_style();
+    GuiTheme::set_style();
     GL::Renderer::setClearColor({theme_->background.Value.x,
                                  theme_->background.Value.y,
                                  theme_->background.Value.z,
@@ -373,4 +373,4 @@ auto ImGuiMagnumApplication::zoom(float amount) -> void {
     camera_package_.update_object();
 }
 
-} // namespace gvs::vis
+} // namespace ltb::gvs

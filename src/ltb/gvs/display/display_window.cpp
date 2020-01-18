@@ -25,10 +25,10 @@
 #include "display_window.hpp"
 
 // project
+#include "backends/opengl_backend.hpp"
 #include "display_scene.hpp"
-#include "gvs/display/backends/opengl_backend.hpp"
-#include "gvs/gui/scene_gui.hpp"
-#include "gvs/vis-client/app/imgui_theme.hpp"
+#include "gui/imgui_theme.hpp"
+#include "gui/scene_gui.hpp"
 
 // external
 #include <Magnum/GL/Context.h>
@@ -39,7 +39,7 @@
 
 using namespace Magnum;
 
-namespace gvs::display {
+namespace ltb::gvs {
 namespace {
 
 int   fake_argc    = 1;
@@ -49,15 +49,15 @@ char* fake_argv[1] = {fake_arg};
 } // namespace
 
 DisplayWindow::DisplayWindow(DisplayScene& parent_scene)
-    : vis::ImGuiMagnumApplication(Arguments{fake_argc, fake_argv},
-                                  Configuration{}
-                                      .setTitle("Geometry Visualisation Client")
-                                      .setSize({1280, 720})
-                                      .setWindowFlags(Configuration::WindowFlag::Resizable)),
+    : ImGuiMagnumApplication(Arguments{fake_argc, fake_argv},
+                             Configuration{}
+                                 .setTitle("Geometry Visualisation Client")
+                                 .setSize({1280, 720})
+                                 .setWindowFlags(Configuration::WindowFlag::Resizable)),
       gl_version_str_(GL::Context::current().versionString()),
       gl_renderer_str_(GL::Context::current().rendererString()),
       parent_scene_(parent_scene),
-      scene_backend_(std::make_unique<backends::OpenglBackend>()) {
+      scene_backend_(std::make_unique<OpenglBackend>()) {
 
     camera_package_.zoom_object.translate({0.f, 0.f, 20.f});
     camera_package_.rotation_object.rotateX(Math::Deg<float>(/*pitch*/ -15));
@@ -120,7 +120,7 @@ void DisplayWindow::configure_gui() {
 
     add_three_line_separator();
 
-    gui::configure_gui(&parent_scene_);
+    gvs::configure_gui(&parent_scene_);
 
     ImGui::End();
 
@@ -143,4 +143,4 @@ void DisplayWindow::resize(const Vector2i& viewport) {
     scene_backend_->resize(viewport);
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs

@@ -25,7 +25,7 @@
 // project
 #include "display_window.hpp"
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 DisplayScene::DisplayScene() {
 
@@ -97,8 +97,7 @@ auto DisplayScene::actually_append_to_item(SceneId const& item_id, SparseSceneIt
     });
 }
 
-auto DisplayScene::actually_get_item_info(SceneId const& item_id, scene::InfoGetterFunc info_getter) const
-    -> util11::Error {
+auto DisplayScene::actually_get_item_info(SceneId const& item_id, InfoGetterFunc info_getter) const -> util11::Error {
     return core_scene_->use_safely([item_id, info_getter = std::move(info_getter)](auto const& core_scene) {
         if (core_scene.items().find(item_id) == core_scene.items().end()) {
             return util11::Error{"Item '" + gvs::to_string(item_id) + "' does not exist in the scene"};
@@ -110,21 +109,20 @@ auto DisplayScene::actually_get_item_info(SceneId const& item_id, scene::InfoGet
 
 auto DisplayScene::added(SceneId const& item_id, SceneItemInfo const& item) -> void {
     display_window_->thread_safe_update(
-        [item_id, item](scene::SceneUpdateHandler* handler) { handler->added(item_id, item); });
+        [item_id, item](SceneUpdateHandler* handler) { handler->added(item_id, item); });
 }
 
-auto DisplayScene::updated(SceneId const& item_id, scene::UpdatedInfo const& updated, SceneItemInfo const& item)
-    -> void {
+auto DisplayScene::updated(SceneId const& item_id, UpdatedInfo const& updated, SceneItemInfo const& item) -> void {
     display_window_->thread_safe_update(
-        [item_id, updated, item](scene::SceneUpdateHandler* handler) { handler->updated(item_id, updated, item); });
+        [item_id, updated, item](SceneUpdateHandler* handler) { handler->updated(item_id, updated, item); });
 }
 
 auto DisplayScene::removed(SceneId const& item_id) -> void {
-    display_window_->thread_safe_update([item_id](scene::SceneUpdateHandler* handler) { handler->removed(item_id); });
+    display_window_->thread_safe_update([item_id](SceneUpdateHandler* handler) { handler->removed(item_id); });
 }
 
 auto DisplayScene::reset_items(SceneItems const& items) -> void {
-    display_window_->thread_safe_update([items](scene::SceneUpdateHandler* handler) { handler->reset_items(items); });
+    display_window_->thread_safe_update([items](SceneUpdateHandler* handler) { handler->reset_items(items); });
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs

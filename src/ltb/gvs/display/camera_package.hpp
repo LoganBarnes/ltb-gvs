@@ -27,7 +27,7 @@
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 #include <Magnum/SceneGraph/Object.h>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 struct Ray {
     Magnum::Vector3 origin;
@@ -57,4 +57,4 @@ struct OrbitCameraPackage : CameraPackage {
     void update_object();
 };
 
-} // namespace gvs::display
+} // namespace ltb::gvs

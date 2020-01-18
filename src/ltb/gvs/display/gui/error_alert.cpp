@@ -28,7 +28,7 @@
 // standard
 #include <iostream>
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 ErrorAlert::ErrorAlert(const std::string& unique_label, LogToConsole log_errors_to_console)
     : imgui_label_("Error popup###" + unique_label),
@@ -64,7 +64,7 @@ auto ErrorAlert::record_warning(util::Error error) -> void {
     error_messages_.push_back({std::move(error), Type::warning});
 }
 
-auto ErrorAlert::display(const gvs::gui::ErrorAlert::Type& type, const std::string& error_message) -> bool {
+auto ErrorAlert::display(const ltb::gvs::ErrorAlert::Type& type, const std::string& error_message) -> bool {
     const auto red    = ImVec4{1.f, 0.f, 0.f, 1.f};
     const auto yellow = ImVec4{1.f, 1.f, 0.f, 1.f};
 
@@ -103,4 +103,4 @@ auto ErrorAlert::display(const gvs::gui::ErrorAlert::Type& type, const std::stri
     return popup_closed;
 }
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

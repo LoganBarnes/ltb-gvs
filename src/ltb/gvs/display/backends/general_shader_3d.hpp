@@ -23,13 +23,13 @@
 #pragma once
 
 // project
-#include "gvs/scene/types.hpp"
+#include "ltb/gvs/core/types.hpp"
 
 // external
 #include <Magnum/GL/AbstractShaderProgram.h>
 #include <Magnum/Math/Color.h>
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 class GeneralShader3d : public Magnum::GL::AbstractShaderProgram {
 public:
@@ -42,8 +42,8 @@ public:
 
     explicit GeneralShader3d();
 
-    auto set_world_from_local_matrix(Magnum::Matrix4 const& view_from_local) -> GeneralShader3d&;
-    auto set_world_from_local_normal_matrix(Magnum::Matrix3 const& view_from_local_normal) -> GeneralShader3d&;
+    auto set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> GeneralShader3d&;
+    auto set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals) -> GeneralShader3d&;
     auto set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local) -> GeneralShader3d&;
 
     auto set_coloring(Coloring const& coloring) -> GeneralShader3d&;
@@ -68,4 +68,4 @@ private:
     int id_uniform_location_ = -1;
 };
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

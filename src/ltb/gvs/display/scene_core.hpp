@@ -23,18 +23,18 @@
 #pragma once
 
 // project
-#include "gvs/scene/forward_declarations.hpp"
-#include "gvs/scene/types.hpp"
-#include "gvs/util/result.hpp"
+#include "ltb/gvs/core/forward_declarations.hpp"
+#include "ltb/gvs/core/types.hpp"
+#include "ltb/util/result.hpp"
 
 // standard
 #include <unordered_set>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 class SceneCore {
 public:
-    explicit SceneCore(scene::SceneUpdateHandler& update_handler);
+    explicit SceneCore(SceneUpdateHandler& update_handler);
     ~SceneCore();
 
     /// \brief Adds the new item to the scene
@@ -59,9 +59,9 @@ public:
     auto item_ids() const -> std::unordered_set<SceneId>;
 
 private:
-    scene::SceneUpdateHandler& update_handler_; ///< Handles scene updates in an implementation specific way
-    std::mt19937               generator_; ///< Used to generate SceneIDs
-    SceneItems                 items_; ///< The map of all the items in the scene
+    SceneUpdateHandler& update_handler_; ///< Handles scene updates in an implementation specific way
+    std::mt19937        generator_; ///< Used to generate SceneIDs
+    SceneItems          items_; ///< The map of all the items in the scene
 };
 
-} // namespace gvs::display
+} // namespace ltb::gvs

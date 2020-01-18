@@ -23,16 +23,16 @@
 #pragma once
 
 // project
-#include "gvs/display/scene_display.hpp"
-#include "gvs/scene/scene_update_handler.hpp"
+#include "../scene_display.hpp"
+#include "ltb/gvs/core/scene_update_handler.hpp"
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
-class DisplayBackend : public scene::SceneUpdateHandler, public SceneDisplay {
+class DisplayBackend : public SceneUpdateHandler, public SceneDisplay {
 public:
     ~DisplayBackend() override = 0;
 };
 
 inline DisplayBackend::~DisplayBackend() = default;
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

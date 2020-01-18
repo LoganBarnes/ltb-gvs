@@ -72,6 +72,31 @@ if (LTB_ENABLE_GVS_DISPLAY)
     ############
     add_subdirectory(ltb-util)
 
+    #############################
+    ### GVS Display Resources ###
+    #############################
+    # Compile resources separately to avoid linting issues on generated code
+    corrade_add_resource(ltb_gvs_display_RESOURCES ${CMAKE_CURRENT_LIST_DIR}/src/resources.conf)
+    add_library(ltb_gvs_display_resources ${ltb_gvs_display_RESOURCES})
+    target_link_libraries(ltb_gvs_display_resources PUBLIC ltb_gvs_display_deps)
+
+    ###################
+    ### GVS Display ###
+    ###################
+    file(GLOB_RECURSE LTB_SOURCE_FILES
+            LIST_DIRECTORIES false
+            CONFIGURE_DEPENDS
+            ${CMAKE_CURRENT_LIST_DIR}/src/ltb/gvs/display/*
+            )
+
+    ltb_add_library(ltb_gvs_display 17 ${LTB_SOURCE_FILES})
+    ltb_link_libraries(ltb_gvs_display
+            PUBLIC
+            ltb_gvs_display_resources
+            ltb_util
+            ltb_gvs_core
+            )
+
 endif (LTB_ENABLE_GVS_DISPLAY)
 
 if (LTB_BUILD_GVS_EXAMPLES)

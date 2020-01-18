@@ -23,9 +23,9 @@
 #include "opengl_backend.hpp"
 
 // project
-#include "gvs/display/magnum_conversions.hpp"
-#include "gvs/util/container_util.hpp"
-#include "gvs/util/result.hpp"
+#include "../magnum_conversions.hpp"
+#include "ltb/util/container_utils.hpp"
+#include "ltb/util/result.hpp"
 
 // external
 #include <Corrade/Containers/ArrayViewStl.h>
@@ -38,7 +38,7 @@
 // standard
 #include <iostream>
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 namespace {
 
 auto update_vbo(OpenglBackend::ObjectMeshPackage* mesh_package, GeometryInfo const& geometry_info) -> void {
@@ -180,11 +180,10 @@ auto OpenglBackend::added(SceneId const& item_id, SceneItemInfo const& item) -> 
     } else {
         add_package(item_id, &get_package(item.parent).object->addChild<Object3D>(), nullptr, shader_);
     }
-    updated(item_id, scene::UpdatedInfo::everything(), item);
+    updated(item_id, UpdatedInfo::everything(), item);
 }
 
-auto OpenglBackend::updated(SceneId const& item_id, scene::UpdatedInfo const& updated, SceneItemInfo const& item)
-    -> void {
+auto OpenglBackend::updated(SceneId const& item_id, UpdatedInfo const& updated, SceneItemInfo const& item) -> void {
     ObjectMeshPackage& mesh_package = *id_to_pkgs_.at(item_id);
 
     if (updated.geometry) {
@@ -326,4 +325,4 @@ auto OpenglBackend::update_drawable_group(ObjectMeshPackage* mesh_package, bool 
     }
 }
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

@@ -22,8 +22,10 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "gvs/display/camera_package.hpp"
-#include "gvs/forward_declarations.hpp"
+// project
+#include "../camera_package.hpp"
+#include "imgui_theme.hpp"
+#include "ltb/gvs/forward_declarations.hpp"
 
 // external
 #include <Magnum/GL/DefaultFramebuffer.h>
@@ -35,7 +37,7 @@
 // system
 #include <memory>
 
-namespace gvs::vis {
+namespace ltb::gvs {
 
 class ImGuiMagnumApplication : public Magnum::Platform::Application {
 public:
@@ -44,9 +46,9 @@ public:
     virtual ~ImGuiMagnumApplication();
 
 private:
-    virtual auto update() -> void                                                   = 0;
-    virtual auto render(display::CameraPackage const& camera_package) const -> void = 0;
-    virtual auto configure_gui() -> void                                            = 0;
+    virtual auto update() -> void                                          = 0;
+    virtual auto render(CameraPackage const& camera_package) const -> void = 0;
+    virtual auto configure_gui() -> void                                   = 0;
 
     virtual auto resize(const Magnum::Vector2i& viewport) -> void = 0;
 
@@ -96,14 +98,14 @@ private:
 
 protected:
     // forward declaration
-    std::unique_ptr<detail::Theme> theme_;
+    std::unique_ptr<GuiTheme> theme_{};
 
     // Camera
-    display::OrbitCameraPackage camera_package_;
+    OrbitCameraPackage camera_package_{};
 
     // Ensures the application renders at least 5 more times after all events are
     // finished to give ImGui a chance to update and render correctly.
     auto reset_draw_counter() -> void;
 };
 
-} // namespace gvs::vis
+} // namespace ltb::gvs

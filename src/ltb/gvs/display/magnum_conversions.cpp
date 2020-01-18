@@ -28,7 +28,7 @@
 #include <Magnum/Math/Vector2.h>
 #include <Magnum/Math/Vector3.h>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 /*
  * To Magnum
@@ -99,4 +99,4 @@ auto from_magnum(Magnum::MeshPrimitive const& format) -> GeometryFormat {
     throw std::runtime_error("Unreachable code");
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs

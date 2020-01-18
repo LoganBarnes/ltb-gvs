@@ -25,7 +25,7 @@
 // gvs
 #include "display_backend.hpp"
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 class EmptyBackend : public DisplayBackend {
 public:
@@ -36,10 +36,10 @@ public:
     auto resize(Magnum::Vector2i const& viewport) -> void override;
 
     auto added(SceneId const& item_id, SceneItemInfo const& item) -> void override;
-    auto updated(SceneId const& item_id, scene::UpdatedInfo const& updated, SceneItemInfo const& item) -> void override;
+    auto updated(SceneId const& item_id, UpdatedInfo const& updated, SceneItemInfo const& item) -> void override;
     auto removed(SceneId const& item_id) -> void override;
 
     auto reset_items(SceneItems const& items) -> void override;
 };
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

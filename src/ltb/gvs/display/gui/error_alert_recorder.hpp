@@ -23,12 +23,12 @@
 #pragma once
 
 // project
-#include "gvs/util/error.hpp"
+#include "ltb/util/error.hpp"
 
 // standard
 #include <memory>
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 class ErrorAlert;
 
@@ -54,4 +54,4 @@ private:
     std::weak_ptr<ErrorAlert> const error_alert_;
 };
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

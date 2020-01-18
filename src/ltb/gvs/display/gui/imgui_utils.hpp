@@ -23,7 +23,7 @@
 #pragma once
 
 // project
-#include "gvs/util/generic_guard.hpp"
+#include "ltb/util/generic_guard.hpp"
 
 // external
 #include <imgui.h>
@@ -31,7 +31,7 @@
 // standard
 #include <string>
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 struct Disable {
     class Guard {
@@ -54,10 +54,10 @@ bool configure_gui(const std::string&          label,
 class ScopedIndent {
 public:
     explicit ScopedIndent(float indent_w = 0.f)
-        : guard_(gvs::util::make_guard(&ImGui::Indent, &ImGui::Unindent, indent_w)) {}
+        : guard_(util::make_guard(&ImGui::Indent, &ImGui::Unindent, indent_w)) {}
 
 private:
-    gvs::util::GenericGuard<decltype(&ImGui::Indent), decltype(&ImGui::Unindent), float&> guard_;
+    util::GenericGuard<decltype(&ImGui::Indent), decltype(&ImGui::Unindent), float&> guard_;
 };
 
 class ScopedID {
@@ -69,4 +69,4 @@ public:
     ~ScopedID();
 };
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

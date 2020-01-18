@@ -23,7 +23,7 @@
 #include "drawables.hpp"
 
 // project
-#include "gvs/display/magnum_conversions.hpp"
+#include "../magnum_conversions.hpp"
 
 // external
 #include <Magnum/GL/Mesh.h>
@@ -36,7 +36,7 @@
 
 using namespace Magnum;
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 OpaqueDrawable::OpaqueDrawable(SceneGraph::Object<SceneGraph::MatrixTransformation3D>& object,
                                SceneGraph::DrawableGroup3D*                            group,
@@ -73,4 +73,4 @@ auto OpaqueDrawable::draw(Matrix4 const& transformation_matrix, SceneGraph::Came
     mesh_.draw(shader_);
 }
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

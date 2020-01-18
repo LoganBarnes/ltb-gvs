@@ -22,7 +22,7 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "empty_backend.hpp"
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 EmptyBackend::EmptyBackend()  = default;
 EmptyBackend::~EmptyBackend() = default;
@@ -33,12 +33,11 @@ auto EmptyBackend::resize(Magnum::Vector2i const & /*viewport*/) -> void {}
 
 auto EmptyBackend::added(SceneId const& /*item_id*/, SceneItemInfo const & /*item*/) -> void {}
 
-auto EmptyBackend::updated(SceneId const& /*item_id*/,
-                           scene::UpdatedInfo const& /*updated*/,
-                           SceneItemInfo const & /*item*/) -> void {}
+auto EmptyBackend::updated(SceneId const& /*item_id*/, UpdatedInfo const& /*updated*/, SceneItemInfo const & /*item*/)
+    -> void {}
 
 auto EmptyBackend::removed(SceneId const & /*item_id*/) -> void {}
 
 auto EmptyBackend::reset_items(SceneItems const & /*items*/) -> void {}
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

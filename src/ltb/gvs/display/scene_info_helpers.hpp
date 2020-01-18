@@ -23,11 +23,11 @@
 #pragma once
 
 // project
-#include "gvs/scene/types.hpp"
-#include "gvs/util/result.hpp"
+#include "ltb/gvs/core/types.hpp"
+#include "ltb/util/result.hpp"
 
-namespace gvs {
+namespace ltb::gvs {
 
 auto replace_if_present(SceneItemInfo* info, SparseSceneItemInfo&& new_info) -> util::Result<void>;
 
-} // namespace gvs
+} // namespace ltb::gvs

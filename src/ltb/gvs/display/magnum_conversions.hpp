@@ -23,20 +23,20 @@
 #pragma once
 
 // project
-#include "gvs/scene/types.hpp"
+#include "ltb/gvs/core/types.hpp"
 
 // external
 #include <Magnum/Magnum.h>
 #include <Magnum/Mesh.h>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 /*
  * To Magnum
  */
 auto to_magnum(GeometryFormat const& format) -> Magnum::MeshPrimitive;
 
-auto to_magnum(mat4 const& matric) -> Magnum::Matrix4;
+auto to_magnum(mat4 const& matrix) -> Magnum::Matrix4;
 auto to_magnum(vec2 const& vector) -> Magnum::Vector2;
 
 template <typename T = Magnum::Vector3>
@@ -47,4 +47,4 @@ auto to_magnum(vec3 const& vector) -> T;
  */
 auto from_magnum(Magnum::MeshPrimitive const& format) -> GeometryFormat;
 
-} // namespace gvs::display
+} // namespace ltb::gvs

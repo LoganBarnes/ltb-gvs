@@ -25,7 +25,7 @@
 // project
 #include "make_primitive.hpp"
 
-namespace gvs {
+namespace ltb::gvs {
 
 auto replace_if_present(SceneItemInfo* info, SparseSceneItemInfo&& new_info) -> util::Result<void> {
 
@@ -37,7 +37,7 @@ auto replace_if_present(SceneItemInfo* info, SparseSceneItemInfo&& new_info) -> 
         auto& geometry_info = info->geometry_info;
 
         if (new_info.geometry->is<Primitive>()) {
-            display::make_primitive(info, new_info.geometry->get<Primitive>());
+            make_primitive(info, new_info.geometry->get<Primitive>());
 
         } else {
             assert(new_info.geometry->is<SparseGeometryInfo>());
@@ -108,4 +108,4 @@ auto replace_if_present(SceneItemInfo* info, SparseSceneItemInfo&& new_info) -> 
     return util::success();
 }
 
-} // namespace gvs
+} // namespace ltb::gvs

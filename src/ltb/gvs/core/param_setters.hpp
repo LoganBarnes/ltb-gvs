@@ -31,6 +31,7 @@
 #include <vector>
 
 namespace ltb {
+namespace gvs {
 namespace detail {
 
 /*
@@ -39,9 +40,9 @@ namespace detail {
  * All the move and copy constructors are deleted so the only way to use these classes is by
  * creating an instance as part of the function call:
  *
- * scene.add_item(loop::SetPositions(positions), loop::SetReadableID("Sphere"));
+ * scene.add_item(gvs::SetPositions(positions), gvs::SetReadableID("Sphere"));
  *
- * where loop::SetPositions and loop::SetReadableID are the "named parameter" classes.
+ * where gvs::SetPositions and gvs::SetReadableID are the "named parameter" classes.
  *
  * The SceneSetter and SceneGetter classes are kept generic since they do the same thing for
  * many different types. To create a new named parameter we add a new class that derives from
@@ -239,4 +240,5 @@ using SetVisible        = detail::SceneDisplaySetter<bool, &SparseDisplayInfo::v
 using SetOpacity        = detail::SceneDisplaySetter<float, &SparseDisplayInfo::opacity>;
 using SetWireframeOnly  = detail::SceneDisplaySetter<bool, &SparseDisplayInfo::wireframe_only>;
 
+} // namespace gvs
 } // namespace ltb

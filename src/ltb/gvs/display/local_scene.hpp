@@ -23,18 +23,18 @@
 #pragma once
 
 // project
+#include "backends/display_backend.hpp"
 #include "forward_declarations.hpp"
-#include "gvs/display/backends/display_backend.hpp"
-#include "gvs/scene/scene.hpp"
+#include "ltb/gvs/core/scene.hpp"
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 enum class BackendType {
     Empty,
     OpenGL,
 };
 
-class LocalScene : public scene::Scene, public SceneDisplay {
+class LocalScene : public Scene, public SceneDisplay {
 public:
     explicit LocalScene(BackendType backend_type = BackendType::OpenGL);
     ~LocalScene() override;
@@ -60,7 +60,7 @@ private:
     auto actually_update_item(SceneId const& item_id, SparseSceneItemInfo&& info) -> util11::Error override;
     auto actually_append_to_item(SceneId const& item_id, SparseSceneItemInfo&& info) -> util11::Error override;
 
-    auto actually_get_item_info(SceneId const& item_id, scene::InfoGetterFunc info_getter) const
+    [[nodiscard]] auto actually_get_item_info(SceneId const& item_id, InfoGetterFunc info_getter) const
         -> util11::Error override;
     /*
      * End `Scene` functions
@@ -70,4 +70,4 @@ private:
     std::unique_ptr<SceneCore>    core_scene_; ///< Handles all the scene logic
 };
 
-} // namespace gvs::display
+} // namespace ltb::gvs

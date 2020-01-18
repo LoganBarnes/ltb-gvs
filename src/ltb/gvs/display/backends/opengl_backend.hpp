@@ -46,7 +46,7 @@
 #include <list>
 #include <memory>
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 class OpenglBackend : public DisplayBackend {
 public:
@@ -57,7 +57,7 @@ public:
     auto resize(Magnum::Vector2i const& viewport) -> void override;
 
     auto added(SceneId const& item_id, SceneItemInfo const& item) -> void override;
-    auto updated(SceneId const& item_id, scene::UpdatedInfo const& updated, SceneItemInfo const& item) -> void override;
+    auto updated(SceneId const& item_id, UpdatedInfo const& updated, SceneItemInfo const& item) -> void override;
     auto removed(SceneId const& item_id) -> void override;
 
     auto reset_items(SceneItems const& items) -> void override;
@@ -84,7 +84,7 @@ public:
 
         explicit ObjectMeshPackage(SceneId                              id,
                                    Object3D*                            obj,
-                                   Magnum::SceneGraph::DrawableGroup3D* drawable_group,
+                                   Magnum::SceneGraph::DrawableGroup3D* drawables,
                                    unsigned                             id_for_intersect,
                                    GeneralShader3d&                     shader);
     };
@@ -127,4 +127,4 @@ private:
     auto update_drawable_group(ObjectMeshPackage* mesh_package, bool parent_visible) -> void;
 };
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

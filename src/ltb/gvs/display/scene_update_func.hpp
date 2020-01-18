@@ -23,13 +23,13 @@
 #pragma once
 
 // project
-#include "gvs/scene/forward_declarations.hpp"
+#include "ltb/gvs/core/forward_declarations.hpp"
 
 // standard
 #include <functional>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
-using SceneUpdateFunc = std::function<void(scene::SceneUpdateHandler*)>;
+using SceneUpdateFunc = std::function<void(SceneUpdateHandler*)>;
 
-} // namespace gvs::display
+} // namespace ltb::gvs

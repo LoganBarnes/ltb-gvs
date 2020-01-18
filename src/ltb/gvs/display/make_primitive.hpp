@@ -23,11 +23,11 @@
 #pragma once
 
 // project
-#include "gvs/scene/primitive_types.hpp"
-#include "gvs/scene/types.hpp"
+#include "ltb/gvs/core/primitive_types.hpp"
+#include "ltb/gvs/core/types.hpp"
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 auto make_primitive(SceneItemInfo* info, Primitive const& primitive) -> void;
 
-} // namespace gvs::display
+} // namespace ltb::gvs

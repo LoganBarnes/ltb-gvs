@@ -22,7 +22,7 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace gvs::display {
+namespace ltb::gvs {
 
 class LocalScene;
 class SceneDisplay;
@@ -30,9 +30,10 @@ class SceneCore;
 class DisplayScene;
 class DisplayWindow;
 
-namespace backends {
+// gui
+class GuiTheme;
 
+// backends
 class DisplayBackend;
 
-} // namespace backends
-} // namespace gvs::display
+} // namespace ltb::gvs

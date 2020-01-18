@@ -23,17 +23,17 @@
 #include "scene_gui.hpp"
 
 // project
-#include "gvs/scene/log_params.hpp"
-#include "gvs/scene/scene.hpp"
+#include "imgui_utils.hpp"
+#include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/core/scene.hpp"
 
 // external
-#include <gvs/gui/imgui_utils.hpp>
 #include <imgui.h>
 
-namespace gvs::gui {
+namespace ltb::gvs {
 namespace {
 
-auto configure_scene_gui(SceneId const& item_id, scene::Scene* scene) -> bool {
+auto configure_scene_gui(SceneId const& item_id, Scene* scene) -> bool {
     const ImVec4 gray = {0.5f, 0.5f, 0.5f, 1.f};
 
     std::string    readable_id;
@@ -169,7 +169,7 @@ auto configure_scene_gui(SceneId const& item_id, scene::Scene* scene) -> bool {
 
 } // namespace
 
-auto configure_gui(scene::Scene* scene) -> bool {
+auto configure_gui(Scene* scene) -> bool {
     std::vector<SceneId> children;
     scene->get_item_info(nil_id(), GetChildren(&children));
 
@@ -190,4 +190,4 @@ auto configure_gui(scene::Scene* scene) -> bool {
     return scene_changed;
 }
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

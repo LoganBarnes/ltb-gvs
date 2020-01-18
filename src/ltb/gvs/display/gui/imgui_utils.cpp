@@ -28,7 +28,7 @@
 // standard
 #include <algorithm>
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 Disable::Guard::Guard(bool disable) : disable_(disable) {
     if (disable_) {
@@ -86,4 +86,4 @@ ScopedID::~ScopedID() {
     ImGui::PopID();
 }
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

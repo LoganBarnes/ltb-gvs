@@ -21,14 +21,12 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "imgui_theme.hpp"
-#include "gvs/gvs_paths.hpp"
-#include <stdexcept>
 
-namespace gvs::vis::detail {
+namespace ltb::gvs {
 
-Theme::Theme() : background(0.15f, 0.15f, 0.15f, 1.f), font(ImGui::GetIO().Fonts->AddFontDefault()) {}
+GuiTheme::GuiTheme() : background(0.15f, 0.15f, 0.15f, 1.f), font(ImGui::GetIO().Fonts->AddFontDefault()) {}
 
-void Theme::set_style() {
+void GuiTheme::set_style() {
     ImGuiStyle& st      = ImGui::GetStyle();
     st.FrameBorderSize  = 1.0f;
     st.FramePadding     = ImVec2(4.0f, 2.0f);
@@ -96,4 +94,4 @@ void Theme::set_style() {
     colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 }
 
-} // namespace gvs::vis::detail
+} // namespace ltb::gvs

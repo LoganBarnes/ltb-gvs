@@ -22,9 +22,6 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "general_shader_3d.hpp"
 
-// project
-#include "gvs/util/variant_utils.hpp"
-
 // external
 #include <Corrade/Containers/Reference.h>
 #include <Corrade/Utility/Resource.h>
@@ -34,7 +31,7 @@
 #include <Magnum/Math/Matrix3.h>
 #include <Magnum/Math/Matrix4.h>
 
-namespace gvs::display::backends {
+namespace ltb::gvs {
 
 GeneralShader3d::GeneralShader3d() {
     MAGNUM_ASSERT_GL_VERSION_SUPPORTED(Magnum::GL::Version::GL450);
@@ -108,4 +105,4 @@ auto GeneralShader3d::set_id(unsigned const& id) -> GeneralShader3d& {
     return *this;
 }
 
-} // namespace gvs::display::backends
+} // namespace ltb::gvs

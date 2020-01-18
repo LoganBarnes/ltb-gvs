@@ -36,7 +36,7 @@
 #include <Magnum/Primitives/UVSphere.h>
 #include <Magnum/Trade/MeshData3D.h>
 
-namespace gvs::display {
+namespace ltb::gvs {
 namespace {
 
 struct PrimitiveVisitor {
@@ -118,4 +118,4 @@ auto make_primitive(SceneItemInfo* info, Primitive const& primitive) -> void {
     return mapbox::util::apply_visitor(PrimitiveVisitor{info}, primitive);
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs

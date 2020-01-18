@@ -22,13 +22,13 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "gvs/scene/forward_declarations.hpp"
+#include "ltb/gvs/core/forward_declarations.hpp"
 
-namespace gvs::gui {
+namespace ltb::gvs {
 
 /// \brief Displays an ImGui based GUI for the given scene.
 /// \param scene - The scene used to display the GUI
 /// \return true if the scene has changed, false otherwise
-auto configure_gui(scene::Scene* scene) -> bool;
+auto configure_gui(Scene* scene) -> bool;
 
-} // namespace gvs::gui
+} // namespace ltb::gvs

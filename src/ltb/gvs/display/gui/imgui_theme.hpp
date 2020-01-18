@@ -25,14 +25,14 @@
 #include <imgui.h>
 #include <string>
 
-namespace gvs::vis::detail {
+namespace ltb::gvs {
 
-class Theme {
+class GuiTheme {
 public:
-    Theme();
+    GuiTheme();
 
     // set ImGui::Style colors
-    void set_style();
+    static void set_style();
 
     // background color, use with glClear for example
     ImColor background;
@@ -41,4 +41,4 @@ public:
     ImFont* font;
 };
 
-} // namespace gvs::vis::detail
+} // namespace ltb::gvs

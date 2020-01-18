@@ -22,17 +22,17 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "gvs/display/forward_declarations.hpp"
-#include "gvs/display/scene_update_func.hpp"
-#include "gvs/util/blocking_queue.hpp"
-#include "gvs/vis-client/app/imgui_magnum_application.hpp"
+#include "forward_declarations.hpp"
+#include "gui/imgui_magnum_application.hpp"
+#include "ltb/util/blocking_queue.hpp"
+#include "scene_update_func.hpp"
 
 // standard
 #include <thread>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
-class DisplayWindow : public vis::ImGuiMagnumApplication {
+class DisplayWindow : public ImGuiMagnumApplication {
 public:
     explicit DisplayWindow(DisplayScene& parent_scene);
     ~DisplayWindow() override;
@@ -52,12 +52,12 @@ private:
     std::string error_message_;
 
     // Scene
-    DisplayScene&                             parent_scene_;
-    std::unique_ptr<backends::DisplayBackend> scene_backend_; ///< Used to update and display the scene
+    DisplayScene&                   parent_scene_;
+    std::unique_ptr<DisplayBackend> scene_backend_; ///< Used to update and display the scene
 
     // Data processing
     std::mutex                  update_lock_;
     std::deque<SceneUpdateFunc> update_functions_;
 };
 
-} // namespace gvs::display
+} // namespace ltb::gvs

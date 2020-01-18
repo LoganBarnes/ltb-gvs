@@ -21,19 +21,19 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "scene_core.hpp"
-#include <gvs/util/container_util.hpp>
 
 // project
-#include "gvs/scene/scene_update_handler.hpp"
+#include "ltb/gvs/core/scene_update_handler.hpp"
+#include "ltb/util/container_utils.hpp"
 #include "scene_info_helpers.hpp"
 
 // standard
 #include <algorithm>
 #include <iterator>
 
-namespace gvs::display {
+namespace ltb::gvs {
 
-SceneCore::SceneCore(scene::SceneUpdateHandler& update_handler)
+SceneCore::SceneCore(SceneUpdateHandler& update_handler)
     : update_handler_(update_handler), generator_(std::random_device{}()) {
     clear();
 }
@@ -51,7 +51,7 @@ auto SceneCore::add_item(SparseSceneItemInfo&& new_info) -> util::Result<SceneId
     }
 
     items_.at(info.parent).children.emplace_back(item_id);
-    update_handler_.updated(info.parent, scene::UpdatedInfo::children_only(), items_.at(info.parent));
+    update_handler_.updated(info.parent, UpdatedInfo::children_only(), items_.at(info.parent));
 
     items_.emplace(item_id, std::move(info));
     update_handler_.added(item_id, items_.at(item_id));
@@ -64,17 +64,17 @@ auto SceneCore::update_item(SceneId const& item_id, SparseSceneItemInfo&& info) 
     if (info.parent && *info.parent != item.parent) {
         // Remove item from the current parent's list of children
         util::remove_all_by_value(items_.at(item.parent).children, item_id);
-        update_handler_.updated(item.parent, scene::UpdatedInfo::children_only(), items_.at(item.parent));
+        update_handler_.updated(item.parent, UpdatedInfo::children_only(), items_.at(item.parent));
 
         auto const& parent = *info.parent;
 
         // Add the item to the new parent's list of children
         items_.at(parent).children.emplace_back(item_id);
-        update_handler_.updated(parent, scene::UpdatedInfo::children_only(), items_.at(parent));
+        update_handler_.updated(parent, UpdatedInfo::children_only(), items_.at(parent));
     }
 
     auto const& const_info = info;
-    auto        updated    = scene::UpdatedInfo(const_info); // info isn't changed here
+    auto        updated    = UpdatedInfo(const_info); // info isn't changed here
 
     auto result = replace_if_present(&item, std::move(info));
     if (!result) {
@@ -117,4 +117,4 @@ auto SceneCore::item_ids() const -> std::unordered_set<SceneId> {
     return ids;
 }
 
-} // namespace gvs::display
+} // namespace ltb::gvs
