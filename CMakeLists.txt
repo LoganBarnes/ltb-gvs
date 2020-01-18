@@ -21,7 +21,7 @@
 # SOFTWARE.
 ##########################################################################################
 cmake_minimum_required(VERSION 3.15)
-project(LtbUtil LANGUAGES CXX)
+project(LtbUtilities LANGUAGES CXX)
 
 include(cmake/ThirdParty.cmake)
 include(cmake/LtbConfig.cmake) # <-- Additional project options are in here.
@@ -43,20 +43,6 @@ ltb_link_libraries(ltb_util
         doctest
         )
 ltb_include_directories(ltb_util
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
-        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
-        )
-
-ltb_add_library(ltb_tmp ${LTB_SOURCE_FILES})
-ltb_link_libraries(ltb_tmp
-        PUBLIC
-        expected
-        range-v3
-        Threads::Threads
-        doctest
-        )
-ltb_include_directories(ltb_tmp
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
         "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
