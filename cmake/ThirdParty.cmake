@@ -1,6 +1,6 @@
 ##########################################################################################
-# LTB Geometry Visualization Server
-# Copyright (c) 2020 Logan Barnes - All Rights Reserved
+# Geometry Visualization Server
+# Copyright (c) 2019 Logan Barnes - All Rights Reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-cmake_minimum_required(VERSION 3.15)
-project(LtbGeometryVisualizationServer LANGUAGES CXX)
+include(FetchContent)
 
-option(LTB_ENABLE_GVS_DISPLAY "Build the GUI targets that display scenes" ON)
-option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
+FetchContent_Declare(
+        mapbox_dl
+        GIT_REPOSITORY https://github.com/mapbox/variant.git
+        GIT_TAG v1.1.6
+)
 
-include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
+### Boost UUID ###
+include(cmake/BoostUuidLibs.cmake)
 
-include(cmake/ThirdParty.cmake)
+### mapbox variant ###
+FetchContent_GetProperties(mapbox_dl)
+if (NOT mapbox_dl_POPULATED)
+    FetchContent_Populate(mapbox_dl)
 
-if (LTB_ENABLE_GVS_DISPLAY)
-    include(cmake/ThirdPartyDisplay.cmake)
-
-    ############
-    ### Util ###
-    ############
-    add_subdirectory(ltb-util)
-
-endif (LTB_ENABLE_GVS_DISPLAY)
-
-#if (LTB_BUILD_GVS_EXAMPLES)
-#    add_subdirectory(examples)
-#endif ()
+    add_library(mapbox INTERFACE)
+    target_include_directories(mapbox SYSTEM INTERFACE "$<BUILD_INTERFACE:${mapbox_dl_SOURCE_DIR}/include>")
+endif (NOT mapbox_dl_POPULATED)
