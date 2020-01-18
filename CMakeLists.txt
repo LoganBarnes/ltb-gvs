@@ -28,11 +28,45 @@ option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
 
 include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
 
+################################
+### Third Party Dependencies ###
+################################
 include(cmake/ThirdParty.cmake)
 
 if (LTB_ENABLE_GVS_DISPLAY)
     include(cmake/ThirdPartyDisplay.cmake)
+endif ()
 
+###########
+### GVS ###
+###########
+add_library(ltb_gvs INTERFACE)
+
+configure_file(${CMAKE_CURRENT_LIST_DIR}/src/gvs_paths.hpp.in ${CMAKE_BINARY_DIR}/generated/ltb/gvs_paths.hpp)
+
+################
+### GVS Core ###
+################
+file(GLOB_RECURSE LTB_SOURCE_FILES
+        LIST_DIRECTORIES false
+        CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_LIST_DIR}/src/ltb/gvs/core/*
+        )
+
+ltb_add_library(ltb_gvs_core 11 ${LTB_SOURCE_FILES})
+ltb_link_libraries(ltb_gvs_core
+        PUBLIC
+        boost_uuid
+        mapbox
+        )
+ltb_include_directories(ltb_gvs_core
+        PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
+        )
+
+target_link_libraries(ltb_gvs INTERFACE ltb_gvs_core)
+
+if (LTB_ENABLE_GVS_DISPLAY)
     ############
     ### Util ###
     ############

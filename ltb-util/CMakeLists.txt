@@ -34,7 +34,7 @@ file(GLOB_RECURSE LTB_SOURCE_FILES
         CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_LIST_DIR}/src/ltb/util/*
         )
-ltb_add_library(ltb_util ${LTB_SOURCE_FILES})
+ltb_add_library(ltb_util 17 ${LTB_SOURCE_FILES})
 ltb_link_libraries(ltb_util
         PUBLIC
         expected

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-function(ltb_add_library target)
+function(ltb_add_library target cxx_standard)
     # Add the library with custom compile flags and link the testing library
     add_library(${target} ${ARGN})
     target_compile_options(${target} PRIVATE ${LTB_COMPILE_FLAGS})
@@ -48,12 +48,12 @@ function(ltb_add_library target)
             ${test_target}
             PROPERTIES
             # C++ flags
-            CXX_STANDARD 17
+            CXX_STANDARD ${cxx_standard}
             CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF
             POSITION_INDEPENDENT_CODE ON
             # CUDA flags
-            CUDA_STANDARD 17
+            CUDA_STANDARD ${cxx_standard}
             CUDA_STANDARD_REQUIRED ON
             CUDA_EXTENSIONS OFF
             # CCache

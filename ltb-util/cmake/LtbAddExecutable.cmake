@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-function(ltb_add_executable target main_file)
+function(ltb_add_executable target cxx_standard main_file)
     # Add a library with custom compile flags and disable testing
     add_library(${target} ${ARGN})
     target_compile_options(${target} PUBLIC ${LTB_COMPILE_FLAGS})
@@ -57,12 +57,12 @@ function(ltb_add_executable target main_file)
             ${test_target}
             PROPERTIES
             # C++ flags
-            CXX_STANDARD 17
+            CXX_STANDARD ${cxx_standard}
             CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF
             POSITION_INDEPENDENT_CODE ON
             # CUDA flags
-            CUDA_STANDARD 17
+            CUDA_STANDARD ${cxx_standard}
             CUDA_STANDARD_REQUIRED ON
             CUDA_EXTENSIONS OFF
             # CCache
