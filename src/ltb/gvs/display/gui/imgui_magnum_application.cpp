@@ -239,11 +239,10 @@ auto ImGuiMagnumApplication::mouseMoveEvent(MouseMoveEvent& event) -> void {
     event.setAccepted(true);
 
     // make these editable settings
-    auto orbiting = (event.buttons() & MouseMoveEvent::Button::Left);
+    auto orbiting = (event.buttons() & MouseMoveEvent::Button::Right);
     auto panning  = (event.buttons() & MouseMoveEvent::Button::Middle);
-    auto zooming  = (event.buttons() & MouseMoveEvent::Button::Right);
 
-    if (!(orbiting || panning || zooming)) {
+    if (!(orbiting || panning)) {
         return;
     }
 
@@ -294,11 +293,6 @@ auto ImGuiMagnumApplication::mouseMoveEvent(MouseMoveEvent& event) -> void {
             camera_package_.translation_object.translate(diff);
             camera_package_.update_object();
         }
-
-    } else if (zooming) {
-        constexpr auto drag_zoom_scale = 0.5f; // make this an editable setting
-
-        zoom(event.relativePosition().y() * drag_zoom_scale);
     }
 }
 
