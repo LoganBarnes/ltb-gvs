@@ -74,6 +74,6 @@ if (LTB_ENABLE_GVS_DISPLAY)
 
 endif (LTB_ENABLE_GVS_DISPLAY)
 
-#if (LTB_BUILD_GVS_EXAMPLES)
-#    add_subdirectory(examples)
-#endif ()
+if (LTB_BUILD_GVS_EXAMPLES)
+    add_subdirectory(examples)
+endif ()
