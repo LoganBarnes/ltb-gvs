@@ -21,17 +21,19 @@
 # SOFTWARE.
 ##########################################################################################
 cmake_minimum_required(VERSION 3.15)
-project(GeometryVisualizationServer LANGUAGES CXX)
+project(LtbGeometryVisualizationServer LANGUAGES CXX)
 
 option(LTB_ENABLE_DISPLAY "Build the GUI targets that display scenes" ON)
 option(LTB_ENABLE_NETWORKING "Build client and server scene clients" ON)
 option(LTB_BUILD_EXAMPLES "Build example programs" OFF)
 
+include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
+
 if (GVS_ENABLE_DISPLAY)
     ############
     ### Util ###
     ############
-    #    add_subdirectory(ltb-util)
+    add_subdirectory(ltb-util)
 
 endif (GVS_ENABLE_DISPLAY)
 

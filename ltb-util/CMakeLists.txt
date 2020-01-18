@@ -21,7 +21,7 @@
 # SOFTWARE.
 ##########################################################################################
 cmake_minimum_required(VERSION 3.15)
-project(LtbUtil LANGUAGES CXX)
+project(LtbUtilities LANGUAGES CXX)
 
 include(cmake/ThirdParty.cmake)
 include(cmake/LtbConfig.cmake) # <-- Additional project options are in here.
