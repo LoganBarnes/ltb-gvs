@@ -47,17 +47,3 @@ ltb_include_directories(ltb_util
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
         "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
         )
-
-ltb_add_library(ltb_tmp ${LTB_SOURCE_FILES})
-ltb_link_libraries(ltb_tmp
-        PUBLIC
-        expected
-        range-v3
-        Threads::Threads
-        doctest
-        )
-ltb_include_directories(ltb_tmp
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
-        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
-        )
