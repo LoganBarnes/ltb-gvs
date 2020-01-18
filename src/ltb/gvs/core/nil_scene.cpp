@@ -1,6 +1,6 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// Geometry Visualization Server
-// Copyright (c) 2019 Logan Barnes - All Rights Reserved
+// LTB Geometry Visualization Server
+// Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,11 @@ auto NilScene::actually_add_item(SparseSceneItemInfo && /*info*/) -> util11::Res
     return nil_id();
 }
 
-auto NilScene::actually_update_item(SceneId const& /*item_id*/, SparseSceneItemInfo && /*info*/)
-    -> ltb::util11::Error {
+auto NilScene::actually_update_item(SceneId const& /*item_id*/, SparseSceneItemInfo && /*info*/) -> ltb::util11::Error {
     return util11::success();
 }
 
-auto NilScene::actually_append_to_item(SceneId const& /*item_id*/, SparseSceneItemInfo && /*info*/)
-    -> util11::Error {
+auto NilScene::actually_append_to_item(SceneId const& /*item_id*/, SparseSceneItemInfo && /*info*/) -> util11::Error {
     return util11::success();
 }
 
