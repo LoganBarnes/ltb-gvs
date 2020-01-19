@@ -43,25 +43,8 @@ function(ltb_add_library target cxx_standard)
         endif ()
     endif ()
 
-    set_target_properties(
-            ${target}
-            ${test_target}
-            PROPERTIES
-            # C++ flags
-            CXX_STANDARD ${cxx_standard}
-            CXX_STANDARD_REQUIRED ON
-            CXX_EXTENSIONS OFF
-            POSITION_INDEPENDENT_CODE ON
-            # CUDA flags
-            CUDA_STANDARD 14
-            CUDA_STANDARD_REQUIRED ON
-            CUDA_EXTENSIONS OFF
-            CUDA_SEPARABLE_COMPILATION ON
-            # CCache
-            COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
-            # Clang-Tidy
-            CXX_CLANG_TIDY "${LTB_CLANG_TIDY}"
-    )
+    ltb_set_properties(${target} ${cxx_standard})
+    ltb_set_properties(${test_target} ${cxx_standard})
 endfunction()
 
 function(ltb_link_libraries target)

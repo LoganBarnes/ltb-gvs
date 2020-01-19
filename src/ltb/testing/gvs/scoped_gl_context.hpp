@@ -37,7 +37,7 @@ public:
     ScopedGLContext();
 
 private:
-    std::shared_ptr<Magnum::Platform::WindowlessGLContext> windowless_gl_context_;
+    std::shared_ptr<Magnum::Platform::WindowlessGLContext> windowless_gl_context_{};
     std::shared_ptr<Magnum::Platform::GLContext>           gl_context_;
 };
 

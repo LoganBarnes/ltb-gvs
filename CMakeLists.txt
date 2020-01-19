@@ -109,7 +109,11 @@ if (LTB_ENABLE_GVS_DISPLAY)
                 ${CMAKE_CURRENT_LIST_DIR}/src/ltb/testing/*
                 )
 
-        target_sources(ltb_testing INTERFACE ${LTB_SOURCE_FILES})
+        add_library(ltb_gvs_testing ${LTB_SOURCE_FILES})
+        ltb_set_properties(ltb_gvs_testing 17)
+        target_link_libraries(ltb_gvs_testing PUBLIC ltb_gvs_display_deps)
+
+        target_link_libraries(ltb_testing INTERFACE ltb_gvs_testing)
     endif ()
 
 endif (LTB_ENABLE_GVS_DISPLAY)
