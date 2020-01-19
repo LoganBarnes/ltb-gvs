@@ -23,9 +23,9 @@
 #pragma once
 
 // project
-#include "ltb/gvs/display/local_scene.hpp"
 #include "ltb/gvs/display/gui/error_alert.hpp"
 #include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
+#include "ltb/gvs/display/local_scene.hpp"
 
 namespace ltb::example {
 
@@ -47,7 +47,7 @@ private:
 
     // Axes
     struct {
-        gvs::SceneId scene_id    = gvs::nil_id();
+        gvs::SceneId scene_id = gvs::nil_id();
     } axes_;
 
     // Cone

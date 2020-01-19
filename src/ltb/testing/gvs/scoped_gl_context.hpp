@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Geometry Visualization Server
+// LTB Distance Volume Hierarchy
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,34 +22,24 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// project
-#include "ltb/gvs/display/gui/error_alert.hpp"
-#include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
-#include "ltb/gvs/display/local_scene.hpp"
+// external
+#include <Magnum/Platform/GLContext.h>
+#include <Magnum/Platform/WindowlessEglApplication.h>
 
-namespace ltb::example {
+// standard
+#include <memory>
 
-class MainWindow : public gvs::ImGuiMagnumApplication {
+namespace ltb {
+namespace testing {
+
+class ScopedGLContext {
 public:
-    explicit MainWindow(const Arguments& arguments);
-    ~MainWindow() override;
+    ScopedGLContext();
 
 private:
-    void update() override;
-    void render(const gvs::CameraPackage& camera_package) const override;
-    void configure_gui() override;
-
-    void resize(const Magnum::Vector2i& viewport) override;
-
-    // General Info
-    std::string gl_version_str_;
-    std::string gl_renderer_str_;
-
-    // Errors
-    gvs::ErrorAlert error_alert_;
-
-    // Scene
-    gvs::LocalScene scene_;
+    std::shared_ptr<Magnum::Platform::WindowlessGLContext> windowless_gl_context_;
+    std::shared_ptr<Magnum::Platform::GLContext>           gl_context_;
 };
 
-} // namespace ltb::example
+} // namespace testing
+} // namespace ltb

@@ -21,11 +21,11 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 // project
+#include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/core/nil_scene.hpp"
 #include "ltb/gvs/display/display_scene.hpp"
 #include "ltb/gvs/display/local_scene.hpp"
 #include "ltb/gvs/net/client_scene.hpp"
-#include "ltb/gvs/core/log_params.hpp"
-#include "ltb/gvs/core/nil_scene.hpp"
 
 // examples
 #include "../common/test_scene.hpp"

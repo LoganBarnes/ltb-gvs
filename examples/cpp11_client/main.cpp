@@ -21,8 +21,8 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 // project
-#include "ltb/gvs/net/client_scene.hpp"
 #include "ltb/gvs/core/nil_scene.hpp"
+#include "ltb/gvs/net/client_scene.hpp"
 
 // examples
 #include "../common/test_scene.hpp"

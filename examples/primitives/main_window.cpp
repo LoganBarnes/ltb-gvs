@@ -23,9 +23,9 @@
 #include "main_window.hpp"
 
 // project
-#include "ltb/gvs/display/magnum_conversions.hpp"
-#include "ltb/gvs/display/gui/scene_gui.hpp"
 #include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/display/gui/scene_gui.hpp"
+#include "ltb/gvs/display/magnum_conversions.hpp"
 
 // external
 #include <Magnum/GL/Context.h>
@@ -43,10 +43,10 @@ namespace ltb::example {
 
 MainWindow::MainWindow(const Arguments& arguments)
     : gvs::ImGuiMagnumApplication(arguments,
-                                       Configuration{}
-                                           .setTitle("Machine Emulator")
-                                           .setSize({1280, 720})
-                                           .setWindowFlags(Configuration::WindowFlag::Resizable)),
+                                  Configuration{}
+                                      .setTitle("Machine Emulator")
+                                      .setSize({1280, 720})
+                                      .setWindowFlags(Configuration::WindowFlag::Resizable)),
       // Device info
       gl_version_str_(GL::Context::current().versionString()),
       gl_renderer_str_(GL::Context::current().rendererString()),

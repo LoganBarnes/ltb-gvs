@@ -99,6 +99,19 @@ if (LTB_ENABLE_GVS_DISPLAY)
 
     target_link_libraries(ltb_gvs INTERFACE ltb_gvs_display)
 
+    ###############
+    ### Testing ###
+    ###############
+    if (LTB_BUILD_TESTS)
+        file(GLOB_RECURSE LTB_SOURCE_FILES
+                LIST_DIRECTORIES false
+                CONFIGURE_DEPENDS
+                ${CMAKE_CURRENT_LIST_DIR}/src/ltb/testing/*
+                )
+
+        target_sources(ltb_testing INTERFACE ${LTB_SOURCE_FILES})
+    endif ()
+
 endif (LTB_ENABLE_GVS_DISPLAY)
 
 if (LTB_BUILD_GVS_EXAMPLES)

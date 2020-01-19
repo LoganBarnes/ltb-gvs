@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Geometry Visualization Server
+// LTB Distance Volume Hierarchy
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,36 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
+#include "scoped_gl_context.hpp"
 
-// project
-#include "ltb/gvs/display/gui/error_alert.hpp"
-#include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
-#include "ltb/gvs/display/local_scene.hpp"
+using namespace Magnum::Platform;
 
-namespace ltb::example {
+namespace ltb::testing {
 
-class MainWindow : public gvs::ImGuiMagnumApplication {
-public:
-    explicit MainWindow(const Arguments& arguments);
-    ~MainWindow() override;
+ScopedGLContext::ScopedGLContext() {
+    auto configuration = WindowlessGLContext::Configuration{};
+    configuration.clearFlags(WindowlessGLContext::Configuration::Flag::ForwardCompatible);
+    windowless_gl_context_ = std::make_shared<WindowlessGLContext>(configuration);
+    windowless_gl_context_->makeCurrent();
+    gl_context_ = std::make_shared<GLContext>(0, nullptr);
+}
 
-private:
-    void update() override;
-    void render(const gvs::CameraPackage& camera_package) const override;
-    void configure_gui() override;
-
-    void resize(const Magnum::Vector2i& viewport) override;
-
-    // General Info
-    std::string gl_version_str_;
-    std::string gl_renderer_str_;
-
-    // Errors
-    gvs::ErrorAlert error_alert_;
-
-    // Scene
-    gvs::LocalScene scene_;
-};
-
-} // namespace ltb::example
+} // namespace ltb::testing

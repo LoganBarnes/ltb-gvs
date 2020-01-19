@@ -34,9 +34,6 @@ if (NOT LTB_CONFIGURED)
     check_language(CUDA)
     if (CMAKE_CUDA_COMPILER)
         enable_language(CUDA)
-        message(STATUS "CUDA supported")
-    else ()
-        message(STATUS "No CUDA support")
     endif ()
 
     if (MSVC)
@@ -70,6 +67,8 @@ if (NOT LTB_CONFIGURED)
                     )
         endif ()
     endif ()
+
+    add_library(ltb_testing INTERFACE)
 
     include(${CMAKE_CURRENT_LIST_DIR}/CCache.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/ClangTidy.cmake)

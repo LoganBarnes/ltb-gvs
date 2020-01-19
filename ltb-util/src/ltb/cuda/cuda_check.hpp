@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Geometry Visualization Server
+// LTB Utilities
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,34 +22,45 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// project
-#include "ltb/gvs/display/gui/error_alert.hpp"
-#include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
-#include "ltb/gvs/display/local_scene.hpp"
+// external
+#include <cuda_runtime.h>
 
-namespace ltb::example {
+// standard
+#include <exception>
+#include <iostream>
+#include <sstream>
+#include <string>
 
-class MainWindow : public gvs::ImGuiMagnumApplication {
-public:
-    explicit MainWindow(const Arguments& arguments);
-    ~MainWindow() override;
+#define CUDA_CHECK(val) ::ltb::cuda::check((val), #val, __FILE__, __LINE__)
 
-private:
-    void update() override;
-    void render(const gvs::CameraPackage& camera_package) const override;
-    void configure_gui() override;
+namespace ltb {
+namespace cuda {
 
-    void resize(const Magnum::Vector2i& viewport) override;
-
-    // General Info
-    std::string gl_version_str_;
-    std::string gl_renderer_str_;
-
-    // Errors
-    gvs::ErrorAlert error_alert_;
-
-    // Scene
-    gvs::LocalScene scene_;
+struct CudaError : public std::runtime_error {
+    using std::runtime_error::runtime_error;
 };
 
-} // namespace ltb::example
+struct OutOfMemoryCudaError : public CudaError {
+    using CudaError::CudaError;
+};
+
+template <typename T>
+void check(T result, char const* const func, const char* const file, int const line) {
+    if (result != cudaSuccess) {
+        std::stringstream error_str;
+        error_str << "CUDA error at " << file << ":" << line;
+        error_str << " code=" << static_cast<unsigned int>(result) << "(" << cudaGetErrorString(result) << ") ";
+        error_str << "\"" << func << "\"";
+
+        if (static_cast<unsigned int>(result) == 2) {
+            cudaGetLastError(); // reset error state to success
+            throw OutOfMemoryCudaError(error_str.str());
+        } else {
+            cudaDeviceReset();
+            throw CudaError(error_str.str());
+        }
+    }
+}
+
+} // namespace cuda
+} // namespace ltb
