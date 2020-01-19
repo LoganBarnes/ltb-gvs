@@ -23,9 +23,9 @@
 #pragma once
 
 // project
-#include "ltb/gvs/display/local_scene.hpp"
 #include "ltb/gvs/display/gui/error_alert.hpp"
 #include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
+#include "ltb/gvs/display/local_scene.hpp"
 
 namespace ltb::example {
 
@@ -52,7 +52,7 @@ private:
     gvs::LocalScene scene_;
 
     // Shapes
-    gvs::SceneId shapes_root_;
+    gvs::SceneId shapes_root_      = gvs::nil_id();
     gvs::mat4    shapes_transform_ = gvs::identity_mat4;
 
     //    gvs::SceneId intersect_point_;
