@@ -39,7 +39,7 @@ function(add_example _directory _cpp17_enabled)
         set(CPP_STANDARD 11)
     endif ()
 
-    target_compile_options(${target} PRIVATE ${GVS_COMPILE_FLAGS})
+    target_compile_options(${target} PRIVATE ${LTB_COMPILE_FLAGS})
     set_target_properties(
             ${target}
             PROPERTIES
@@ -49,9 +49,9 @@ function(add_example _directory _cpp17_enabled)
             CXX_EXTENSIONS OFF
             POSITION_INDEPENDENT_CODE ON
             # CCache
-            COMPILER_LAUNCHER "${GVS_CCACHE_PROGRAM}"
+            COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
             # Clang-Tidy
-            CXX_CLANG_TIDY "${GVS_CLANG_TIDY}"
+            CXX_CLANG_TIDY "${LTB_CLANG_TIDY}"
     )
 
 endfunction()
