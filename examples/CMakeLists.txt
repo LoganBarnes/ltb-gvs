@@ -23,14 +23,14 @@
 function(add_example _directory _cpp17_enabled)
     set(target run_${_directory}_example)
 
-    file(GLOB_RECURSE GVS_SOURCE_FILES
+    file(GLOB_RECURSE LTB_SOURCE_FILES
             LIST_DIRECTORIES false
             CONFIGURE_DEPENDS
             ${CMAKE_CURRENT_LIST_DIR}/common/*
             ${CMAKE_CURRENT_LIST_DIR}/${_directory}/*
             )
 
-    add_executable(${target} ${GVS_SOURCE_FILES})
+    add_executable(${target} ${LTB_SOURCE_FILES})
     target_link_libraries(${target} PUBLIC ltb_gvs)
 
     if (_cpp17_enabled)
