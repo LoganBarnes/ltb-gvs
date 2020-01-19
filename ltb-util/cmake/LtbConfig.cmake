@@ -29,6 +29,16 @@ if (NOT LTB_CONFIGURED)
     option(LTB_BUILD_TESTS "Build unit tests" OFF)
     option(LTB_USE_DEV_FLAGS "Compile with all the flags" OFF)
 
+    include(CheckLanguage)
+
+    check_language(CUDA)
+    if (CMAKE_CUDA_COMPILER)
+        enable_language(CUDA)
+        message(STATUS "CUDA supported")
+    else ()
+        message(STATUS "No CUDA support")
+    endif ()
+
     if (MSVC)
         add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS) # silly microsoft
     endif ()

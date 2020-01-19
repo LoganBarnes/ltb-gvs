@@ -51,8 +51,8 @@ if (NOT Boost_FOUND)
 
     endfunction()
 
-    message("-- Manually downloading Boost UUID libs (This might take a while)")
-    message("   Consider setting FETCHCONTENT_FULLY_DISCONNECTED=ON after the initial cmake configuration")
+    message(STATUS "Manually downloading Boost UUID libs (This might take a while)")
+    message(STATUS "    Consider setting FETCHCONTENT_FULLY_DISCONNECTED=ON after the initial cmake configuration")
 
     # All the boost libs needed to use the boost uuid "header only" library
     add_boost_library(config)
@@ -119,7 +119,7 @@ if (NOT Boost_FOUND)
                 )
     endif ()
 
-    message("-- Done downloading Boost UUID libs")
+    message(STATUS "Done downloading Boost UUID libs")
 
 else (NOT Boost_FOUND)
 
