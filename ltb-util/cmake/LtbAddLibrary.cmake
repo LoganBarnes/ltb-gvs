@@ -26,6 +26,8 @@ function(ltb_add_library target cxx_standard)
     target_compile_options(${target} PRIVATE ${LTB_COMPILE_FLAGS})
     target_compile_definitions(${target} PRIVATE -DDOCTEST_CONFIG_DISABLE)
 
+    ltb_set_properties(${target} ${cxx_standard})
+
     if (LTB_BUILD_TESTS) # BUILDING WITH TESTS
         # Create an executable to run the tests
         set(test_target test_${target})
@@ -41,10 +43,9 @@ function(ltb_add_library target cxx_standard)
             setup_target_for_coverage(${test_target}_coverage ${test_target} ${test_target}_coverage)
             apply_coverage_dependencies(${test_target})
         endif ()
-    endif ()
 
-    ltb_set_properties(${target} ${cxx_standard})
-    ltb_set_properties(${test_target} ${cxx_standard})
+        ltb_set_properties(${test_target} ${cxx_standard})
+    endif ()
 endfunction()
 
 function(ltb_link_libraries target)
