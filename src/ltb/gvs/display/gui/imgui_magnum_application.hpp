@@ -45,6 +45,17 @@ public:
     explicit ImGuiMagnumApplication(const Arguments& arguments);
     virtual ~ImGuiMagnumApplication();
 
+    // keyboard
+    virtual auto handleKeyPressEvent(KeyEvent & /*event*/) -> void {}
+    virtual auto handleKeyReleaseEvent(KeyEvent & /*event*/) -> void {}
+    virtual auto handleTextInputEvent(TextInputEvent & /*event*/) -> void {}
+
+    // mouse
+    virtual auto handleMousePressEvent(MouseEvent & /*event*/) -> void {}
+    virtual auto handleMouseReleaseEvent(MouseEvent & /*event*/) -> void {}
+    virtual auto handleMouseMoveEvent(MouseMoveEvent & /*event*/) -> void {}
+    virtual auto handleMouseScrollEvent(MouseScrollEvent & /*event*/) -> void {}
+
 private:
     virtual auto update() -> void                                          = 0;
     virtual auto render(CameraPackage const& camera_package) const -> void = 0;

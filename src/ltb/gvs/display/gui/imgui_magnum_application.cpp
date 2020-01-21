@@ -166,6 +166,12 @@ auto ImGuiMagnumApplication::keyPressEvent(KeyEvent& event) -> void {
     if (imgui_.handleKeyPressEvent(event)) {
         return;
     }
+
+    handleKeyPressEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 }
 
@@ -185,6 +191,12 @@ auto ImGuiMagnumApplication::keyReleaseEvent(KeyEvent& event) -> void {
     if (imgui_.handleKeyReleaseEvent(event)) {
         return;
     }
+
+    handleKeyReleaseEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 
     switch (event.key()) {
@@ -204,6 +216,12 @@ auto ImGuiMagnumApplication::textInputEvent(TextInputEvent& event) -> void {
     if (imgui_.handleTextInputEvent(event)) {
         return;
     }
+
+    handleTextInputEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 }
 
@@ -212,6 +230,12 @@ auto ImGuiMagnumApplication::mousePressEvent(MouseEvent& event) -> void {
     if (imgui_.handleMousePressEvent(event)) {
         return;
     }
+
+    handleMousePressEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 
     previous_mouse_data_.zoom_transform        = camera_package_.zoom_object.transformation();
@@ -228,6 +252,12 @@ auto ImGuiMagnumApplication::mouseReleaseEvent(MouseEvent& event) -> void {
     if (imgui_.handleMouseReleaseEvent(event)) {
         return;
     }
+
+    handleMouseReleaseEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 }
 
@@ -236,6 +266,12 @@ auto ImGuiMagnumApplication::mouseMoveEvent(MouseMoveEvent& event) -> void {
     if (imgui_.handleMouseMoveEvent(event)) {
         return;
     }
+
+    handleMouseMoveEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 
     // make these editable settings
@@ -301,6 +337,12 @@ auto ImGuiMagnumApplication::mouseScrollEvent(MouseScrollEvent& event) -> void {
     if (imgui_.handleMouseScrollEvent(event)) {
         return;
     }
+
+    handleMouseScrollEvent(event);
+    if (event.isAccepted()) {
+        return;
+    }
+
     event.setAccepted(true);
 
     if (event.offset().y() == 0.f) {
