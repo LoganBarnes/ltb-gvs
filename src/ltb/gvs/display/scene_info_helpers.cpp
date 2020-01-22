@@ -48,29 +48,33 @@ auto replace_if_present(SceneItemInfo* info, SparseSceneItemInfo&& new_info) -> 
                 geometry_info.positions = std::move(*new_geometry_info.positions);
             }
 
-            auto positions_size = geometry_info.positions.size();
+            auto positions_size = geometry_info.positions.size() / 3ul;
 
-            auto maybe_replace
-                = [positions_size](auto& data, auto&& new_data, std::string const& name) -> util::Result<void> {
+            auto maybe_replace = [positions_size](auto&              data,
+                                                  auto&&             new_data,
+                                                  std::size_t        element_size,
+                                                  std::string const& name) -> util::Result<void> {
                 if (new_data) {
                     data = std::move(*(new_data));
                 }
 
-                if (!data.empty() && data.size() != positions_size) {
+                if (!data.empty() && data.size() / element_size != positions_size) {
                     return tl::make_unexpected(
                         MAKE_ERROR(name + " is non-empty and positions.size() != " + name + ".size()"));
                 }
                 return util::success();
             };
 
-            auto result = maybe_replace(geometry_info.normals, std::move(new_geometry_info.normals), "normals")
+            auto result = maybe_replace(geometry_info.normals, std::move(new_geometry_info.normals), 3ul, "normals")
                               .and_then(maybe_replace,
                                         geometry_info.texture_coordinates,
                                         std::move(new_geometry_info.texture_coordinates),
+                                        2ul,
                                         "texture_coordinates")
                               .and_then(maybe_replace,
                                         geometry_info.vertex_colors,
                                         std::move(new_geometry_info.vertex_colors),
+                                        3ul,
                                         "vertex_colors");
 
             if (!result) {
