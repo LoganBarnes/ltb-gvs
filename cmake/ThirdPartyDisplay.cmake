@@ -80,6 +80,9 @@ if (NOT corrade_dl_POPULATED)
     endif ()
 
     add_subdirectory(${corrade_dl_SOURCE_DIR} ${corrade_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+    # Tell cmake where to find this library
+    set(Corrade_DIR ${corrade_dl_SOURCE_DIR}/modules)
 endif ()
 
 ### Magnum ###
@@ -99,6 +102,9 @@ if (NOT magnum_dl_POPULATED)
     endif ()
 
     add_subdirectory(${magnum_dl_SOURCE_DIR} ${magnum_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+    # Tell cmake where to find this library
+    set(Magnum_DIR ${magnum_dl_SOURCE_DIR}/modules)
 endif ()
 
 ### Magnum Integration ###
@@ -147,4 +153,3 @@ target_link_libraries(ltb_gvs_display_deps INTERFACE
         Magnum::${LTB_GVS_TEST_GL_CONTEXT}
         Magnum::${LTB_GVS_WINDOWLESS_APP}
         )
-
