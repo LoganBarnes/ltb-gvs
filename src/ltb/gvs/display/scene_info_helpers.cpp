@@ -60,7 +60,7 @@ auto replace_if_present(SceneItemInfo* info, SparseSceneItemInfo&& new_info) -> 
 
                 if (!data.empty() && data.size() / element_size != positions_size) {
                     return tl::make_unexpected(
-                        MAKE_ERROR(name + " is non-empty and positions.size() != " + name + ".size()"));
+                        LTB_MAKE_ERROR(name + " is non-empty and positions.size() != " + name + ".size()"));
                 }
                 return util::success();
             };

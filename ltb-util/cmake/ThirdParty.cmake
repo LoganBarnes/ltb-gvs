@@ -22,21 +22,18 @@
 ##########################################################################################
 include(FetchContent)
 
-FetchContent_Declare(
-        expected_dl
+FetchContent_Declare(expected_dl
         GIT_REPOSITORY https://github.com/TartanLlama/expected.git
         GIT_TAG v1.0.0
-)
-FetchContent_Declare(
-        range_v3_dl
+        )
+FetchContent_Declare(range_v3_dl
         GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
         GIT_TAG 0.9.1
-)
-FetchContent_Declare(
-        doctest_dl
+        )
+FetchContent_Declare(doctest_dl
         GIT_REPOSITORY https://github.com/onqtam/doctest.git
         GIT_TAG 2.3.6
-)
+        )
 
 ### Threads ###
 set(THREADS_PREFER_PTHREAD_FLAG ON)

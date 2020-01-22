@@ -22,11 +22,10 @@
 ##########################################################################################
 include(FetchContent)
 
-FetchContent_Declare(
-        mapbox_dl
+FetchContent_Declare(mapbox_dl
         GIT_REPOSITORY https://github.com/mapbox/variant.git
         GIT_TAG v1.1.6
-)
+        )
 
 ### Boost UUID ###
 include(cmake/BoostUuidLibs.cmake)

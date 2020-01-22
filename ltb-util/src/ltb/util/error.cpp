@@ -125,15 +125,15 @@ namespace {
 } // namespace
 
 TEST_CASE("[util] check error helpers") {
-    CHECK(MAKE_ERROR("Error message").error_message() == "Error message");
-    CHECK(MAKE_ERROR("blarg") == MAKE_ERROR("blarg"));
+    CHECK(LTB_MAKE_ERROR("Error message").error_message() == "Error message");
+    CHECK(LTB_MAKE_ERROR("blarg") == LTB_MAKE_ERROR("blarg"));
 
 #ifndef _MSC_VER
     INFO("project_root():" + ltb::paths::project_root());
     INFO("__FILE__:      " + std::string(__FILE__));
 #endif
 
-    auto error             = MAKE_ERROR("Error message");
+    auto error             = LTB_MAKE_ERROR("Error message");
     auto expected_message1 = build_expected_message("..", __LINE__ - 1, "Error message");
     auto expected_message2 = build_expected_message("", __LINE__ - 2, "Error message");
 
@@ -142,15 +142,15 @@ TEST_CASE("[util] check error helpers") {
 }
 
 TEST_CASE("[util] check warning helpers") {
-    CHECK(MAKE_WARNING("Error message").error_message() == "Error message");
-    CHECK(MAKE_WARNING("blarg") == MAKE_WARNING("blarg"));
+    CHECK(LTB_MAKE_WARNING("Error message").error_message() == "Error message");
+    CHECK(LTB_MAKE_WARNING("blarg") == LTB_MAKE_WARNING("blarg"));
 
 #ifndef _MSC_VER
     INFO("project_root():" + ltb::paths::project_root());
     INFO("__FILE__:      " + std::string(__FILE__));
 #endif
 
-    auto warning           = MAKE_WARNING("Error message");
+    auto warning           = LTB_MAKE_WARNING("Error message");
     auto expected_message1 = build_expected_message("..", __LINE__ - 1, "Error message");
     auto expected_message2 = build_expected_message("", __LINE__ - 2, "Error message");
 

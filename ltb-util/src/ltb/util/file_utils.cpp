@@ -31,7 +31,7 @@ auto read_file_to_string(const std::string& filename) -> util::Result<std::strin
     std::ifstream input_stream(filename);
 
     if (!input_stream.is_open()) {
-        return tl::make_unexpected(MAKE_ERROR("Failed to open: '" + filename + "'"));
+        return tl::make_unexpected(LTB_MAKE_ERROR("Failed to open: '" + filename + "'"));
     }
 
     input_stream.seekg(0, std::ios::end);
