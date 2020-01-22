@@ -32,14 +32,15 @@ namespace ltb::gvs {
 using namespace Magnum;
 using namespace Math::Literals;
 
-constexpr float            camera_near_dist = 1.f;
-constexpr float            camera_far_dist  = 1000.f;
-constexpr Math::Rad<Float> camera_fovy      = 35.0_degf;
+constexpr float camera_near_dist = 1.f;
+constexpr float camera_far_dist  = 1000.f;
+constexpr float camera_fovy      = 35.0;
 
 void CameraPackage::set_camera(Magnum::SceneGraph::Camera3D* cam, const Vector2i& viewport) {
     camera = cam;
     camera->setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
-        .setProjectionMatrix(Matrix4::perspectiveProjection(camera_fovy, 1.0f, camera_near_dist, camera_far_dist));
+        .setProjectionMatrix(
+            Matrix4::perspectiveProjection(Math::Deg<Float>(camera_fovy), 1.0f, camera_near_dist, camera_far_dist));
     //        .setProjectionMatrix(Matrix4::orthographicProjection({100.f, 100.f}, camera_near_dist, camera_far_dist));
 
     update_viewport(viewport);
