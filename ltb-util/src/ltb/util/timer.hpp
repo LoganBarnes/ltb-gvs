@@ -24,16 +24,18 @@
 
 // standard
 #include <chrono>
+#include <iostream>
 #include <string>
 
 namespace ltb::util {
 
 class ScopedTimer {
 public:
-    explicit ScopedTimer(std::string name);
+    explicit ScopedTimer(std::string name, std::ostream& os = std::cout);
     ~ScopedTimer();
 
 private:
+    std::ostream&                                      ostream_;
     std::string                                        name_;
     std::chrono::time_point<std::chrono::steady_clock> start_time_;
 };

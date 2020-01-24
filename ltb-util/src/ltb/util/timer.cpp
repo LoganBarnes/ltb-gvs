@@ -27,15 +27,16 @@
 
 namespace ltb::util {
 
-ScopedTimer::ScopedTimer(std::string name) : name_(std::move(name)), start_time_(std::chrono::steady_clock::now()) {
-    std::cout << name_ << "..." << std::endl;
+ScopedTimer::ScopedTimer(std::string name, std::ostream& os)
+    : ostream_(os), name_(std::move(name)), start_time_(std::chrono::steady_clock::now()) {
+    ostream_ << name_ << "..." << std::endl;
 }
 
 ScopedTimer::~ScopedTimer() {
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration<double, std::milli>(end_time - start_time_).count();
 
-    std::cout << name_ << (name_.empty() ? "" : ": ") << std::to_string(duration) << "ms" << std::endl;
+    ostream_ << name_ << (name_.empty() ? "" : ": ") << std::to_string(duration) << "ms" << std::endl;
 }
 
 } // namespace ltb::util
