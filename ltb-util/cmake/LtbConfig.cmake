@@ -37,6 +37,7 @@ if (NOT LTB_CONFIGURED)
         check_language(CUDA)
         if (CMAKE_CUDA_COMPILER)
             enable_language(CUDA)
+            set(LTB_CUDA_ENABLED ON)
         endif ()
     endif ()
 

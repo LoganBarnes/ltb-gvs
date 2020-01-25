@@ -37,4 +37,6 @@ inline auto project_root() -> std::string {
     return "@NATIVE_PROJECT_SOURCE_DIR@" + slash();
 }
 
+#cmakedefine LTB_CUDA_ENABLED
+
 } // namespace ltb::paths
