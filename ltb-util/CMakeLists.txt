@@ -59,11 +59,3 @@ ltb_include_directories(ltb_util
         "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
         )
 
-if (CMAKE_CUDA_COMPILER)
-    file(GLOB_RECURSE LTB_SOURCE_FILES
-            LIST_DIRECTORIES false
-            CONFIGURE_DEPENDS
-            ${CMAKE_CURRENT_LIST_DIR}/src/ltb/cuda/*
-            )
-    target_sources(ltb_util PUBLIC ${LTB_SOURCE_FILES})
-endif ()
