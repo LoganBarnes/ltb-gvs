@@ -36,14 +36,14 @@
  *         ... do stuff ...
  *
  *         if (bad_thing) {
- *             return MAKE_ERROR("Bad thing happened!");
+ *             return LTB_MAKE_ERROR("Bad thing happened!");
  *         }
  *         return ltb::util::Error::no_errors();
  *     }
  * ```
  */
-#define MAKE_ERROR(msg) ::ltb::util::Error({__FILE__, __LINE__}, ::ltb::util::Error::Severity::Error, msg)
-#define MAKE_WARNING(msg) ::ltb::util::Error({__FILE__, __LINE__}, ::ltb::util::Error::Severity::Warning, msg)
+#define LTB_MAKE_ERROR(msg) ::ltb::util::Error({__FILE__, __LINE__}, ::ltb::util::Error::Severity::Error, msg)
+#define LTB_MAKE_WARNING(msg) ::ltb::util::Error({__FILE__, __LINE__}, ::ltb::util::Error::Severity::Warning, msg)
 
 namespace ltb::util {
 

@@ -20,42 +20,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-cmake_minimum_required(VERSION 3.15)
-project(LtbUtilities LANGUAGES CXX)
-
-include(cmake/ThirdParty.cmake)
-include(cmake/LtbConfig.cmake) # <-- Additional project options are in here.
-
-############
-### Util ###
-############
-file(GLOB_RECURSE LTB_SOURCE_FILES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_LIST_DIR}/src/ltb/util/*
-        )
-
-### Optional CUDA ###
-if (CMAKE_CUDA_COMPILER)
-    file(GLOB_RECURSE LTB_CUDA_SOURCE_FILES
-            LIST_DIRECTORIES false
-            CONFIGURE_DEPENDS
-            ${CMAKE_CURRENT_LIST_DIR}/src/ltb/cuda/*
-            )
-    list(APPEND LTB_SOURCE_FILES ${LTB_CUDA_SOURCE_FILES})
-endif ()
-
-ltb_add_library(ltb_util 17 ${LTB_SOURCE_FILES})
-ltb_link_libraries(ltb_util
-        PUBLIC
-        expected
-        range-v3
-        Threads::Threads
-        doctest
-        )
-ltb_include_directories(ltb_util
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
-        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
-        )
-
+function(ltb_set_properties target cxx_standard)
+    set_target_properties(
+            ${target}
+            PROPERTIES
+            # C++ flags
+            CXX_STANDARD ${cxx_standard}
+            CXX_STANDARD_REQUIRED ON
+            CXX_EXTENSIONS OFF
+            POSITION_INDEPENDENT_CODE ON
+            # CUDA flags
+            CUDA_STANDARD 14
+            CUDA_STANDARD_REQUIRED ON
+            CUDA_EXTENSIONS OFF
+            CUDA_SEPARABLE_COMPILATION ON
+            # CCache
+            COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
+            # Clang-Tidy
+            CXX_CLANG_TIDY "${LTB_CLANG_TIDY}"
+    )
+endfunction()

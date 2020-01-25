@@ -29,11 +29,16 @@ if (NOT LTB_CONFIGURED)
     option(LTB_BUILD_TESTS "Build unit tests" OFF)
     option(LTB_USE_DEV_FLAGS "Compile with all the flags" OFF)
 
-    include(CheckLanguage)
+    # Disabling CUDA support for lower versions because there is a cmake bug
+    # which causes an undefined reference to '__cudaUnregisterFatBinary'.
+    if (${CMAKE_VERSION} VERSION_GREATER "3.16.2")
+        include(CheckLanguage)
 
-    check_language(CUDA)
-    if (CMAKE_CUDA_COMPILER)
-        enable_language(CUDA)
+        check_language(CUDA)
+        if (CMAKE_CUDA_COMPILER)
+            enable_language(CUDA)
+            set(LTB_CUDA_ENABLED ON)
+        endif ()
     endif ()
 
     if (MSVC)
@@ -72,6 +77,7 @@ if (NOT LTB_CONFIGURED)
 
     include(${CMAKE_CURRENT_LIST_DIR}/CCache.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/ClangTidy.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/LtbSetProperties.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/LtbAddLibrary.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/LtbAddExecutable.cmake)
 
@@ -97,6 +103,7 @@ if (NOT LTB_CONFIGURED)
     endif ()
 
     configure_file(${CMAKE_CURRENT_LIST_DIR}/../src/ltb_paths.hpp.in ${CMAKE_BINARY_DIR}/generated/ltb/paths.hpp)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/../src/ltb_config.hpp.in ${CMAKE_BINARY_DIR}/generated/ltb/config.hpp)
 
     set(LTB_CONFIGURED TRUE)
 endif (NOT LTB_CONFIGURED)

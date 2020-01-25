@@ -26,6 +26,8 @@ function(ltb_add_executable target cxx_standard main_file)
     target_compile_options(${target} PUBLIC ${LTB_COMPILE_FLAGS})
     target_compile_definitions(${target} PRIVATE -DDOCTEST_CONFIG_DISABLE)
 
+    ltb_set_properties(${target} ${cxx_standard})
+
     # Add the executable with custom compile flags and disable testing
     set(exec_target run_${target})
     add_executable(${exec_target} ${main_file})
@@ -33,6 +35,8 @@ function(ltb_add_executable target cxx_standard main_file)
     target_link_libraries(${exec_target} PRIVATE ${target})
     target_compile_options(${exec_target} PRIVATE ${LTB_COMPILE_FLAGS})
     target_compile_definitions(${exec_target} PRIVATE -DDOCTEST_CONFIG_DISABLE)
+
+    ltb_set_properties(${exec_target} ${cxx_standard})
 
     if (LTB_BUILD_TESTS)
         # Create an executable to run the tests
@@ -49,26 +53,7 @@ function(ltb_add_executable target cxx_standard main_file)
             setup_target_for_coverage(${test_target}_coverage ${test_target} ${test_target}_coverage)
             apply_coverage_dependencies(${test_target})
         endif ()
-    endif (LTB_BUILD_TESTS)
 
-    set_target_properties(
-            ${target}
-            ${exec_target}
-            ${test_target}
-            PROPERTIES
-            # C++ flags
-            CXX_STANDARD ${cxx_standard}
-            CXX_STANDARD_REQUIRED ON
-            CXX_EXTENSIONS OFF
-            POSITION_INDEPENDENT_CODE ON
-            # CUDA flags
-            CUDA_STANDARD 14
-            CUDA_STANDARD_REQUIRED ON
-            CUDA_EXTENSIONS OFF
-            CUDA_SEPARABLE_COMPILATION ON
-            # CCache
-            COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
-            # Clang-Tidy
-            CXX_CLANG_TIDY "${LTB_CLANG_TIDY}"
-    )
+        ltb_set_properties(${test_target} ${cxx_standard})
+    endif (LTB_BUILD_TESTS)
 endfunction()
