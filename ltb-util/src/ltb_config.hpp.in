@@ -25,16 +25,4 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <string>
-
-namespace ltb::paths {
-
-inline auto slash() -> std::string {
-    return "@SLASH@";
-}
-
-inline auto project_root() -> std::string {
-    return "@NATIVE_PROJECT_SOURCE_DIR@" + slash();
-}
-
-} // namespace ltb::paths
+#cmakedefine LTB_CUDA_ENABLED

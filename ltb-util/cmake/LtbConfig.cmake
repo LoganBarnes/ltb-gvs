@@ -103,6 +103,7 @@ if (NOT LTB_CONFIGURED)
     endif ()
 
     configure_file(${CMAKE_CURRENT_LIST_DIR}/../src/ltb_paths.hpp.in ${CMAKE_BINARY_DIR}/generated/ltb/paths.hpp)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/../src/ltb_config.hpp.in ${CMAKE_BINARY_DIR}/generated/ltb/config.hpp)
 
     set(LTB_CONFIGURED TRUE)
 endif (NOT LTB_CONFIGURED)
