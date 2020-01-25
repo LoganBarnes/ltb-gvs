@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-function(ltb_add_library target)
+function(ltb_add_library target cxx_standard)
     # Add the library with custom compile flags and link the testing library
     add_library(${target} ${ARGN})
     target_compile_options(${target} PRIVATE ${LTB_COMPILE_FLAGS})
@@ -31,7 +31,7 @@ function(ltb_add_library target)
         set(test_target test_${target})
         add_executable(${test_target} ${ARGN})
 
-        target_link_libraries(${test_target} PRIVATE doctest_with_main)
+        target_link_libraries(${test_target} PRIVATE doctest_with_main ltb_testing)
         target_compile_options(${test_target} PRIVATE ${LTB_COMPILE_FLAGS})
 
         add_test(NAME ${target}_tests COMMAND ${test_target})
@@ -48,14 +48,15 @@ function(ltb_add_library target)
             ${test_target}
             PROPERTIES
             # C++ flags
-            CXX_STANDARD 17
+            CXX_STANDARD ${cxx_standard}
             CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF
             POSITION_INDEPENDENT_CODE ON
             # CUDA flags
-            CUDA_STANDARD 17
+            CUDA_STANDARD 14
             CUDA_STANDARD_REQUIRED ON
             CUDA_EXTENSIONS OFF
+            CUDA_SEPARABLE_COMPILATION ON
             # CCache
             COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
             # Clang-Tidy

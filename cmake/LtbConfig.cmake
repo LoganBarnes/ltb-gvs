@@ -29,6 +29,13 @@ if (NOT LTB_CONFIGURED)
     option(LTB_BUILD_TESTS "Build unit tests" OFF)
     option(LTB_USE_DEV_FLAGS "Compile with all the flags" OFF)
 
+    include(CheckLanguage)
+
+    check_language(CUDA)
+    if (CMAKE_CUDA_COMPILER)
+        enable_language(CUDA)
+    endif ()
+
     if (MSVC)
         add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS) # silly microsoft
     endif ()
@@ -60,6 +67,8 @@ if (NOT LTB_CONFIGURED)
                     )
         endif ()
     endif ()
+
+    add_library(ltb_testing INTERFACE)
 
     include(${CMAKE_CURRENT_LIST_DIR}/CCache.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/ClangTidy.cmake)

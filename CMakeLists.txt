@@ -34,7 +34,7 @@ file(GLOB_RECURSE LTB_SOURCE_FILES
         CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_LIST_DIR}/src/ltb/util/*
         )
-ltb_add_library(ltb_util ${LTB_SOURCE_FILES})
+ltb_add_library(ltb_util 17 ${LTB_SOURCE_FILES})
 ltb_link_libraries(ltb_util
         PUBLIC
         expected
@@ -47,3 +47,12 @@ ltb_include_directories(ltb_util
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
         "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
         )
+
+if (CMAKE_CUDA_COMPILER)
+    file(GLOB_RECURSE LTB_SOURCE_FILES
+            LIST_DIRECTORIES false
+            CONFIGURE_DEPENDS
+            ${CMAKE_CURRENT_LIST_DIR}/src/ltb/cuda/*
+            )
+    target_sources(ltb_util PUBLIC ${LTB_SOURCE_FILES})
+endif ()
