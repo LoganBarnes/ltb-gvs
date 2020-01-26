@@ -22,7 +22,9 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#ifndef __CUDACC
 #define GOOGLE_COMPARISON
+#endif
 
 #ifdef GOOGLE_COMPARISON
 #include <google/AlmostEquals.h>
@@ -34,12 +36,13 @@
 // standard
 #include <type_traits>
 
-namespace ltb::util {
+namespace ltb {
+namespace util {
 
 #ifdef GOOGLE_COMPARISON
 
 template <typename T>
-auto constexpr almost_equal(T a, T b) -> typename std::enable_if_t<std::is_floating_point_v<T>, bool> {
+auto constexpr almost_equal(T a, T b) -> typename std::enable_if_t<std::is_floating_point<T>::value, bool> {
     return AlmostEquals(a, b);
 }
 
@@ -55,4 +58,5 @@ auto constexpr almost_equal(T a, T b, T scale = 1.0, T epsilon = 10 * std::numer
 
 #endif
 
-} // namespace ltb::util
+} // namespace util
+} // namespace ltb
