@@ -28,10 +28,11 @@ if (NOT LTB_CONFIGURED)
 
     option(LTB_BUILD_TESTS "Build unit tests" OFF)
     option(LTB_USE_DEV_FLAGS "Compile with all the flags" OFF)
+    option(LTB_USE_CUDA "Enable CUDA features if available" ON)
 
     # Disabling CUDA support for lower versions because there is a cmake bug
     # which causes an undefined reference to '__cudaUnregisterFatBinary'.
-    if (${CMAKE_VERSION} VERSION_GREATER "3.16.2")
+    if (LTB_USE_CUDA AND ${CMAKE_VERSION} VERSION_GREATER "3.16.2")
         include(CheckLanguage)
 
         check_language(CUDA)
