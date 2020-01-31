@@ -24,7 +24,11 @@
 
 // external
 #include <Magnum/Platform/GLContext.h>
+#if defined(_MSC_VER)
+#include <Magnum/Platform/WindowlessWglApplication.h>
+#else
 #include <Magnum/Platform/WindowlessEglApplication.h>
+#endif
 
 // standard
 #include <memory>

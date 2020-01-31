@@ -28,6 +28,9 @@
 // external
 #include <tl/expected.hpp>
 
+// standard
+#include <stdexcept>
+
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 #define CHECK_RESULT __attribute__((warn_unused))
 #elif defined(_MSC_VER) && (_MSC_VER >= 1700)
