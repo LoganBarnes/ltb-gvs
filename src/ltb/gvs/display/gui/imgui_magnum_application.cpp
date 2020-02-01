@@ -276,7 +276,7 @@ auto ImGuiMagnumApplication::mouseMoveEvent(MouseMoveEvent& event) -> void {
 
     // make these editable settings
     auto orbiting = (event.buttons() & MouseMoveEvent::Button::Right);
-    auto panning  = (event.buttons() & MouseMoveEvent::Button::Middle);
+    auto panning  = (event.buttons() & MouseMoveEvent::Button::Left);
 
     if (!(orbiting || panning)) {
         return;
