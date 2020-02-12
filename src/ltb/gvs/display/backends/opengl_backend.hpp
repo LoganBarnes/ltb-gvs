@@ -25,7 +25,7 @@
 // gvs
 #include "display_backend.hpp"
 #include "drawables.hpp"
-#include "general_shader_3d.hpp"
+#include "ltb/gvs/display/shaders/general_shader.hpp"
 
 // external
 #include <Corrade/Containers/Array.h>
@@ -86,11 +86,11 @@ public:
                                    Object3D*                            obj,
                                    Magnum::SceneGraph::DrawableGroup3D* drawables,
                                    unsigned                             id_for_intersect,
-                                   GeneralShader3d&                     shader);
+                                   GeneralShader&                       shader);
     };
 
 private:
-    GeneralShader3d shader_;
+    GeneralShader shader_;
 
     using ObjectList = std::list<ObjectMeshPackage>;
 
@@ -115,7 +115,7 @@ private:
     Magnum::GL::Renderbuffer        id_rbo_;
     Magnum::GL::Renderbuffer        depth_rbo_;
 
-    auto add_package(SceneId id, Object3D* obj, Magnum::SceneGraph::DrawableGroup3D* drawables, GeneralShader3d& shader)
+    auto add_package(SceneId id, Object3D* obj, Magnum::SceneGraph::DrawableGroup3D* drawables, GeneralShader& shader)
         -> void;
 
     auto remove_package(SceneId const& item_id) -> void;

@@ -23,8 +23,8 @@
 #pragma once
 
 // project
-#include "general_shader_3d.hpp"
 #include "ltb/gvs/core/types.hpp"
+#include "ltb/gvs/display/shaders/general_shader.hpp"
 
 // external
 #include <Magnum/SceneGraph/Drawable.h>
@@ -37,7 +37,7 @@ public:
                             Magnum::SceneGraph::DrawableGroup3D*                                    group,
                             Magnum::GL::Mesh&                                                       mesh,
                             unsigned                                                                intersect_id,
-                            GeneralShader3d&                                                        shader);
+                            GeneralShader&                                                          shader);
 
     ~OpaqueDrawable() override = default;
 
@@ -54,7 +54,7 @@ private:
     Shading        shading_       = default_shading;
     unsigned       intersect_id_  = 0u;
 
-    GeneralShader3d& shader_;
+    GeneralShader& shader_;
 };
 
 } // namespace ltb::gvs

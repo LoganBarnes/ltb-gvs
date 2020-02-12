@@ -29,9 +29,10 @@
 #include <Magnum/GL/AbstractShaderProgram.h>
 #include <Magnum/Math/Color.h>
 
-namespace ltb::gvs {
+namespace ltb {
+namespace gvs {
 
-class GeneralShader3d : public Magnum::GL::AbstractShaderProgram {
+class PointsShader : public Magnum::GL::AbstractShaderProgram {
 public:
     typedef Magnum::GL::Attribute<0, Magnum::Vector3> Position;
     typedef Magnum::GL::Attribute<1, Magnum::Vector3> Normal;
@@ -40,17 +41,17 @@ public:
 
     enum : Magnum::UnsignedInt { ColorOutput = 0, IdOutput = 1 };
 
-    explicit GeneralShader3d();
+    explicit PointsShader();
 
-    auto set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> GeneralShader3d&;
-    auto set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals) -> GeneralShader3d&;
-    auto set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local) -> GeneralShader3d&;
+    auto set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> PointsShader&;
+    auto set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals) -> PointsShader&;
+    auto set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local) -> PointsShader&;
 
-    auto set_coloring(Coloring const& coloring) -> GeneralShader3d&;
-    auto set_uniform_color(Magnum::Color3 const& color) -> GeneralShader3d&;
+    auto set_coloring(Coloring const& coloring) -> PointsShader&;
+    auto set_uniform_color(Magnum::Color3 const& color) -> PointsShader&;
 
-    auto set_shading(Shading const& shading) -> GeneralShader3d&;
-    auto set_id(unsigned const& id) -> GeneralShader3d&;
+    auto set_shading(Shading const& shading) -> PointsShader&;
+    auto set_id(unsigned const& id) -> PointsShader&;
 
 private:
     int projection_from_local_uniform_location_    = -1;
@@ -68,4 +69,5 @@ private:
     int id_uniform_location_ = -1;
 };
 
-} // namespace ltb::gvs
+} // namespace gvs
+} // namespace ltb

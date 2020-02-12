@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "general_shader_3d.hpp"
+#include "general_shader.hpp"
 
 // external
 #include <Corrade/Containers/Reference.h>
@@ -33,7 +33,7 @@
 
 namespace ltb::gvs {
 
-GeneralShader3d::GeneralShader3d() {
+GeneralShader::GeneralShader() {
     MAGNUM_ASSERT_GL_VERSION_SUPPORTED(Magnum::GL::Version::GL450);
 
     const Corrade::Utility::Resource rs{"gvs-resource-data"};
@@ -68,39 +68,38 @@ GeneralShader3d::GeneralShader3d() {
     id_uniform_location_ = uniformLocation("id");
 }
 
-auto GeneralShader3d::set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> GeneralShader3d& {
+auto GeneralShader::set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> GeneralShader& {
     setUniform(world_from_local_uniform_location_, world_from_local);
     return *this;
 }
 
-auto GeneralShader3d::set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals)
-    -> GeneralShader3d& {
+auto GeneralShader::set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals)
+    -> GeneralShader& {
     setUniform(world_from_local_normals_uniform_location_, world_from_local_normals);
     return *this;
 }
 
-auto GeneralShader3d::set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local)
-    -> GeneralShader3d& {
+auto GeneralShader::set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local) -> GeneralShader& {
     setUniform(projection_from_local_uniform_location_, projection_from_local);
     return *this;
 }
 
-auto GeneralShader3d::set_coloring(Coloring const& coloring) -> GeneralShader3d& {
+auto GeneralShader::set_coloring(Coloring const& coloring) -> GeneralShader& {
     setUniform(coloring_uniform_location_, std::underlying_type_t<Coloring>(coloring));
     return *this;
 }
 
-auto GeneralShader3d::set_uniform_color(Magnum::Color3 const& color) -> GeneralShader3d& {
+auto GeneralShader::set_uniform_color(Magnum::Color3 const& color) -> GeneralShader& {
     setUniform(uniform_color_uniform_location_, color);
     return *this;
 }
 
-auto GeneralShader3d::set_shading(Shading const& shading) -> GeneralShader3d& {
+auto GeneralShader::set_shading(Shading const& shading) -> GeneralShader& {
     setUniform(shading_uniform_location_, std::underlying_type_t<Shading>(shading));
     return *this;
 }
 
-auto GeneralShader3d::set_id(unsigned const& id) -> GeneralShader3d& {
+auto GeneralShader::set_id(unsigned const& id) -> GeneralShader& {
     setUniform(id_uniform_location_, id);
     return *this;
 }

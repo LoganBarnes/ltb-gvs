@@ -42,7 +42,7 @@ OpaqueDrawable::OpaqueDrawable(SceneGraph::Object<SceneGraph::MatrixTransformati
                                SceneGraph::DrawableGroup3D*                            group,
                                GL::Mesh&                                               mesh,
                                unsigned                                                intersect_id,
-                               GeneralShader3d&                                        shader)
+                               GeneralShader&                                          shader)
     : SceneGraph::Drawable3D{object, group},
       object_(object),
       mesh_(mesh),
