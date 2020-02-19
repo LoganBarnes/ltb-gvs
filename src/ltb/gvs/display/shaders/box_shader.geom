@@ -80,11 +80,11 @@ void main()
     vec3  color  = vec3(0.8);
 
     add_face(
-        center + vec3(-1, -1, +1) * radius,
-        center + vec3(+1, -1, +1) * radius,
-        center + vec3(-1, +1, +1) * radius,
-        center + vec3(+1, +1, +1) * radius,
-        vec3(0, 0, 1),
+        center + vec3(-1, -1, 1.f) * radius,
+        center + vec3(+1, -1, 1.f) * radius,
+        center + vec3(-1, +1, 1.f) * radius,
+        center + vec3(+1, +1, 1.f) * radius,
+        vec3(0.f, 0.f, 1.f),
         color
     );
 }
