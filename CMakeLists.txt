@@ -35,6 +35,13 @@ include(cmake/ThirdParty.cmake)
 
 if (LTB_ENABLE_GVS_DISPLAY)
     include(cmake/ThirdPartyDisplay.cmake)
+
+    file(GLOB_RECURSE LTB_SOURCE_FILES
+            LIST_DIRECTORIES false
+            CONFIGURE_DEPENDS
+            ${CMAKE_CURRENT_LIST_DIR}/external/*
+            )
+    target_sources(ltb_gvs_display_deps INTERFACE ${LTB_SOURCE_FILES})
 endif ()
 
 ###########
