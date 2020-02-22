@@ -34,14 +34,22 @@ include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in 
 include(cmake/ThirdParty.cmake)
 
 if (LTB_ENABLE_GVS_DISPLAY)
-    include(cmake/ThirdPartyDisplay.cmake)
-
+    # All GUI thirdparty libraries put into a single target
     file(GLOB_RECURSE LTB_SOURCE_FILES
             LIST_DIRECTORIES false
             CONFIGURE_DEPENDS
             ${CMAKE_CURRENT_LIST_DIR}/external/*
             )
-    target_sources(ltb_gvs_display_deps INTERFACE ${LTB_SOURCE_FILES})
+
+    add_library(ltb_gvs_display_deps ${LTB_SOURCE_FILES})
+
+    # Set the include directory as system headers to avoid compiler warnings
+    target_include_directories(ltb_gvs_display_deps
+            SYSTEM PUBLIC
+            ${CMAKE_CURRENT_LIST_DIR}/external
+            )
+
+    include(cmake/ThirdPartyDisplay.cmake)
 endif ()
 
 ###########

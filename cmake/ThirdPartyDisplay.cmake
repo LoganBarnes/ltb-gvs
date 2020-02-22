@@ -34,7 +34,7 @@ FetchContent_Declare(corrade_dl
         )
 FetchContent_Declare(magnum_dl
         GIT_REPOSITORY https://github.com/mosra/magnum.git
-        GIT_TAG v2019.10
+        GIT_TAG 65743b564720fab0b00615df5067af9a2c525a45
         )
 FetchContent_Declare(magnum_integration_dl
         GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
@@ -121,9 +121,6 @@ if (NOT magnum_integration_dl_POPULATED)
     set(MagnumIntegration_DIR ${magnum_integration_dl_SOURCE_DIR}/modules)
 endif ()
 
-# All GUI thirdparty libraries put into a single target
-add_library(ltb_gvs_display_deps INTERFACE)
-
 find_package(Magnum REQUIRED
         GL
         GlfwApplication
@@ -134,13 +131,13 @@ find_package(MagnumIntegration REQUIRED ImGui)
 
 # Set the include directory as system headers to avoid compiler warnings
 target_include_directories(ltb_gvs_display_deps
-        SYSTEM INTERFACE
+        SYSTEM PUBLIC
         ${corrade_dl_SOURCE_DIR}/src
         ${magnum_dl_SOURCE_DIR}/src
         )
 
 # Add the necessary libraries
-target_link_libraries(ltb_gvs_display_deps INTERFACE
+target_link_libraries(ltb_gvs_display_deps PUBLIC
         Corrade::Utility
         Magnum::Application
         Magnum::Magnum
