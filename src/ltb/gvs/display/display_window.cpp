@@ -28,6 +28,7 @@
 #include "backends/opengl_backend.hpp"
 #include "display_scene.hpp"
 #include "gui/imgui_theme.hpp"
+#include "gui/imgui_utils.hpp"
 #include "gui/scene_gui.hpp"
 
 // external
@@ -54,8 +55,6 @@ DisplayWindow::DisplayWindow(DisplayScene& parent_scene)
                                  .setTitle("Geometry Visualisation Client")
                                  .setSize({1280, 720})
                                  .setWindowFlags(Configuration::WindowFlag::Resizable)),
-      gl_version_str_(GL::Context::current().versionString()),
-      gl_renderer_str_(GL::Context::current().rendererString()),
       parent_scene_(parent_scene),
       scene_backend_(std::make_unique<OpenglBackend>()) {}
 
@@ -89,49 +88,22 @@ void DisplayWindow::render(CameraPackage const& camera_package) const {
 }
 
 void DisplayWindow::configure_gui() {
-
-    auto add_three_line_separator = [] {
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Separator();
-        ImGui::Separator();
-        ImGui::Spacing();
-    };
-
     auto height = static_cast<float>(this->windowSize().y());
     ImGui::SetNextWindowPos({0.f, 0.f});
     ImGui::SetNextWindowSizeConstraints(ImVec2(0.f, height), ImVec2(std::numeric_limits<float>::infinity(), height));
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::Text("GL Version:   ");
-    ImGui::SameLine();
-    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_version_str_.c_str());
-
-    ImGui::Text("GL Renderer:  ");
-    ImGui::SameLine();
-    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_renderer_str_.c_str());
+    display_device_info();
 
     settings_.configure_gui();
 
-    add_three_line_separator();
+    gvs::add_three_line_separator();
 
     gvs::configure_gui(&parent_scene_);
 
     ImGui::End();
 
-    if (not error_message_.empty()) {
-        int w = this->windowSize().x();
-        ImGui::SetNextWindowPos({static_cast<float>(w) * 0.5f, 0.f}, 0, {0.5f, 0.f});
-
-        bool open = true;
-        ImGui::Begin("Errors", &open, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
-        ImGui::TextColored({1.f, 0.f, 0.f, 1.f}, "%s", error_message_.c_str());
-        ImGui::End();
-
-        if (not open) {
-            error_message_ = "";
-        }
-    }
+    error_alert_.display_next_error();
 }
 
 void DisplayWindow::resize(const Vector2i& viewport) {

@@ -46,11 +46,6 @@ private:
 
     void resize(const Magnum::Vector2i& viewport) override;
 
-    // General Info
-    std::string gl_version_str_;
-    std::string gl_renderer_str_;
-    std::string error_message_;
-
     // Scene
     DisplayScene&                   parent_scene_;
     std::unique_ptr<DisplayBackend> scene_backend_; ///< Used to update and display the scene

@@ -41,10 +41,6 @@ private:
 
     void resize(const Magnum::Vector2i& viewport) override;
 
-    // General Info
-    std::string gl_version_str_;
-    std::string gl_renderer_str_;
-
     // Axes
     struct {
         gvs::SceneId scene_id = gvs::nil_id();
@@ -82,9 +78,6 @@ private:
         unsigned     rings    = 35u;
         unsigned     segments = 35u;
     } sphere_;
-
-    // Errors
-    gvs::ErrorAlert error_alert_;
 
     // Scene
     gvs::LocalScene scene_;

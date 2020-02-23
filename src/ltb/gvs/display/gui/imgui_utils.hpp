@@ -69,4 +69,6 @@ public:
     ~ScopedID();
 };
 
+void add_three_line_separator();
+
 } // namespace ltb::gvs

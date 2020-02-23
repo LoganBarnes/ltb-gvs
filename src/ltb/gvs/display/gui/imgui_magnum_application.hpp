@@ -24,6 +24,7 @@
 
 // project
 #include "../camera_package.hpp"
+#include "error_alert.hpp"
 #include "imgui_theme.hpp"
 #include "ltb/gvs/forward_declarations.hpp"
 #include "settings.hpp"
@@ -90,15 +91,23 @@ protected:
     // forward declaration
     std::unique_ptr<GuiTheme> theme_;
 
-    Settings settings_;
+    // General Info
+    std::string gl_version_str_;
+    std::string gl_renderer_str_;
+    Settings    settings_;
 
     // Camera
     std::optional<Magnum::ArcBallCamera> arcball_camera_;
     CameraPackage                        camera_package_;
 
+    // Errors
+    ErrorAlert error_alert_;
+
     // Ensures the application renders at least 5 more times after all events are
     // finished to give ImGui a chance to update and render correctly.
     auto reset_draw_counter() -> void;
+
+    auto display_device_info() -> void;
 };
 
 } // namespace ltb::gvs

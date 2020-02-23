@@ -57,7 +57,10 @@ constexpr auto camera_fovy      = 45.0_degf;
 
 ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const Configuration& configuration)
     : GlfwApplication(arguments, configuration, GLConfiguration().setSampleCount(4)),
-      imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()) {
+      imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()),
+      gl_version_str_(GL::Context::current().versionString()),
+      gl_renderer_str_(GL::Context::current().rendererString()),
+      error_alert_("Error Popup") {
 
     ImGui::GetCurrentContext()->SettingsHandlers.push_back(settings_.handler());
 
@@ -330,6 +333,16 @@ auto ImGuiMagnumApplication::mouseScrollEvent(MouseScrollEvent& event) -> void {
         arcball_camera_->zoom(delta * wheel_zoom_scale);
         reset_draw_counter();
     }
+}
+
+auto ImGuiMagnumApplication::display_device_info() -> void {
+    ImGui::Text("GL Version:   ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_version_str_.c_str());
+
+    ImGui::Text("GL Renderer:  ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_renderer_str_.c_str());
 }
 
 } // namespace ltb::gvs

@@ -86,4 +86,12 @@ ScopedID::~ScopedID() {
     ImGui::PopID();
 }
 
+void add_three_line_separator() {
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Separator();
+    ImGui::Separator();
+    ImGui::Spacing();
+}
+
 } // namespace ltb::gvs
