@@ -36,12 +36,12 @@ struct Settings {
     using App = Magnum::Platform::Application;
 
     struct Camera {
-        App::MouseEvent::Button    select_button    = App::MouseEvent::Button::Left;
-        App::MouseEvent::Modifiers select_modifiers = {};
-        App::MouseEvent::Button    pan_button       = App::MouseEvent::Button::Middle;
-        App::MouseEvent::Modifiers pan_modifiers    = {};
-        App::MouseEvent::Button    orbit_button     = App::MouseEvent::Button::Right;
-        App::MouseEvent::Modifiers orbit_modifiers  = {};
+        App::MouseMoveEvent::Button    select_button    = App::MouseMoveEvent::Button::Left;
+        App::MouseMoveEvent::Modifiers select_modifiers = {};
+        App::MouseMoveEvent::Button    pan_button       = App::MouseMoveEvent::Button::Middle;
+        App::MouseMoveEvent::Modifiers pan_modifiers    = {};
+        App::MouseMoveEvent::Button    orbit_button     = App::MouseMoveEvent::Button::Right;
+        App::MouseMoveEvent::Modifiers orbit_modifiers  = {};
     } camera;
 
     Settings();

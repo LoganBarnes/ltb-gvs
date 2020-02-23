@@ -295,8 +295,8 @@ auto ImGuiMagnumApplication::mouseMoveEvent(MouseMoveEvent& event) -> void {
     event.setAccepted(true);
 
     // make these editable settings
-    auto orbiting = (event.buttons() & MouseMoveEvent::Button::Right);
-    auto panning  = (event.buttons() & MouseMoveEvent::Button::Left);
+    auto orbiting = (event.buttons() & settings_.camera.orbit_button);
+    auto panning  = (event.buttons() & settings_.camera.pan_button);
 
     if (panning) {
         arcball_camera_->translate(event.position());

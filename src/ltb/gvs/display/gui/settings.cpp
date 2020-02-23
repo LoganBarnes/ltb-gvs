@@ -23,6 +23,7 @@
 #include "settings.hpp"
 
 // project
+#include "imgui_utils.hpp"
 #include "ltb/util/string.hpp"
 
 // standard
@@ -43,7 +44,12 @@ auto to_underlying_type(const Enum& e) {
     return static_cast<std::underlying_type_t<Enum>>(e);
 }
 
-auto to_string(const Settings::App::MouseEvent::Modifiers& modifiers) -> std::string {
+template <typename Enum>
+auto from_underlying_type(const std::underlying_type_t<Enum>& e) {
+    return static_cast<Enum>(e);
+}
+
+auto to_string(const Settings::App::MouseMoveEvent::Modifiers& modifiers) -> std::string {
     std::stringstream result;
     if (modifiers & Settings::App::InputEvent::Modifier::Shift) {
         result << to_underlying_type(Settings::App::InputEvent::Modifier::Shift) << ",";
@@ -61,22 +67,22 @@ auto to_string(const Settings::App::MouseEvent::Modifiers& modifiers) -> std::st
 }
 
 auto get_button(const std::string& button_str) {
-    std::underlying_type_t<Settings::App::MouseEvent::Button> val;
-    std::istringstream                                        iss(button_str);
+    std::underlying_type_t<Settings::App::MouseMoveEvent::Button> val;
+    std::istringstream                                            iss(button_str);
     iss >> val;
-    return static_cast<Settings::App::MouseEvent::Button>(val);
+    return static_cast<Settings::App::MouseMoveEvent::Button>(val);
 }
 
 auto get_modifier(const std::string& modifier_str) {
-    std::underlying_type_t<Settings::App::MouseEvent::Modifier> val;
-    std::istringstream                                          iss(modifier_str);
+    std::underlying_type_t<Settings::App::MouseMoveEvent::Modifier> val;
+    std::istringstream                                              iss(modifier_str);
     iss >> val;
-    return static_cast<Settings::App::MouseEvent::Modifier>(val);
+    return static_cast<Settings::App::MouseMoveEvent::Modifier>(val);
 }
 
 auto get_modifiers(const std::string& modifiers_str) {
-    Settings::App::MouseEvent::Modifiers modifiers;
-    std::istringstream                   iss(modifiers_str);
+    Settings::App::MouseMoveEvent::Modifiers modifiers;
+    std::istringstream                       iss(modifiers_str);
 
     std::string modifier_str;
     while (std::getline(iss, modifier_str, ',')) {
@@ -88,10 +94,6 @@ auto get_modifiers(const std::string& modifiers_str) {
 
 void* settings_read_open(ImGuiContext* /*ctx*/, ImGuiSettingsHandler* handler, const char* name) {
     auto name_str = std::string(name);
-
-    Debug{} << __FUNCTION__;
-    Debug{} << "\thandler->UserData: " << handler->UserData;
-    Debug{} << "\tname: " << name;
 
     auto* settings = static_cast<Settings*>(handler->UserData);
 
@@ -132,11 +134,6 @@ void settings_read_line(ImGuiContext* /*ctx*/, ImGuiSettingsHandler* handler, vo
         return;
     }
 
-    Debug{} << __FUNCTION__;
-    Debug{} << "\thandler->UserData: " << handler->UserData;
-    Debug{} << "\tentry: " << entry;
-    Debug{} << "\tline: " << line;
-
     auto* settings = static_cast<Settings*>(handler->UserData);
 
     if (entry == &settings->camera) {
@@ -145,14 +142,9 @@ void settings_read_line(ImGuiContext* /*ctx*/, ImGuiSettingsHandler* handler, vo
 }
 
 void settings_write_all(ImGuiContext* /*ctx*/, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf) {
-    Debug{} << __FUNCTION__;
-    Debug{} << "\thandler->UserData: " << handler->UserData;
-    Debug{} << "\tout_buf: " << out_buf;
 
-    const auto* settings = static_cast<Settings*>(handler->UserData);
-    assert(settings);
+    const auto* settings        = static_cast<Settings*>(handler->UserData);
     const auto& camera_settings = settings->camera;
-    assert(settings);
 
     std::stringstream ss;
     ss << "[" << handler->TypeName << "][Camera]\n"
@@ -185,6 +177,35 @@ ImGuiSettingsHandler Settings::handler() {
     return ini_handler_;
 }
 
-void Settings::configure_gui() {}
+void Settings::configure_gui() {
+    if (ImGui::CollapsingHeader("Camera Settings")) {
+
+        auto single_mouse_radio_button = [](const auto& label, auto button, auto button_type) {
+            if (ImGui::RadioButton(label, button == button_type)) {
+                button = button_type;
+            }
+            return button;
+        };
+
+        auto mouse_radio_buttons = [&single_mouse_radio_button](const auto& label, auto button) {
+            ScopedID     id(label);
+            ScopedIndent indent;
+
+            ImGui::TextUnformatted(label);
+            ImGui::SameLine();
+            button = single_mouse_radio_button("Left", button, App::MouseMoveEvent::Button::Left);
+            ImGui::SameLine();
+            button = single_mouse_radio_button("Middle", button, App::MouseMoveEvent::Button::Middle);
+            ImGui::SameLine();
+            button = single_mouse_radio_button("Right", button, App::MouseMoveEvent::Button::Right);
+            return button;
+        };
+
+        ImGui::TextUnformatted("Mouse Buttons");
+        camera.select_button = mouse_radio_buttons("Selection: ", camera.select_button);
+        camera.pan_button    = mouse_radio_buttons("Panning:   ", camera.pan_button);
+        camera.orbit_button  = mouse_radio_buttons("Rotation:  ", camera.orbit_button);
+    }
+}
 
 } // namespace ltb::gvs

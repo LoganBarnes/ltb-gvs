@@ -111,6 +111,8 @@ void DisplayWindow::configure_gui() {
     ImGui::SameLine();
     ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_renderer_str_.c_str());
 
+    settings_.configure_gui();
+
     add_three_line_separator();
 
     gvs::configure_gui(&parent_scene_);

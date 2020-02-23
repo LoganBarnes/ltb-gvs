@@ -79,7 +79,6 @@ private:
     auto mouseMoveEvent(MouseMoveEvent& event) -> void override;
     auto mouseScrollEvent(MouseScrollEvent& event) -> void override;
 
-    Settings                          settings_;
     Magnum::ImGuiIntegration::Context imgui_{Magnum::NoCreate};
 
     // Camera
@@ -90,6 +89,8 @@ private:
 protected:
     // forward declaration
     std::unique_ptr<GuiTheme> theme_;
+
+    Settings settings_;
 
     // Camera
     std::optional<Magnum::ArcBallCamera> arcball_camera_;
