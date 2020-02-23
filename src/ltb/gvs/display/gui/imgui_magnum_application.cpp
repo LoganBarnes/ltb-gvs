@@ -33,8 +33,6 @@
 #include <Magnum/Math/Angle.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Matrix4.h>
-#include <Magnum/Math/Vector2.h>
-#include <Magnum/SceneGraph/Camera.h>
 #include <imgui.h>
 
 // standard
@@ -50,25 +48,21 @@ using namespace Magnum;
 
 namespace {
 
-// 'p' is a point on a plane
-float intersect_plane(Ray const& ray, Vector3 p, const Vector3& plane_normal) {
-    // plane ray intersection
-    float const denom = Math::dot(ray.direction, plane_normal);
-
-    p -= ray.origin;
-    float const t = Math::dot(p, plane_normal) / denom;
-
-    if (t >= 0.f && t != std::numeric_limits<float>::infinity()) {
-        return t;
-    }
-    return std::numeric_limits<float>::infinity();
-}
+constexpr auto camera_near_dist = 1.f;
+constexpr auto camera_far_dist  = 1000.f;
+constexpr auto camera_fovy      = 45.0_degf;
 
 } // namespace
 
 ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const Configuration& configuration)
     : GlfwApplication(arguments, configuration, GLConfiguration().setSampleCount(4)),
-      imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()) {
+      imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()),
+      gl_version_str_(GL::Context::current().versionString()),
+      gl_renderer_str_(GL::Context::current().rendererString()),
+      error_alert_("Error Popup") {
+
+    ImGui::GetCurrentContext()->SettingsHandlers.push_back(settings_.handler());
+
     initialize_resources();
 
     this->startTextInput(); // allow for text input callbacks
@@ -92,13 +86,23 @@ ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const
     GL::Renderer::setBlendFunction(GL::Renderer::BlendFunction::SourceAlpha,
                                    GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
-    camera_package_.object.setParent(&camera_scene_);
-    camera_package_.zoom_object.translate(Vector3::zAxis(5.0f));
-    camera_package_.update_object();
+    /*
+     * Camera
+     */
+    const Vector3 eye = Vector3::zAxis(25.0f);
+    const Vector3 center{};
+    const Vector3 up = Vector3::yAxis();
+    arcball_camera_.emplace(camera_scene_,
+                            eye,
+                            center,
+                            up,
+                            camera_fovy,
+                            camera_near_dist,
+                            camera_far_dist,
+                            windowSize(),
+                            framebufferSize());
 
-    // Memory ownership is handled elsewhere
-    camera_package_.set_camera(new SceneGraph::Camera3D(camera_package_.object),
-                               GL::defaultFramebuffer.viewport().size());
+    camera_package_.camera = arcball_camera_->camera();
 
     reset_draw_counter();
 }
@@ -120,6 +124,8 @@ auto ImGuiMagnumApplication::drawEvent() -> void {
     update();
 
     GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
+
+    auto cam_changed = arcball_camera_->update();
 
     render(camera_package_);
 
@@ -145,6 +151,10 @@ auto ImGuiMagnumApplication::drawEvent() -> void {
 
     swapBuffers();
 
+    if (cam_changed) {
+        reset_draw_counter();
+    }
+
     if (draw_counter_-- > 0) {
         redraw();
     }
@@ -156,7 +166,8 @@ auto ImGuiMagnumApplication::viewportEvent(ViewportEvent& event) -> void {
 
     imgui_.relayout(Vector2{event.windowSize()} / event.dpiScaling(), event.windowSize(), event.framebufferSize());
 
-    camera_package_.update_viewport(event.windowSize());
+    //    camera_package_.update_viewport(event.windowSize());
+    arcball_camera_->reshape(event.windowSize(), event.framebufferSize());
 
     resize(event.windowSize());
 }
@@ -180,9 +191,11 @@ auto ImGuiMagnumApplication::keyReleaseEvent(KeyEvent& event) -> void {
 
     using KE = KeyEvent;
 
+    const auto ctrl_down  = static_cast<bool>(event.modifiers() & KE::Modifier::Ctrl);
+    const auto shift_down = static_cast<bool>(event.modifiers() & KE::Modifier::Shift);
+
     // Ctrl + Shift + Q == Exit
-    if (event.modifiers() & KE::Modifier::Ctrl and event.modifiers() & KE::Modifier::Shift
-        and event.key() == KE::Key::Q) {
+    if (ctrl_down and shift_down and event.key() == KE::Key::Q) {
 
         this->exit();
         return;
@@ -201,9 +214,23 @@ auto ImGuiMagnumApplication::keyReleaseEvent(KeyEvent& event) -> void {
 
     switch (event.key()) {
 
+    case KE::Key::L:
+        if (arcball_camera_->lagging() > 0.0f) {
+            Debug{} << "Lagging disabled";
+            arcball_camera_->setLagging(0.0f);
+        } else {
+            Debug{} << "Lagging enabled";
+            arcball_camera_->setLagging(0.85f);
+        }
+        break;
+
     case KE::Key::R: {
-        camera_package_.translation_object.resetTransformation();
-        camera_package_.update_object();
+        if (ctrl_down) {
+            arcball_camera_->reset();
+        } else {
+            arcball_camera_->resetViewCenter(Vector3{});
+            arcball_camera_->update(true);
+        }
     } break;
 
     default:
@@ -238,13 +265,8 @@ auto ImGuiMagnumApplication::mousePressEvent(MouseEvent& event) -> void {
 
     event.setAccepted(true);
 
-    previous_mouse_data_.zoom_transform        = camera_package_.zoom_object.transformation();
-    previous_mouse_data_.rotation_transform    = camera_package_.rotation_object.transformation();
-    previous_mouse_data_.translation_transform = camera_package_.translation_object.transformation();
-
-    previous_mouse_data_.arcball = arcball_info(Vector2(event.position()), previous_mouse_data_.rotation_transform);
-
-    pan_pos_ = world_position(Vector2(event.position()), camera_package_.rotation_object.transformation(), 0.f);
+    arcball_camera_->initTransformation(event.position());
+    reset_draw_counter();
 }
 
 auto ImGuiMagnumApplication::mouseReleaseEvent(MouseEvent& event) -> void {
@@ -275,61 +297,15 @@ auto ImGuiMagnumApplication::mouseMoveEvent(MouseMoveEvent& event) -> void {
     event.setAccepted(true);
 
     // make these editable settings
-    auto orbiting = (event.buttons() & MouseMoveEvent::Button::Right);
-    auto panning  = (event.buttons() & MouseMoveEvent::Button::Left);
+    auto orbiting = (event.buttons() & settings_.camera.orbit_button);
+    auto panning  = (event.buttons() & settings_.camera.pan_button);
 
-    if (!(orbiting || panning)) {
-        return;
+    if (panning) {
+        arcball_camera_->translate(event.position());
+    } else if (orbiting) {
+        arcball_camera_->rotate(event.position());
     }
-
-    if (orbiting) {
-
-        auto const current_arcball = arcball_info(Vector2(event.position()), previous_mouse_data_.rotation_transform);
-
-        Vector3 const& previous_arcball_position = previous_mouse_data_.arcball.world_space_position;
-        Vector3 const& current_arcball_position  = current_arcball.world_space_position;
-
-        Vector3 const axis = Math::cross(previous_arcball_position, current_arcball_position);
-
-        if (axis.length() < 0.001f) {
-            return;
-        }
-
-        // TODO: scale this depending on screen size so it doesn't feel different if you change the window
-        constexpr auto scale = 4.f; // make this a setting
-        auto           angle = -scale * Math::angle(previous_arcball_position, current_arcball_position);
-
-        camera_package_.rotation_object.setTransformation(previous_mouse_data_.rotation_transform);
-        camera_package_.rotation_object.rotate(angle, axis.normalized());
-        camera_package_.update_object();
-
-    } else if (panning) {
-        // TODO: clean this mess up
-        auto const orbit_point
-            = camera_package_.translation_object.transformation().transformPoint(Magnum::Vector3{0.f});
-
-        auto world_from_mouse_pos = [&](const auto& mouse_pos, float* dist_to_plane) {
-            auto ray          = camera_package_.get_camera_ray_from_window_pos(mouse_pos);
-            auto plane_normal = (ray.origin - orbit_point).normalized();
-
-            *dist_to_plane = intersect_plane(ray, orbit_point, plane_normal);
-            return ray.origin + ray.direction * (*dist_to_plane);
-        };
-
-        float should_not_be_inf1, should_not_be_inf2;
-
-        auto previous_world_pos
-            = world_from_mouse_pos(previous_mouse_data_.arcball.screen_space_mouse_position, &should_not_be_inf1);
-        auto current_world_pos = world_from_mouse_pos(Vector2(event.position()), &should_not_be_inf2);
-
-        if (not std::isinf(should_not_be_inf1) and not std::isinf(should_not_be_inf2)) {
-            auto diff = previous_world_pos - current_world_pos;
-
-            camera_package_.translation_object.setTransformation(previous_mouse_data_.translation_transform);
-            camera_package_.translation_object.translate(diff);
-            camera_package_.update_object();
-        }
-    }
+    reset_draw_counter();
 }
 
 auto ImGuiMagnumApplication::mouseScrollEvent(MouseScrollEvent& event) -> void {
@@ -349,64 +325,23 @@ auto ImGuiMagnumApplication::mouseScrollEvent(MouseScrollEvent& event) -> void {
         return;
     }
 
-    constexpr auto wheel_zoom_scale = 10.f; // make this an editable setting
+    constexpr auto wheel_zoom_scale = 1.f; // make this an editable setting
 
-    zoom(event.offset().y() * wheel_zoom_scale);
-}
-
-auto ImGuiMagnumApplication::arcball_info(Magnum::Vector2 const& screen_space_mouse_position,
-                                          Magnum::Matrix4 const& rotation_transform) const -> ArcballData {
-    constexpr auto sphere_radius         = 2.f;
-    constexpr auto sphere_radius_squared = sphere_radius * sphere_radius;
-
-    Vector2 const normalized_pos = screen_space_mouse_position / Vector2{camera_package_.camera->viewport()};
-    Vector2 const clipspace_pos  = (normalized_pos * 2.f) - Vector2{1.f}; // [-1, 1]
-    float const   length_squared = dot(clipspace_pos, clipspace_pos);
-
-    float z = (length_squared > sphere_radius_squared ? 0.f : std::sqrt(sphere_radius_squared - length_squared));
-
-    auto const view_space_position  = Vector3(clipspace_pos.x(), -clipspace_pos.y(), z).normalized();
-    auto const world_space_position = rotation_transform.transformVector(view_space_position).normalized();
-
-    return {
-        screen_space_mouse_position,
-        view_space_position,
-        world_space_position,
-    };
-}
-
-auto ImGuiMagnumApplication::world_position(Magnum::Vector2 const& screen_space_mouse_position,
-                                            Magnum::Matrix4 const& camera_transform,
-                                            float                  clip_space_z) const -> Vector3 {
-
-    Vector2 const normalized_pos = screen_space_mouse_position / Vector2{camera_package_.camera->viewport()};
-    Vector2 const clipspace_pos  = (normalized_pos * 2.f) - Vector2{1.f}; // [-1, 1]
-
-    auto const view_space_position  = Vector3(clipspace_pos.x(), -clipspace_pos.y(), clip_space_z);
-    auto const world_space_position = camera_transform.transformVector(view_space_position);
-
-    return world_space_position;
-}
-
-auto ImGuiMagnumApplication::zoom(float amount) -> void {
-    auto const camera_pos = camera_package_.zoom_object.transformation().transformPoint(Magnum::Vector3{0.f});
-    auto const length     = camera_pos.length();
-
-    // if camera pos is too small use look
-    auto direction = -camera_pos;
-    if (length < 0.5f) {
-        direction = camera_package_.zoom_object.transformation().transformPoint(Magnum::Vector3{0.f, 0.f, -1.f});
+    const auto delta = event.offset().y();
+    if (std::abs(delta) >= 1.0e-2f) {
+        arcball_camera_->zoom(delta * wheel_zoom_scale);
+        reset_draw_counter();
     }
+}
 
-    if (length < 0.001f && amount > 0.f) {
-        return;
-    }
+auto ImGuiMagnumApplication::display_device_info() -> void {
+    ImGui::Text("GL Version:   ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_version_str_.c_str());
 
-    auto const move_dist   = std::max(length, 0.01f) * amount * 0.01f;
-    auto const translation = direction.normalized() * std::min(move_dist, length);
-
-    camera_package_.zoom_object.translate(translation);
-    camera_package_.update_object();
+    ImGui::Text("GL Renderer:  ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_renderer_str_.c_str());
 }
 
 } // namespace ltb::gvs

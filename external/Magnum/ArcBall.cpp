@@ -33,7 +33,6 @@
 #include <Magnum/Math/Matrix3.h>
 
 namespace Magnum {
-namespace Examples {
 
 namespace {
 
@@ -154,6 +153,16 @@ bool ArcBall::updateTransformation() {
     return true;
 }
 
+void ArcBall::resetViewCenter(const Vector3& viewCenter) {
+    _targetPosition = -viewCenter;
+
+    _currentPosition  = _targetPosition;
+    _currentZooming   = _targetZooming;
+    _currentQRotation = _targetQRotation;
+
+    updateInternalTransformations();
+}
+
 void ArcBall::updateInternalTransformations() {
     _view = DualQuaternion::translation(Vector3::zAxis(_currentZooming)) * DualQuaternion{_currentQRotation}
         * DualQuaternion::translation(_currentPosition);
@@ -164,5 +173,4 @@ Vector2 ArcBall::screenCoordToNDC(const Vector2i& mousePos) const {
     return {mousePos.x() * 2.0f / _windowSize.x() - 1.0f, 1.0f - 2.0f * mousePos.y() / _windowSize.y()};
 }
 
-} // namespace Examples
 } // namespace Magnum

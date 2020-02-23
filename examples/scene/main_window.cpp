@@ -25,6 +25,7 @@
 // project
 #include "../common/test_scene.hpp"
 #include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/display/gui/imgui_utils.hpp"
 #include "ltb/gvs/display/gui/scene_gui.hpp"
 
 // external
@@ -37,6 +38,7 @@
 #include <random>
 
 using namespace Magnum;
+using namespace Math::Literals;
 
 namespace ltb::example {
 
@@ -45,17 +47,15 @@ MainWindow::MainWindow(const Arguments& arguments)
                                   Configuration{}
                                       .setTitle("Machine Emulator")
                                       .setSize({1280, 720})
-                                      .setWindowFlags(Configuration::WindowFlag::Resizable)),
-      // Device info
-      gl_version_str_(GL::Context::current().versionString()),
-      gl_renderer_str_(GL::Context::current().rendererString()),
-      error_alert_("Error Popup") {
+                                      .setWindowFlags(Configuration::WindowFlag::Resizable)) {
 
-    camera_package_.zoom_object.translate({0.f, 0.f, 20.f});
-    camera_package_.rotation_object.rotateX(Math::Deg<float>(/*pitch*/ -15));
-    camera_package_.rotation_object.rotateY(Math::Deg<float>(/*yaw*/ 30));
+    auto rotation = Matrix4::rotationY(30.0_degf) * Matrix4::rotationX(-15.0_degf);
+    auto eye      = rotation.transformPoint({0.f, 0.f, 20.f});
+    auto center   = Vector3{};
+    auto up       = Vector3{0.f, 1.f, 0.f};
 
-    camera_package_.update_object();
+    arcball_camera_->setViewParameters(eye, center, up);
+    arcball_camera_->update(true);
 
     scene_.add_item(gvs::SetReadableId("Axes"), gvs::SetPrimitive(gvs::Axes{}));
 
@@ -126,28 +126,17 @@ void MainWindow::render(const gvs::CameraPackage& camera_package) const {
 }
 
 void MainWindow::configure_gui() {
-    auto add_three_line_separator = [] {
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Separator();
-        ImGui::Separator();
-        ImGui::Spacing();
-    };
 
     auto height = static_cast<float>(this->windowSize().y());
     ImGui::SetNextWindowPos({0.f, 0.f});
     ImGui::SetNextWindowSizeConstraints({0.f, height}, {std::numeric_limits<float>::infinity(), height});
     ImGui::Begin("Settings", nullptr, {350.f, height});
 
-    ImGui::Text("GL Version:   ");
-    ImGui::SameLine();
-    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_version_str_.c_str());
+    display_device_info();
 
-    ImGui::Text("GL Renderer:  ");
-    ImGui::SameLine();
-    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_renderer_str_.c_str());
+    settings_.configure_gui();
 
-    add_three_line_separator();
+    gvs::add_three_line_separator();
 
     gvs::configure_gui(&scene_);
 

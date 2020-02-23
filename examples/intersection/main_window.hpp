@@ -41,13 +41,6 @@ private:
 
     void resize(const Magnum::Vector2i& viewport) override;
 
-    // General Info
-    std::string gl_version_str_;
-    std::string gl_renderer_str_;
-
-    // Errors
-    gvs::ErrorAlert error_alert_;
-
     // Scene
     gvs::LocalScene scene_;
 

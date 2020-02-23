@@ -20,16 +20,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "camera_package.hpp"
+#pragma once
+
+// project
+#include "ltb/gvs/forward_declarations.hpp"
 
 // external
-#include <Magnum/GL/DefaultFramebuffer.h>
-#include <Magnum/Math/Functions.h>
-#include <Magnum/SceneGraph/MatrixTransformation3D.h>
+#include <Magnum/Platform/GlfwApplication.h>
+#include <imgui.h>
+#include <imgui_internal.h>
 
 namespace ltb::gvs {
 
-using namespace Magnum;
-using namespace Math::Literals;
+struct Settings {
+    using App = Magnum::Platform::Application;
+
+    struct Camera {
+        App::MouseMoveEvent::Button    select_button    = App::MouseMoveEvent::Button::Left;
+        App::MouseMoveEvent::Modifiers select_modifiers = {};
+        App::MouseMoveEvent::Button    pan_button       = App::MouseMoveEvent::Button::Middle;
+        App::MouseMoveEvent::Modifiers pan_modifiers    = {};
+        App::MouseMoveEvent::Button    orbit_button     = App::MouseMoveEvent::Button::Right;
+        App::MouseMoveEvent::Modifiers orbit_modifiers  = {};
+    } camera;
+
+    Settings();
+
+    ImGuiSettingsHandler handler();
+
+    void configure_gui();
+
+private:
+    // Add .ini handle for UserData type
+    ImGuiSettingsHandler ini_handler_;
+};
 
 } // namespace ltb::gvs
