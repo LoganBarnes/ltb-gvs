@@ -39,6 +39,7 @@
 
 // system
 #include <memory>
+#include <optional>
 
 namespace ltb::gvs {
 
