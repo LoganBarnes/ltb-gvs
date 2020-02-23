@@ -108,6 +108,7 @@ protected:
     // finished to give ImGui a chance to update and render correctly.
     auto reset_draw_counter() -> void;
 
+    auto display_fps_info() -> void;
     auto display_device_info() -> void;
 };
 

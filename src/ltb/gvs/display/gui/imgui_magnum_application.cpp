@@ -335,6 +335,15 @@ auto ImGuiMagnumApplication::mouseScrollEvent(MouseScrollEvent& event) -> void {
     }
 }
 
+auto ImGuiMagnumApplication::display_fps_info() -> void {
+    ImGui::TextUnformatted("Framerate:    ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f},
+                       "%.3f ms/frame (%.1f FPS) \t",
+                       1000.0f / ImGui::GetIO().Framerate,
+                       ImGui::GetIO().Framerate);
+}
+
 auto ImGuiMagnumApplication::display_device_info() -> void {
     ImGui::Text("GL Version:   ");
     ImGui::SameLine();
