@@ -103,7 +103,7 @@ void DisplayWindow::configure_gui() {
 
     ImGui::End();
 
-    error_alert_.display_next_error();
+    error_alert_->display_next_error();
 }
 
 void DisplayWindow::resize(const Vector2i& viewport) {

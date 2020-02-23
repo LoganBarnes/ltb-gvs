@@ -45,6 +45,7 @@ static void initialize_resources() {
 namespace ltb::gvs {
 
 using namespace Magnum;
+using namespace Math::Literals;
 
 namespace {
 
@@ -59,7 +60,7 @@ ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const
       imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()),
       gl_version_str_(GL::Context::current().versionString()),
       gl_renderer_str_(GL::Context::current().rendererString()),
-      error_alert_("Error Popup") {
+      error_alert_(std::make_shared<ErrorAlert>("Error Popup")) {
 
     ImGui::GetCurrentContext()->SettingsHandlers.push_back(settings_.handler());
 
