@@ -23,91 +23,36 @@
 #pragma once
 
 // project
-#include "../camera_package.hpp"
-#include "imgui_theme.hpp"
 #include "ltb/gvs/forward_declarations.hpp"
 
 // external
-#include <Magnum/ArcBallCamera.h>
-#include <Magnum/GL/DefaultFramebuffer.h>
-#include <Magnum/ImGuiIntegration/Context.hpp>
 #include <Magnum/Platform/GlfwApplication.h>
-#include <Magnum/SceneGraph/Scene.h>
-#include <Magnum/SceneGraph/SceneGraph.h>
-
-// system
+#include <imgui.h>
 #include <imgui_internal.h>
-#include <memory>
 
 namespace ltb::gvs {
 
-class ImGuiMagnumApplication : public Magnum::Platform::Application {
-public:
-    explicit ImGuiMagnumApplication(const Arguments& arguments, const Configuration& configuration);
-    explicit ImGuiMagnumApplication(const Arguments& arguments);
-    virtual ~ImGuiMagnumApplication();
+struct Settings {
+    using App = Magnum::Platform::Application;
 
-    // keyboard
-    virtual auto handleKeyPressEvent(KeyEvent & /*event*/) -> void {}
-    virtual auto handleKeyReleaseEvent(KeyEvent & /*event*/) -> void {}
-    virtual auto handleTextInputEvent(TextInputEvent & /*event*/) -> void {}
+    struct Camera {
+        App::MouseEvent::Button    select_button    = App::MouseEvent::Button::Left;
+        App::MouseEvent::Modifiers select_modifiers = {};
+        App::MouseEvent::Button    pan_button       = App::MouseEvent::Button::Middle;
+        App::MouseEvent::Modifiers pan_modifiers    = {};
+        App::MouseEvent::Button    orbit_button     = App::MouseEvent::Button::Right;
+        App::MouseEvent::Modifiers orbit_modifiers  = {};
+    } camera;
 
-    // mouse
-    virtual auto handleMousePressEvent(MouseEvent & /*event*/) -> void {}
-    virtual auto handleMouseReleaseEvent(MouseEvent & /*event*/) -> void {}
-    virtual auto handleMouseMoveEvent(MouseMoveEvent & /*event*/) -> void {}
-    virtual auto handleMouseScrollEvent(MouseScrollEvent & /*event*/) -> void {}
+    Settings();
+
+    ImGuiSettingsHandler handler();
+
+    void configure_gui();
 
 private:
-    virtual auto update() -> void                                          = 0;
-    virtual auto render(CameraPackage const& camera_package) const -> void = 0;
-    virtual auto configure_gui() -> void                                   = 0;
-
-    virtual auto resize(const Magnum::Vector2i& viewport) -> void = 0;
-
-    auto drawEvent() -> void override;
-    auto viewportEvent(ViewportEvent& event) -> void override;
-
-    // keyboard
-    auto keyPressEvent(KeyEvent& event) -> void override;
-    auto keyReleaseEvent(KeyEvent& event) -> void override;
-    auto textInputEvent(TextInputEvent& event) -> void override;
-
-    // mouse
-    auto mousePressEvent(MouseEvent& event) -> void override;
-    auto mouseReleaseEvent(MouseEvent& event) -> void override;
-    auto mouseMoveEvent(MouseMoveEvent& event) -> void override;
-    auto mouseScrollEvent(MouseScrollEvent& event) -> void override;
-
-    Magnum::ImGuiIntegration::Context imgui_{Magnum::NoCreate};
-    int                               draw_counter_ = 1; // continue drawing until this counter is zero
-
-    // Camera
-    Magnum::SceneGraph::Scene<Magnum::SceneGraph::MatrixTransformation3D> camera_scene_;
-
     // Add .ini handle for UserData type
     ImGuiSettingsHandler ini_handler_;
-
-    struct Settings {
-        MouseEvent::Button    select_button   = MouseEvent::Button::Left;
-        MouseEvent::Modifiers select_modifier = {};
-        MouseEvent::Button    pan_button      = MouseEvent::Button::Middle;
-        MouseEvent::Modifiers pan_modifier    = {};
-        MouseEvent::Button    orbit_button    = MouseEvent::Button::Right;
-        MouseEvent::Modifiers orbit_modifier  = {};
-    };
-
-protected:
-    // forward declaration
-    std::unique_ptr<GuiTheme> theme_;
-
-    // Camera
-    std::optional<Magnum::ArcBallCamera> arcball_camera_;
-    CameraPackage                        camera_package_;
-
-    // Ensures the application renders at least 5 more times after all events are
-    // finished to give ImGui a chance to update and render correctly.
-    auto reset_draw_counter() -> void;
 };
 
 } // namespace ltb::gvs

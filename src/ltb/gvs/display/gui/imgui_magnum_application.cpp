@@ -58,6 +58,9 @@ constexpr auto camera_fovy      = 45.0_degf;
 ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const Configuration& configuration)
     : GlfwApplication(arguments, configuration, GLConfiguration().setSampleCount(4)),
       imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()) {
+
+    ImGui::GetCurrentContext()->SettingsHandlers.push_back(settings_.handler());
+
     initialize_resources();
 
     this->startTextInput(); // allow for text input callbacks
@@ -81,6 +84,9 @@ ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const
     GL::Renderer::setBlendFunction(GL::Renderer::BlendFunction::SourceAlpha,
                                    GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
+    /*
+     * Camera
+     */
     const Vector3 eye = Vector3::zAxis(25.0f);
     const Vector3 center{};
     const Vector3 up = Vector3::yAxis();

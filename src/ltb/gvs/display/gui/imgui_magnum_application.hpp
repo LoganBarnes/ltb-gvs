@@ -26,6 +26,7 @@
 #include "../camera_package.hpp"
 #include "imgui_theme.hpp"
 #include "ltb/gvs/forward_declarations.hpp"
+#include "settings.hpp"
 
 // external
 #include <Magnum/ArcBallCamera.h>
@@ -78,11 +79,13 @@ private:
     auto mouseMoveEvent(MouseMoveEvent& event) -> void override;
     auto mouseScrollEvent(MouseScrollEvent& event) -> void override;
 
+    Settings                          settings_;
     Magnum::ImGuiIntegration::Context imgui_{Magnum::NoCreate};
-    int                               draw_counter_ = 1; // continue drawing until this counter is zero
 
     // Camera
     Magnum::SceneGraph::Scene<Magnum::SceneGraph::MatrixTransformation3D> camera_scene_;
+
+    int draw_counter_ = 1; /// continue drawing until this counter is zero
 
 protected:
     // forward declaration
