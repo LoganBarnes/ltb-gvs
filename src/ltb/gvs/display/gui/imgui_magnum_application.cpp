@@ -60,7 +60,7 @@ ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const
       imgui_(Vector2{windowSize()} / dpiScaling(), windowSize(), framebufferSize()),
       gl_version_str_(GL::Context::current().versionString()),
       gl_renderer_str_(GL::Context::current().rendererString()),
-      error_alert_("Error Popup") {
+      error_alert_(std::make_shared<ErrorAlert>("Error Popup")) {
 
     ImGui::GetCurrentContext()->SettingsHandlers.push_back(settings_.handler());
 
@@ -333,6 +333,15 @@ auto ImGuiMagnumApplication::mouseScrollEvent(MouseScrollEvent& event) -> void {
         arcball_camera_->zoom(delta * wheel_zoom_scale);
         reset_draw_counter();
     }
+}
+
+auto ImGuiMagnumApplication::display_fps_info() -> void {
+    ImGui::TextUnformatted("Framerate:    ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f},
+                       "%.3f ms/frame (%.1f FPS) \t",
+                       1000.0f / ImGui::GetIO().Framerate,
+                       ImGui::GetIO().Framerate);
 }
 
 auto ImGuiMagnumApplication::display_device_info() -> void {

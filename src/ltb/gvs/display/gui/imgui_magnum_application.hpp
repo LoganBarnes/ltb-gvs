@@ -102,12 +102,13 @@ protected:
     CameraPackage                        camera_package_;
 
     // Errors
-    ErrorAlert error_alert_;
+    std::shared_ptr<ErrorAlert> error_alert_;
 
     // Ensures the application renders at least 5 more times after all events are
     // finished to give ImGui a chance to update and render correctly.
     auto reset_draw_counter() -> void;
 
+    auto display_fps_info() -> void;
     auto display_device_info() -> void;
 };
 
