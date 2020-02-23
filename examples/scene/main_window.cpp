@@ -37,6 +37,7 @@
 #include <random>
 
 using namespace Magnum;
+using namespace Math::Literals;
 
 namespace ltb::example {
 
@@ -51,11 +52,13 @@ MainWindow::MainWindow(const Arguments& arguments)
       gl_renderer_str_(GL::Context::current().rendererString()),
       error_alert_("Error Popup") {
 
-    camera_package_.zoom_object.translate({0.f, 0.f, 20.f});
-    camera_package_.rotation_object.rotateX(Math::Deg<float>(/*pitch*/ -15));
-    camera_package_.rotation_object.rotateY(Math::Deg<float>(/*yaw*/ 30));
+    auto rotation = Matrix4::rotationY(30.0_degf) * Matrix4::rotationX(-15.0_degf);
+    auto eye      = rotation.transformPoint({0.f, 0.f, 20.f});
+    auto center   = Vector3{};
+    auto up       = Vector3{0.f, 1.f, 0.f};
 
-    camera_package_.update_object();
+    arcball_camera_->setViewParameters(eye, center, up);
+    arcball_camera_->update(true);
 
     scene_.add_item(gvs::SetReadableId("Axes"), gvs::SetPrimitive(gvs::Axes{}));
 

@@ -37,7 +37,6 @@
 #include "ArcBall.h"
 
 namespace Magnum {
-namespace Examples {
 
 /* Arcball camera implementation integrated into the SceneGraph */
 class ArcBallCamera : public ArcBall {
@@ -48,6 +47,8 @@ public:
                   const Vector3&                     viewCenter,
                   const Vector3&                     upDir,
                   Deg                                fov,
+                  Float                              nearDist,
+                  Float                              farDist,
                   const Vector2i&                    windowSize,
                   const Vector2i&                    viewportSize)
         : ArcBall{cameraPosition, viewCenter, upDir, fov, windowSize} {
@@ -55,7 +56,8 @@ public:
         auto* cameraObject = new SceneGraph::Object<Transformation>{&scene};
         (*(_camera = new SceneGraph::Camera3D{*cameraObject}))
             .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
-            .setProjectionMatrix(Matrix4::perspectiveProjection(fov, Vector2{windowSize}.aspectRatio(), 0.01f, 100.0f))
+            .setProjectionMatrix(
+                Matrix4::perspectiveProjection(fov, Vector2{windowSize}.aspectRatio(), nearDist, farDist))
             .setViewport(viewportSize);
 
         /* Save the abstract transformation interface and initialize the
@@ -70,10 +72,11 @@ public:
     }
 
     /* Update the SceneGraph camera if arcball has been changed */
-    bool update() {
+    bool update(bool force_update = false) {
         /* call the internal update */
-        if (!updateTransformation())
+        if (!force_update && !updateTransformation()) {
             return false;
+        }
 
         (*_cameraObject)
             .resetTransformation()
@@ -82,13 +85,11 @@ public:
         return true;
     }
 
-    /* Draw objects using the internal scenegraph camera */
-    void draw(SceneGraph::DrawableGroup3D& drawables) { _camera->draw(drawables); }
+    SceneGraph::Camera3D* camera() { return _camera; }
 
 private:
     SceneGraph::AbstractTranslationRotation3D* _cameraObject{};
     SceneGraph::Camera3D*                      _camera{};
 };
 
-} // namespace Examples
 } // namespace Magnum

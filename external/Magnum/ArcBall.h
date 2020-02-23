@@ -36,7 +36,6 @@
 #include <Magnum/Math/Vector3.h>
 
 namespace Magnum {
-namespace Examples {
 
 /* Implementation of Ken Shoemake's arcball camera with smooth navigation
    feature: https://www.talisman.org/~erlkonig/misc/shoemake92-arcball.pdf */
@@ -105,6 +104,8 @@ public:
     /* Return the distance from the camera position to the center view */
     Float viewDistance() const { return Math::abs(_targetZooming); }
 
+    void resetViewCenter(const Vector3& viewCenter);
+
 protected:
     /* Update the camera transformations */
     void updateInternalTransformations();
@@ -126,5 +127,4 @@ protected:
     DualQuaternion _view, _inverseView;
 };
 
-} // namespace Examples
 } // namespace Magnum

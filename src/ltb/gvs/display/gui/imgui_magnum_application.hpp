@@ -28,6 +28,7 @@
 #include "ltb/gvs/forward_declarations.hpp"
 
 // external
+#include <Magnum/ArcBallCamera.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/ImGuiIntegration/Context.hpp>
 #include <Magnum/Platform/GlfwApplication.h>
@@ -77,42 +78,19 @@ private:
     auto mouseMoveEvent(MouseMoveEvent& event) -> void override;
     auto mouseScrollEvent(MouseScrollEvent& event) -> void override;
 
-    struct ArcballData {
-        Magnum::Vector2 screen_space_mouse_position = {};
-        Magnum::Vector3 view_space_position         = {};
-        Magnum::Vector3 world_space_position        = {};
-    };
-
-    [[nodiscard]] auto arcball_info(Magnum::Vector2 const& screen_space_mouse_position,
-                                    Magnum::Matrix4 const& rotation_transform) const -> ArcballData;
-
-    [[nodiscard]] auto world_position(Magnum::Vector2 const& screen_space_mouse_position,
-                                      Magnum::Matrix4 const& camera_transform,
-                                      float                  clip_space_z) const -> Magnum::Vector3;
-
-    auto zoom(float amount) -> void;
-
     Magnum::ImGuiIntegration::Context imgui_{Magnum::NoCreate};
     int                               draw_counter_ = 1; // continue drawing until this counter is zero
 
     // Camera
     Magnum::SceneGraph::Scene<Magnum::SceneGraph::MatrixTransformation3D> camera_scene_;
 
-    struct {
-        Magnum::Matrix4 zoom_transform        = {};
-        Magnum::Matrix4 rotation_transform    = {};
-        Magnum::Matrix4 translation_transform = {};
-        ArcballData     arcball               = {};
-    } previous_mouse_data_;
-
-    Magnum::Vector3 pan_pos_ = {};
-
 protected:
     // forward declaration
-    std::unique_ptr<GuiTheme> theme_{};
+    std::unique_ptr<GuiTheme> theme_;
 
     // Camera
-    OrbitCameraPackage camera_package_{};
+    std::optional<Magnum::ArcBallCamera> arcball_camera_;
+    CameraPackage                        camera_package_;
 
     // Ensures the application renders at least 5 more times after all events are
     // finished to give ImGui a chance to update and render correctly.

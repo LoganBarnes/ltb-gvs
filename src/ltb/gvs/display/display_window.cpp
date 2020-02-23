@@ -57,14 +57,7 @@ DisplayWindow::DisplayWindow(DisplayScene& parent_scene)
       gl_version_str_(GL::Context::current().versionString()),
       gl_renderer_str_(GL::Context::current().rendererString()),
       parent_scene_(parent_scene),
-      scene_backend_(std::make_unique<OpenglBackend>()) {
-
-    camera_package_.zoom_object.translate({0.f, 0.f, 20.f});
-    camera_package_.rotation_object.rotateX(Math::Deg<float>(/*pitch*/ -15));
-    camera_package_.rotation_object.rotateY(Math::Deg<float>(/*yaw*/ 30));
-
-    camera_package_.update_object();
-}
+      scene_backend_(std::make_unique<OpenglBackend>()) {}
 
 DisplayWindow::~DisplayWindow() = default;
 
