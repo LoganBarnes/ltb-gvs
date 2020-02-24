@@ -86,7 +86,15 @@ ScopedID::~ScopedID() {
     ImGui::PopID();
 }
 
-void add_three_line_separator() {
+auto display_fps_info() -> void {
+    auto framerate = static_cast<double>(ImGui::GetIO().Framerate);
+
+    ImGui::TextUnformatted("Framerate:    ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%.3f ms/frame (%.1f FPS) \t", 1000.0 / framerate, framerate);
+}
+
+auto add_three_line_separator() -> void {
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Separator();

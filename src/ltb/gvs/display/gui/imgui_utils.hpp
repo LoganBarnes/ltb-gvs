@@ -69,6 +69,8 @@ public:
     ~ScopedID();
 };
 
-void add_three_line_separator();
+auto display_fps_info() -> void;
+
+auto add_three_line_separator() -> void;
 
 } // namespace ltb::gvs
