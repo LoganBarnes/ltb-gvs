@@ -114,4 +114,9 @@ auto ContextError<Context>::operator!=(const ContextError<Context>& other) const
     return !(this->operator==(other));
 }
 
+template <typename Context>
+auto make_context_error(Error error, Context context) -> ContextError<Context> {
+    return {std::move(error), std::move(context)};
+}
+
 } // namespace ltb::util
