@@ -51,7 +51,7 @@ namespace {
 
 constexpr auto camera_near_dist = 1.f;
 constexpr auto camera_far_dist  = 1000.f;
-constexpr auto camera_fovy      = 45.0_degf;
+constexpr auto camera_fovy_deg  = 45.0;
 
 } // namespace
 
@@ -97,7 +97,7 @@ ImGuiMagnumApplication::ImGuiMagnumApplication(const Arguments& arguments, const
                             eye,
                             center,
                             up,
-                            camera_fovy,
+                            Math::Deg<float>(camera_fovy_deg),
                             camera_near_dist,
                             camera_far_dist,
                             windowSize(),
