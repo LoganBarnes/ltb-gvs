@@ -102,6 +102,8 @@ struct ContextError {
 
     auto operator==(const ContextError<Context>& other) const -> bool;
     auto operator!=(const ContextError<Context>& other) const -> bool;
+
+    ContextError(Error err, Context ctx) : error(std::move(err)), context(std::move(ctx)) {}
 };
 
 template <typename Context>
