@@ -23,6 +23,7 @@
 #include "imgui_utils.hpp"
 
 // external
+#include <Magnum/GL/Context.h>
 #include <imgui_internal.h>
 
 // standard
@@ -52,7 +53,7 @@ void Disable::disable_pop() {
     ImGui::PopItemFlag();
 }
 
-bool configure_gui(const std::string& label, std::string* data, ImGuiInputTextFlags_ const& flags) {
+auto configure_gui(const std::string& label, std::string* data, ImGuiInputTextFlags_ const& flags) -> bool {
     char buf[1024];
 
     std::size_t max_size = std::min(sizeof(buf) - 1u, data->size());
@@ -92,6 +93,18 @@ auto display_fps_info() -> void {
     ImGui::TextUnformatted("Framerate:    ");
     ImGui::SameLine();
     ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%.3f ms/frame (%.1f FPS) \t", 1000.0 / framerate, framerate);
+}
+
+auto display_device_info() -> void {
+    auto gl_version_str = Magnum::GL::Context::current().versionString();
+    ImGui::Text("GL Version:   ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_version_str.c_str());
+
+    auto gl_renderer_str = Magnum::GL::Context::current().rendererString();
+    ImGui::Text("GL Renderer:  ");
+    ImGui::SameLine();
+    ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s\t", gl_renderer_str.c_str());
 }
 
 auto add_three_line_separator() -> void {
