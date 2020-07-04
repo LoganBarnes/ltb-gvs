@@ -29,9 +29,10 @@
 #include "ltb/gvs/display/gui/scene_gui.hpp"
 
 // external
+#include <Corrade/Containers/ArrayViewStl.h>
 #include <Magnum/GL/Context.h>
 #include <Magnum/Primitives/Cube.h>
-#include <Magnum/Trade/MeshData3D.h>
+#include <Magnum/Trade/MeshData.h>
 #include <imgui.h>
 
 // standard
@@ -45,7 +46,7 @@ namespace ltb::example {
 MainWindow::MainWindow(const Arguments& arguments)
     : gvs::ImGuiMagnumApplication(arguments,
                                   Configuration{}
-                                      .setTitle("Machine Emulator")
+                                      .setTitle("Scene Example")
                                       .setSize({1280, 720})
                                       .setWindowFlags(Configuration::WindowFlag::Resizable)) {
 
@@ -60,7 +61,7 @@ MainWindow::MainWindow(const Arguments& arguments)
     scene_.add_item(gvs::SetReadableId("Axes"), gvs::SetPrimitive(gvs::Axes{}));
 
     {
-        Trade::MeshData3D const cube = Primitives::cubeSolid();
+        Trade::MeshData const cube = Primitives::cubeSolid();
 
         auto scale_transfomation = gvs::mat4();
         scale_transfomation[0]   = 0.5f;
@@ -68,10 +69,18 @@ MainWindow::MainWindow(const Arguments& arguments)
         scale_transfomation[10]  = 0.5f;
         scale_transfomation[15]  = 1.f;
 
+        auto positions = std::vector<Magnum::Vector3>(cube.vertexCount());
+        auto normals   = std::vector<Magnum::Vector3>(cube.vertexCount());
+        auto indices   = std::vector<unsigned>(cube.indexCount());
+
+        cube.positions3DInto(positions);
+        cube.normalsInto(normals);
+        cube.indicesInto(indices);
+
         scene_.add_item(gvs::SetReadableId("Cube"),
-                        gvs::SetPositions3d(cube.positions(0)),
-                        gvs::SetNormals3d(cube.normals(0)),
-                        gvs::SetTriangles(cube.indices()),
+                        gvs::SetPositions3d(positions),
+                        gvs::SetNormals3d(normals),
+                        gvs::SetTriangles(indices),
                         gvs::SetTransformation(scale_transfomation),
                         gvs::SetShading(gvs::Shading::Lambertian));
     }
@@ -83,9 +92,9 @@ MainWindow::MainWindow(const Arguments& arguments)
         std::uniform_real_distribution<float> u_dist(-1.f, 1.f);
         std::uniform_real_distribution<float> theta_dist(0.f, 2.f * pi);
 
-        float u;
-        float theta;
-        float coeff;
+        auto u     = 0.f;
+        auto theta = 0.f;
+        auto coeff = 0.f;
 
         for (auto i = 0u; i < 5000u; ++i) {
             u     = u_dist(gen);
@@ -130,7 +139,8 @@ void MainWindow::configure_gui() {
     auto height = static_cast<float>(this->windowSize().y());
     ImGui::SetNextWindowPos({0.f, 0.f});
     ImGui::SetNextWindowSizeConstraints({0.f, height}, {std::numeric_limits<float>::infinity(), height});
-    ImGui::Begin("Settings", nullptr, {350.f, height});
+    ImGui::SetNextWindowSize({350.f, height}, ImGuiCond_FirstUseEver);
+    ImGui::Begin("Settings", nullptr);
 
     display_device_info();
 
@@ -142,7 +152,7 @@ void MainWindow::configure_gui() {
 
     ImGui::End();
 
-    error_alert_.display_next_error();
+    error_alert_->display_next_error();
 }
 
 void MainWindow::resize(const Vector2i& viewport) {

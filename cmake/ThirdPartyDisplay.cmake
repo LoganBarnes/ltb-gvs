@@ -21,24 +21,24 @@
 # SOFTWARE.
 ##########################################################################################
 FetchContent_Declare(glfw_dl
-        GIT_REPOSITORY git@${GITLAB_URL}:external/glfw.git
-        GIT_TAG cloudnc/2.0.0
+        GIT_REPOSITORY https://github.com/glfw/glfw.git
+        GIT_TAG 3.3.2
         )
 FetchContent_Declare(imgui_dl
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG v1.71
+        GIT_TAG v1.77
         )
 FetchContent_Declare(corrade_dl
         GIT_REPOSITORY https://github.com/mosra/corrade.git
-        GIT_TAG v2019.10
+        GIT_TAG v2020.06
         )
 FetchContent_Declare(magnum_dl
         GIT_REPOSITORY https://github.com/mosra/magnum.git
-        GIT_TAG 65743b564720fab0b00615df5067af9a2c525a45
+        GIT_TAG v2020.06
         )
 FetchContent_Declare(magnum_integration_dl
         GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
-        GIT_TAG v2019.01
+        GIT_TAG v2020.06
         )
 
 if (MSVC)

@@ -68,9 +68,8 @@ auto OpaqueDrawable::draw(Matrix4 const& transformation_matrix, SceneGraph::Came
         .set_coloring(coloring_)
         .set_uniform_color(uniform_color_)
         .set_shading(shading_)
-        .set_id(intersect_id_);
-
-    mesh_.draw(shader_);
+        .set_id(intersect_id_)
+        .draw(mesh_);
 }
 
 } // namespace ltb::gvs
