@@ -23,7 +23,7 @@
 #pragma once
 
 // project
-#include "../util11/make_unique_11.hpp"
+#include "ltb/gvs/util11/make_unique_11.hpp"
 #include "primitive_types.hpp"
 #include "scene_id.hpp"
 

@@ -95,6 +95,11 @@ auto from_magnum(Magnum::MeshPrimitive const& format) -> GeometryFormat {
 
     case Magnum::MeshPrimitive::TriangleFan:
         return GeometryFormat::TriangleFan;
+
+    case Magnum::MeshPrimitive::Instances:
+    case Magnum::MeshPrimitive::Faces:
+    case Magnum::MeshPrimitive::Edges:
+        throw std::invalid_argument("Mesh primitive type not supported");
     }
     throw std::runtime_error("Unreachable code");
 }

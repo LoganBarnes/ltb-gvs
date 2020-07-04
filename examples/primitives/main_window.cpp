@@ -30,9 +30,6 @@
 
 // external
 #include <Magnum/GL/Context.h>
-#include <Magnum/Math/Color.h>
-#include <Magnum/Primitives/Axis.h>
-#include <Magnum/Trade/MeshData3D.h>
 #include <imgui.h>
 
 // standard
@@ -45,17 +42,11 @@ namespace ltb::example {
 MainWindow::MainWindow(const Arguments& arguments)
     : gvs::ImGuiMagnumApplication(arguments,
                                   Configuration{}
-                                      .setTitle("Machine Emulator")
+                                      .setTitle("Primitive Example")
                                       .setSize({1280, 720})
                                       .setWindowFlags(Configuration::WindowFlag::Resizable)) {
 
-    {
-        axes_.scene_id = scene_.add_item(gvs::SetReadableId("Axes"),
-                                         gvs::SetPositions3d(),
-                                         gvs::SetColoring(gvs::Coloring::VertexColors),
-                                         gvs::SetShading(gvs::Shading::UniformColor));
-        reset_axes();
-    }
+    axes_.scene_id = scene_.add_item(gvs::SetReadableId("Axes"), gvs::SetPrimitive(gvs::Axes{}));
 
     {
         auto translation = gvs::identity_mat4;
@@ -141,7 +132,8 @@ void MainWindow::configure_gui() {
     auto height = static_cast<float>(this->windowSize().y());
     ImGui::SetNextWindowPos({0.f, 0.f});
     ImGui::SetNextWindowSizeConstraints({0.f, height}, {std::numeric_limits<float>::infinity(), height});
-    ImGui::Begin("Settings", nullptr, {350.f, height});
+    ImGui::SetNextWindowSize({350.f, height}, ImGuiCond_FirstUseEver);
+    ImGui::Begin("Settings", nullptr);
 
     display_device_info();
 
@@ -241,29 +233,11 @@ void MainWindow::configure_gui() {
 
     ImGui::End();
 
-    error_alert_.display_next_error();
+    error_alert_->display_next_error();
 }
 
 void MainWindow::resize(const Vector2i& viewport) {
     scene_.resize(viewport);
-}
-
-auto MainWindow::reset_axes() -> void {
-    Trade::MeshData3D const axes = Primitives::axis3D();
-
-    auto const& colors = axes.colors(0);
-
-    std::vector<Magnum::Color3> vertex_colors;
-    vertex_colors.reserve(colors.size());
-    for (auto const& color4 : colors) {
-        vertex_colors.emplace_back(color4.r(), color4.g(), color4.b());
-    }
-
-    scene_.update_item(axes_.scene_id,
-                       gvs::SetPositions3d(axes.positions(0)),
-                       gvs::SetVertexColors3d(vertex_colors),
-                       gvs::SetIndices(axes.indices()),
-                       gvs::SetGeometryFormat(gvs::from_magnum(axes.primitive())));
 }
 
 auto MainWindow::reset_cone() -> void {
