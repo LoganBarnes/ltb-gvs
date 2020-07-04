@@ -21,8 +21,8 @@
 # SOFTWARE.
 ##########################################################################################
 FetchContent_Declare(glfw_dl
-        GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.3
+        GIT_REPOSITORY git@${GITLAB_URL}:external/glfw.git
+        GIT_TAG cloudnc/2.0.0
         )
 FetchContent_Declare(imgui_dl
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
