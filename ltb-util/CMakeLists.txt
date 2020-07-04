@@ -50,7 +50,6 @@ ltb_link_libraries(ltb_util
         PUBLIC
         expected
         range-v3
-        Threads::Threads
         doctest
         )
 ltb_include_directories(ltb_util

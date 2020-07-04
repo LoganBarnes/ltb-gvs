@@ -25,6 +25,7 @@
 // project
 #include "../common/test_scene.hpp"
 #include "ltb/gvs/core/log_params.hpp"
+#include "ltb/gvs/display/gui/error_alert.hpp"
 #include "ltb/gvs/display/gui/imgui_utils.hpp"
 #include "ltb/gvs/display/gui/scene_gui.hpp"
 
@@ -33,7 +34,6 @@
 #include <Magnum/GL/Context.h>
 #include <Magnum/Primitives/Cube.h>
 #include <Magnum/Trade/MeshData.h>
-#include <imgui.h>
 
 // standard
 #include <random>

@@ -23,7 +23,6 @@
 #pragma once
 
 // project
-#include "ltb/gvs/display/gui/error_alert.hpp"
 #include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
 #include "ltb/gvs/display/local_scene.hpp"
 

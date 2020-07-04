@@ -35,10 +35,6 @@ FetchContent_Declare(doctest_dl
         GIT_TAG 2.3.6
         )
 
-### Threads ###
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-
 ### Expected ###
 FetchContent_GetProperties(expected_dl)
 if (NOT expected_dl_POPULATED)
