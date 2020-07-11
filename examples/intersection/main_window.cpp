@@ -29,14 +29,7 @@
 #include "ltb/gvs/display/magnum_conversions.hpp"
 
 // external
-#include <Magnum/GL/Context.h>
-#include <Magnum/Math/Color.h>
-#include <Magnum/Primitives/Axis.h>
-#include <Magnum/Trade/MeshData3D.h>
 #include <imgui.h>
-
-// standard
-#include <random>
 
 using namespace Magnum;
 
@@ -53,7 +46,7 @@ constexpr gvs::vec3 orange   = {1.f, 0.5f, 0.1f};
 MainWindow::MainWindow(const Arguments& arguments)
     : gvs::ImGuiMagnumApplication(arguments,
                                   Configuration{}
-                                      .setTitle("Machine Emulator")
+                                      .setTitle("Intersection Example")
                                       .setSize({1280, 720})
                                       .setWindowFlags(Configuration::WindowFlag::Resizable)) {
 
@@ -155,7 +148,8 @@ void MainWindow::configure_gui() {
     auto height = static_cast<float>(this->windowSize().y());
     ImGui::SetNextWindowPos({0.f, 0.f});
     ImGui::SetNextWindowSizeConstraints({0.f, height}, {std::numeric_limits<float>::infinity(), height});
-    ImGui::Begin("Settings", nullptr, {350.f, height});
+    ImGui::SetNextWindowSize({350.f, height}, ImGuiCond_FirstUseEver);
+    ImGui::Begin("Settings", nullptr);
 
     display_device_info();
 
@@ -169,7 +163,7 @@ void MainWindow::configure_gui() {
 
     ImGui::End();
 
-    error_alert_.display_next_error();
+    error_alert_->display_next_error();
 }
 
 void MainWindow::resize(const Vector2i& viewport) {

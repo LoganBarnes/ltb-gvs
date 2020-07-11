@@ -35,8 +35,12 @@ function(ltb_set_properties target cxx_standard)
             CUDA_EXTENSIONS OFF
             CUDA_SEPARABLE_COMPILATION ON
             # CCache
-            COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
+            C_COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
+            CXX_COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
+            CUDA_COMPILER_LAUNCHER "${LTB_CCACHE_PROGRAM}"
             # Clang-Tidy
+            C_CLANG_TIDY "${LTB_CLANG_TIDY}"
             CXX_CLANG_TIDY "${LTB_CLANG_TIDY}"
+            CUDA_CLANG_TIDY "${LTB_CLANG_TIDY}"
     )
 endfunction()

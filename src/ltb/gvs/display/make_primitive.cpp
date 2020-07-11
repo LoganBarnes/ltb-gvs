@@ -26,6 +26,8 @@
 #include "magnum_conversions.hpp"
 
 // external
+#include <Corrade/Containers/ArrayViewStl.h>
+#include <Corrade/Containers/StridedArrayView.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Vector3.h>
 #include <Magnum/Primitives/Axis.h>
@@ -34,81 +36,104 @@
 #include <Magnum/Primitives/Cylinder.h>
 #include <Magnum/Primitives/Plane.h>
 #include <Magnum/Primitives/UVSphere.h>
-#include <Magnum/Trade/MeshData3D.h>
+#include <Magnum/Trade/MeshData.h>
+#include <range/v3/view/transform.hpp>
 
 namespace ltb::gvs {
 namespace {
+
+auto extract_positions_normal_indices(const Magnum::Trade::MeshData& mesh,
+                                      AttributeVector<3>*            positions_out,
+                                      AttributeVector<3>*            normals_out,
+                                      std::vector<unsigned>*         indices_out) {
+    if (positions_out) {
+        auto positions = std::vector<Magnum::Vector3>(mesh.vertexCount());
+        mesh.positions3DInto(positions);
+        *positions_out = std::move(positions);
+    }
+
+    if (normals_out) {
+        auto normals = std::vector<Magnum::Vector3>(mesh.vertexCount());
+        mesh.normalsInto(normals);
+        *normals_out = std::move(normals);
+    }
+
+    if (indices_out) {
+        indices_out->resize(mesh.indexCount());
+        mesh.indicesInto(*indices_out);
+    }
+}
 
 struct PrimitiveVisitor {
     SceneItemInfo* info;
 
     auto operator()(Axes const&) const -> void {
-        auto axes_mesh = Magnum::Primitives::axis3D();
+        auto mesh = Magnum::Primitives::axis3D();
 
-        auto const& colors4 = axes_mesh.colors(0);
+        auto colors4 = mesh.colorsAsArray();
+        auto colors  = colors4 | ranges::views::transform([](const auto& color) {
+                          return Magnum::Color3{color.r(), color.g(), color.b()};
+                      })
+            | ranges::to<std::vector>;
 
-        std::vector<Magnum::Color3> colors3;
-        colors3.reserve(colors4.size());
-        for (auto const& color4 : colors4) {
-            colors3.emplace_back(color4.r(), color4.g(), color4.b());
-        }
-
-        info->geometry_info                = {};
-        info->geometry_info.positions      = std::move(axes_mesh.positions(0));
-        info->geometry_info.vertex_colors  = std::move(colors3);
-        info->geometry_info.indices        = std::move(axes_mesh.indices());
-        info->display_info.geometry_format = from_magnum(axes_mesh.primitive());
+        info->geometry_info = {};
+        extract_positions_normal_indices(mesh, &info->geometry_info.positions, nullptr, &info->geometry_info.indices);
+        info->geometry_info.vertex_colors  = std::move(colors);
+        info->display_info.geometry_format = from_magnum(mesh.primitive());
         info->display_info.coloring        = gvs::Coloring::VertexColors;
         info->display_info.shading         = gvs::Shading::UniformColor;
     }
 
     auto operator()(Cone const& cone) const -> void {
-        auto cone_mesh = Magnum::Primitives::coneSolid(cone.rings, cone.segments, cone.half_length);
+        auto mesh = Magnum::Primitives::coneSolid(cone.rings, cone.segments, cone.half_length);
 
-        info->geometry_info                = {};
-        info->geometry_info.positions      = std::move(cone_mesh.positions(0));
-        info->geometry_info.normals        = std::move(cone_mesh.normals(0));
-        info->geometry_info.indices        = std::move(cone_mesh.indices());
-        info->display_info.geometry_format = from_magnum(cone_mesh.primitive());
+        info->geometry_info = {};
+        extract_positions_normal_indices(mesh,
+                                         &info->geometry_info.positions,
+                                         &info->geometry_info.normals,
+                                         &info->geometry_info.indices);
+        info->display_info.geometry_format = from_magnum(mesh.primitive());
     }
 
     auto operator()(Cube const&) const -> void {
-        auto cube_mesh = Magnum::Primitives::cubeSolid();
+        auto mesh = Magnum::Primitives::cubeSolid();
 
-        info->geometry_info                = {};
-        info->geometry_info.positions      = std::move(cube_mesh.positions(0));
-        info->geometry_info.normals        = std::move(cube_mesh.normals(0));
-        info->geometry_info.indices        = std::move(cube_mesh.indices());
-        info->display_info.geometry_format = from_magnum(cube_mesh.primitive());
+        info->geometry_info = {};
+        extract_positions_normal_indices(mesh,
+                                         &info->geometry_info.positions,
+                                         &info->geometry_info.normals,
+                                         &info->geometry_info.indices);
+        info->display_info.geometry_format = from_magnum(mesh.primitive());
     }
 
     auto operator()(Cylinder const& cylinder) const -> void {
-        auto cylinder_mesh = Magnum::Primitives::cylinderSolid(cylinder.rings, cylinder.segments, cylinder.half_length);
+        auto mesh = Magnum::Primitives::cylinderSolid(cylinder.rings, cylinder.segments, cylinder.half_length);
 
-        info->geometry_info                = {};
-        info->geometry_info.positions      = std::move(cylinder_mesh.positions(0));
-        info->geometry_info.normals        = std::move(cylinder_mesh.normals(0));
-        info->geometry_info.indices        = std::move(cylinder_mesh.indices());
-        info->display_info.geometry_format = from_magnum(cylinder_mesh.primitive());
+        info->geometry_info = {};
+        extract_positions_normal_indices(mesh,
+                                         &info->geometry_info.positions,
+                                         &info->geometry_info.normals,
+                                         &info->geometry_info.indices);
+        info->display_info.geometry_format = from_magnum(mesh.primitive());
     }
 
     auto operator()(Plane const&) const -> void {
-        auto plane_mesh = Magnum::Primitives::planeSolid();
+        auto mesh = Magnum::Primitives::planeSolid();
 
-        info->geometry_info                = {};
-        info->geometry_info.positions      = std::move(plane_mesh.positions(0));
-        info->geometry_info.normals        = std::move(plane_mesh.normals(0));
-        info->display_info.geometry_format = from_magnum(plane_mesh.primitive());
+        info->geometry_info = {};
+        extract_positions_normal_indices(mesh, &info->geometry_info.positions, &info->geometry_info.normals, nullptr);
+        info->display_info.geometry_format = from_magnum(mesh.primitive());
     }
 
     auto operator()(Sphere const& sphere) const -> void {
-        auto sphere_mesh = Magnum::Primitives::uvSphereSolid(sphere.rings, sphere.segments);
+        auto mesh = Magnum::Primitives::uvSphereSolid(sphere.rings, sphere.segments);
 
-        info->geometry_info                = {};
-        info->geometry_info.positions      = std::move(sphere_mesh.positions(0));
-        info->geometry_info.normals        = std::move(sphere_mesh.normals(0));
-        info->geometry_info.indices        = std::move(sphere_mesh.indices());
-        info->display_info.geometry_format = from_magnum(sphere_mesh.primitive());
+        info->geometry_info = {};
+        extract_positions_normal_indices(mesh,
+                                         &info->geometry_info.positions,
+                                         &info->geometry_info.normals,
+                                         &info->geometry_info.indices);
+        info->display_info.geometry_format = from_magnum(mesh.primitive());
     }
 };
 

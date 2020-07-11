@@ -23,12 +23,13 @@
 #include "opengl_backend.hpp"
 
 // project
-#include "../magnum_conversions.hpp"
+#include "ltb/gvs/display/magnum_conversions.hpp"
 #include "ltb/util/container_utils.hpp"
 #include "ltb/util/result.hpp"
 
 // external
 #include <Corrade/Containers/ArrayViewStl.h>
+#include <Corrade/Containers/StridedArrayView.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/RenderbufferFormat.h>
 #include <Magnum/GL/Renderer.h>
@@ -82,14 +83,12 @@ auto update_ibo(OpenglBackend::ObjectMeshPackage* mesh_package, std::vector<unsi
     if (!indices.empty()) {
         Corrade::Containers::Array<char> index_data;
         Magnum::MeshIndexType            index_type;
-        Magnum::UnsignedInt              index_start, index_end;
-        std::tie(index_data, index_type, index_start, index_end) = Magnum::MeshTools::compressIndices(indices);
+        std::tie(index_data, index_type) = Magnum::MeshTools::compressIndices(indices);
         mesh_package->index_buffer.setData(index_data, Magnum::GL::BufferUsage::StaticDraw);
 
         mesh_package->ibo_count = static_cast<int>(indices.size());
 
-        mesh_package->mesh.setCount(mesh_package->ibo_count)
-            .setIndexBuffer(mesh_package->index_buffer, 0, index_type, index_start, index_end);
+        mesh_package->mesh.setCount(mesh_package->ibo_count).setIndexBuffer(mesh_package->index_buffer, 0, index_type);
     }
 }
 
