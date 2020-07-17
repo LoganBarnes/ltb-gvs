@@ -26,7 +26,7 @@ FetchContent_Declare(glfw_dl
         )
 FetchContent_Declare(imgui_dl
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG v1.77
+        GIT_TAG 3d4af15d1d5f5d3746b69859308949c357e0c21e # from docking branch
         )
 FetchContent_Declare(corrade_dl
         GIT_REPOSITORY https://github.com/mosra/corrade.git
