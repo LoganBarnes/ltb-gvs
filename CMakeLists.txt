@@ -110,9 +110,15 @@ if (LTB_ENABLE_GVS_DISPLAY)
             ltb_gvs_display_resources
             ltb_util
             ltb_gvs_core
+            CUDA::OptiX
+            CUDA::nvrtc
             )
 
     target_link_libraries(ltb_gvs INTERFACE ltb_gvs_display)
+
+    #####################
+    ### OptiX Backend ###
+    #####################
 
     ###############
     ### Testing ###

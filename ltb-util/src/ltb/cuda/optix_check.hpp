@@ -23,29 +23,29 @@
 #pragma once
 
 // external
-#include <cuda_runtime.h>
+#include <optix_stubs.h>
 
 // standard
 #include <exception>
 #include <sstream>
 #include <string>
 
-#define LTB_CUDA_CHECK(val) ::ltb::cuda::check((val), #val, __FILE__, __LINE__)
+#define LTB_OPTIX_CHECK(val) ::ltb::optix::check((val), #val, __FILE__, __LINE__)
 
 namespace ltb {
-namespace cuda {
+namespace optix {
 
 template <typename T>
 void check(T result, char const* const func, const char* const file, int const line) {
-    if (result != cudaSuccess) {
+    if (result != OPTIX_SUCCESS) {
         std::stringstream error_str;
-        error_str << "CUDA error at " << file << ":" << line;
-        error_str << " code=" << static_cast<unsigned int>(result) << "(" << cudaGetErrorString(result) << ") ";
+        error_str << "OPTIX error at " << file << ":" << line;
+        error_str << " code=" << static_cast<unsigned int>(result) << "(" << optixGetErrorString(result) << ") ";
         error_str << "\"" << func << "\"";
 
         throw std::runtime_error(error_str.str());
     }
 }
 
-} // namespace cuda
+} // namespace optix
 } // namespace ltb

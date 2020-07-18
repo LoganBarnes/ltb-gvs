@@ -26,7 +26,7 @@ FetchContent_Declare(glfw_dl
         )
 FetchContent_Declare(imgui_dl
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG v1.77
+        GIT_TAG docking
         )
 FetchContent_Declare(corrade_dl
         GIT_REPOSITORY https://github.com/mosra/corrade.git
@@ -40,6 +40,17 @@ FetchContent_Declare(magnum_integration_dl
         GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
         GIT_TAG v2020.06
         )
+
+if (CMAKE_CUDA_COMPILER)
+    find_package(CUDAToolkit 10 REQUIRED)
+
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+    find_package(OptiX REQUIRED)
+
+    add_library(cuda-optix INTERFACE)
+    target_include_directories(cuda-optix SYSTEM INTERFACE ${OptiX_INCLUDE})
+    add_library(CUDA::OptiX ALIAS cuda-optix)
+endif ()
 
 if (MSVC)
     set(LTB_GVS_TEST_GL_CONTEXT WglContext)
