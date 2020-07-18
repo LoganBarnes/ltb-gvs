@@ -60,7 +60,15 @@ if (NOT range_v3_dl_POPULATED)
 
     # compile with current project
     add_subdirectory(${range_v3_dl_SOURCE_DIR} ${range_v3_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-    target_include_directories(range-v3 SYSTEM INTERFACE $<BUILD_INTERFACE:${range_v3_dl_SOURCE_DIR}/include/>)
+    target_include_directories(range-v3
+            SYSTEM INTERFACE
+            $<BUILD_INTERFACE:${range_v3_dl_SOURCE_DIR}/include/>
+            )
+    target_compile_options(range-v3
+            INTERFACE
+            $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->
+            )
+    add_library(LtbExternal::RangeV3 ALIAS range-v3)
 endif (NOT range_v3_dl_POPULATED)
 
 ### DocTest ###
