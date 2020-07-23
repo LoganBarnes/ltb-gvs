@@ -1,0 +1,83 @@
+// ///////////////////////////////////////////////////////////////////////////////////////
+// LTB Geometry Visualization Server
+// Copyright (c) 2020 Logan Barnes - All Rights Reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// ///////////////////////////////////////////////////////////////////////////////////////
+
+// ///////////////////////////////////////////////////////////////////////////////////////
+// @AUTO_GENERATION_MESSAGE@
+// ///////////////////////////////////////////////////////////////////////////////////////
+#pragma once
+
+#include <stdexcept>
+#include <string>
+
+#cmakedefine LTB_CUDA_ENABLED
+#cmakedefine LTB_OPTIX_ENABLED
+
+namespace ltb {
+namespace paths {
+
+inline auto slash() -> std::string {
+    return "@SLASH@";
+}
+
+inline auto project_root() -> std::string {
+    return "@NATIVE_PROJECT_SOURCE_DIR@" + slash();
+}
+
+inline auto resources() -> std::string {
+    return project_root() + "res" + slash();
+}
+
+inline auto gvs_src() -> std::string {
+    return project_root() + "src" + slash() + "ltb" + slash() + "gvs";
+}
+
+inline auto shaders() -> std::string {
+    return gvs_src() + "display" + slash() + "shaders" + slash();
+}
+
+inline auto frag_shader_file() -> std::string {
+#ifdef __APPLE__
+    return shaders() + "shader_mac.frag";
+#else
+    return shaders() + "shader.frag";
+#endif
+}
+
+inline auto cuda_include_dir() -> std::string {
+#ifdef LTB_CUDA_ENABLED
+    return "@CUDAToolkit_INCLUDE_DIRS@";
+#else
+    throw std::runtime_error("optix is not enabled");
+#endif
+}
+
+inline auto optix_include_dir() -> std::string {
+#ifdef LTB_OPTIX_ENABLED
+    return "@@";
+#else
+    throw std::runtime_error("optix is not enabled");
+#endif
+}
+
+} // namespace paths
+} // namespace ltb
