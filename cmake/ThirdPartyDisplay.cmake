@@ -43,12 +43,17 @@ FetchContent_Declare(magnum_integration_dl
 
 if (CMAKE_CUDA_COMPILER)
     find_package(CUDAToolkit 10 REQUIRED)
+    set(LTB_CUDA_ENABLED TRUE)
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
     find_package(OptiX REQUIRED)
+    set(LTB_OPTIX_ENABLED TRUE)
 
     add_library(cuda-optix INTERFACE)
-    target_include_directories(cuda-optix SYSTEM INTERFACE ${OptiX_INCLUDE})
+    target_include_directories(cuda-optix
+            SYSTEM INTERFACE
+            "$<BUILD_INTERFACE:${OptiX_INCLUDE}>"
+            )
     add_library(CUDA::OptiX ALIAS cuda-optix)
 endif ()
 

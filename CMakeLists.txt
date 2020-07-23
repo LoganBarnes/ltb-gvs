@@ -57,7 +57,14 @@ endif ()
 ###########
 add_library(ltb_gvs INTERFACE)
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/src/gvs_paths.hpp.in ${CMAKE_BINARY_DIR}/generated/ltb/gvs_paths.hpp)
+configure_file(
+        ${CMAKE_CURRENT_LIST_DIR}/src/gvs_cuda_includes.hpp.in
+        ${CMAKE_BINARY_DIR}/generated/ltb/gvs_cuda_includes.hpp
+)
+configure_file(
+        ${CMAKE_CURRENT_LIST_DIR}/src/gvs_paths.hpp.in
+        ${CMAKE_BINARY_DIR}/generated/ltb/gvs_paths.hpp
+)
 
 ################
 ### GVS Core ###

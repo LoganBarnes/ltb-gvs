@@ -26,42 +26,15 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <stdexcept>
-#include <string>
+#include "ltb/config.hpp"
+#include "ltb/gvs_paths.hpp"
 
-#cmakedefine LTB_CUDA_ENABLED
+#include <stdexcept>
+
 #cmakedefine LTB_OPTIX_ENABLED
 
 namespace ltb {
 namespace paths {
-
-inline auto slash() -> std::string {
-    return "@SLASH@";
-}
-
-inline auto project_root() -> std::string {
-    return "@NATIVE_PROJECT_SOURCE_DIR@" + slash();
-}
-
-inline auto resources() -> std::string {
-    return project_root() + "res" + slash();
-}
-
-inline auto gvs_src() -> std::string {
-    return project_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
 
 inline auto cuda_include_dir() -> std::string {
 #ifdef LTB_CUDA_ENABLED
@@ -73,7 +46,7 @@ inline auto cuda_include_dir() -> std::string {
 
 inline auto optix_include_dir() -> std::string {
 #ifdef LTB_OPTIX_ENABLED
-    return "@@";
+    return "@OptiX_INCLUDE@";
 #else
     throw std::runtime_error("optix is not enabled");
 #endif
