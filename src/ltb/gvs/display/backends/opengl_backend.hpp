@@ -106,6 +106,7 @@ private:
     mutable Object3D                      camera_object_;
     mutable Magnum::SceneGraph::Camera3D* camera_;
 
+    mutable Magnum::SceneGraph::DrawableGroup3D custom_renderable_drawables_;
     mutable Magnum::SceneGraph::DrawableGroup3D opaque_drawables_;
     mutable Magnum::SceneGraph::DrawableGroup3D wireframe_drawables_;
     mutable Magnum::SceneGraph::DrawableGroup3D transparent_drawables_;
