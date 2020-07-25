@@ -23,19 +23,11 @@
 
 // version will be inserted automagically
 
-layout(location = 0) in vec4 local_position;
-layout(location = 1) in vec3 local_normal;
-layout(location = 2) in vec2 texture_coordinates;
-layout(location = 3) in vec3 vertex_color;
+in int gl_VertexID;
 
-uniform mat4 world_from_local = mat4(1.f);
-uniform mat3 world_from_local_normals = mat3(1.f);
-uniform mat4 projection_from_local = mat4(1.f);
+uniform float ndc_depth = 0.5f;
 
-layout(location = 0) out vec3 world_position_out;
-layout(location = 1) out vec3 world_normal_out;
-layout(location = 2) out vec2 texture_coordinates_out;
-layout(location = 3) out vec3 vertex_color_out;
+layout(location = 0) out vec2 texture_coordinates;
 
 out gl_PerVertex
 {
@@ -44,10 +36,31 @@ out gl_PerVertex
 
 void main()
 {
-    world_position_out      = vec3(world_from_local * local_position);
-    world_normal_out        = world_from_local_normals * local_normal;
-    texture_coordinates_out = texture_coordinates;
-    vertex_color_out        = vertex_color;
+    switch (gl_VertexID)
+    {
+        case 0:
+        texture_coordinates = vec2(0.f, 1.f);
+        gl_Position         = vec4(-1.f, -1.f, ndc_depth, 1.f);
+        break;
 
-    gl_Position = projection_from_local * local_position;
+        case 1:
+        texture_coordinates = vec2(1.f, 1.f);
+        gl_Position         = vec4(1.f, -1.f, ndc_depth, 1.f);
+        break;
+
+        case 2:
+        texture_coordinates = vec2(0.f, 0.f);
+        gl_Position         = vec4(-1.f, 1.f, ndc_depth, 1.f);
+        break;
+
+        case 3:
+        texture_coordinates = vec2(1.f, 0.f);
+        gl_Position         = vec4(1.f, 1.f, ndc_depth, 1.f);
+        break;
+
+        default :
+        texture_coordinates = vec2(-1.f);
+        gl_Position         = vec4(0.f);
+        break;
+    }
 }

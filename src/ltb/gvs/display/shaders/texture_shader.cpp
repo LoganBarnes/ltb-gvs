@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "general_shader.hpp"
+#include "texture_shader.hpp"
 
 // external
 #include <Corrade/Containers/Reference.h>
@@ -33,7 +33,7 @@
 
 namespace ltb::gvs {
 
-GeneralShader::GeneralShader() {
+TextureShader::TextureShader() {
     MAGNUM_ASSERT_GL_VERSION_SUPPORTED(Magnum::GL::Version::GL450);
 
     const Corrade::Utility::Resource rs{"gvs-resource-data"};
@@ -41,8 +41,8 @@ GeneralShader::GeneralShader() {
     Magnum::GL::Shader vert{Magnum::GL::Version::GL450, Magnum::GL::Shader::Type::Vertex};
     Magnum::GL::Shader frag{Magnum::GL::Version::GL450, Magnum::GL::Shader::Type::Fragment};
 
-    vert.addSource(rs.get("general_shader.vert"));
-    frag.addSource(rs.get("general_shader.frag"));
+    vert.addSource(rs.get("texture_shader.vert"));
+    frag.addSource(rs.get("texture_shader.frag"));
 
     auto vert_ref = Corrade::Containers::Reference<Magnum::GL::Shader>(vert);
     auto frag_ref = Corrade::Containers::Reference<Magnum::GL::Shader>(frag);
@@ -52,55 +52,10 @@ GeneralShader::GeneralShader() {
     attachShaders({vert, frag});
 
     CORRADE_INTERNAL_ASSERT_OUTPUT(link());
-
-    world_from_local_uniform_location_         = uniformLocation("world_from_local");
-    world_from_local_normals_uniform_location_ = uniformLocation("world_from_local_normals");
-    projection_from_local_uniform_location_    = uniformLocation("projection_from_local");
-
-    coloring_uniform_location_      = uniformLocation("coloring");
-    uniform_color_uniform_location_ = uniformLocation("uniform_color");
-
-    shading_uniform_location_         = uniformLocation("shading");
-    light_direction_uniform_location_ = uniformLocation("light_direction");
-    light_color_uniform_location_     = uniformLocation("light_color");
-    ambient_scale_uniform_location_   = uniformLocation("ambient_scale");
-
-    id_uniform_location_ = uniformLocation("id");
 }
 
-auto GeneralShader::set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> GeneralShader& {
-    setUniform(world_from_local_uniform_location_, world_from_local);
-    return *this;
-}
-
-auto GeneralShader::set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals)
-    -> GeneralShader& {
-    setUniform(world_from_local_normals_uniform_location_, world_from_local_normals);
-    return *this;
-}
-
-auto GeneralShader::set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local) -> GeneralShader& {
-    setUniform(projection_from_local_uniform_location_, projection_from_local);
-    return *this;
-}
-
-auto GeneralShader::set_coloring(Coloring const& coloring) -> GeneralShader& {
-    setUniform(coloring_uniform_location_, std::underlying_type_t<Coloring>(coloring));
-    return *this;
-}
-
-auto GeneralShader::set_uniform_color(Magnum::Color3 const& color) -> GeneralShader& {
-    setUniform(uniform_color_uniform_location_, color);
-    return *this;
-}
-
-auto GeneralShader::set_shading(Shading const& shading) -> GeneralShader& {
-    setUniform(shading_uniform_location_, std::underlying_type_t<Shading>(shading));
-    return *this;
-}
-
-auto GeneralShader::set_id(unsigned const& id) -> GeneralShader& {
-    setUniform(id_uniform_location_, id);
+auto TextureShader::bind_tex(Magnum::GL::Texture2D& tex) -> TextureShader& {
+    tex.bind(0);
     return *this;
 }
 

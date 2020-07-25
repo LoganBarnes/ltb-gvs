@@ -27,45 +27,17 @@
 
 // external
 #include <Magnum/GL/AbstractShaderProgram.h>
-#include <Magnum/Math/Color.h>
+#include <Magnum/GL/Texture.h>
 
 namespace ltb::gvs {
 
-class GeneralShader : public Magnum::GL::AbstractShaderProgram {
+class TextureShader : public Magnum::GL::AbstractShaderProgram {
 public:
-    typedef Magnum::GL::Attribute<0, Magnum::Vector3> Position;
-    typedef Magnum::GL::Attribute<1, Magnum::Vector3> Normal;
-    typedef Magnum::GL::Attribute<2, Magnum::Vector2> TextureCoordinate;
-    typedef Magnum::GL::Attribute<3, Magnum::Vector3> VertexColor;
+    enum : Magnum::UnsignedInt { ColorOutput = 0 };
 
-    enum : Magnum::UnsignedInt { ColorOutput = 0, IdOutput = 1 };
+    explicit TextureShader();
 
-    explicit GeneralShader();
-
-    auto set_world_from_local_matrix(Magnum::Matrix4 const& world_from_local) -> GeneralShader&;
-    auto set_world_from_local_normal_matrix(Magnum::Matrix3 const& world_from_local_normals) -> GeneralShader&;
-    auto set_projection_from_local_matrix(Magnum::Matrix4 const& projection_from_local) -> GeneralShader&;
-
-    auto set_coloring(Coloring const& coloring) -> GeneralShader&;
-    auto set_uniform_color(Magnum::Color3 const& color) -> GeneralShader&;
-
-    auto set_shading(Shading const& shading) -> GeneralShader&;
-    auto set_id(unsigned const& id) -> GeneralShader&;
-
-private:
-    int projection_from_local_uniform_location_    = -1;
-    int world_from_local_uniform_location_         = -1;
-    int world_from_local_normals_uniform_location_ = -1;
-
-    int coloring_uniform_location_      = -1;
-    int uniform_color_uniform_location_ = -1;
-
-    int shading_uniform_location_         = -1;
-    int light_direction_uniform_location_ = -1;
-    int light_color_uniform_location_     = -1;
-    int ambient_scale_uniform_location_   = -1;
-
-    int id_uniform_location_ = -1;
+    auto bind_tex(Magnum::GL::Texture2D& tex) -> TextureShader&;
 };
 
 } // namespace ltb::gvs
