@@ -39,22 +39,22 @@ void main()
     switch (gl_VertexID)
     {
         case 0:
-        texture_coordinates = vec2(0.f, 1.f);
+        texture_coordinates = vec2(0.f, 0.f);
         gl_Position         = vec4(-1.f, -1.f, ndc_depth, 1.f);
         break;
 
         case 1:
-        texture_coordinates = vec2(1.f, 1.f);
+        texture_coordinates = vec2(1.f, 0.f);
         gl_Position         = vec4(1.f, -1.f, ndc_depth, 1.f);
         break;
 
         case 2:
-        texture_coordinates = vec2(0.f, 0.f);
+        texture_coordinates = vec2(0.f, 1.f);
         gl_Position         = vec4(-1.f, 1.f, ndc_depth, 1.f);
         break;
 
         case 3:
-        texture_coordinates = vec2(1.f, 0.f);
+        texture_coordinates = vec2(1.f, 1.f);
         gl_Position         = vec4(1.f, 1.f, ndc_depth, 1.f);
         break;
 
