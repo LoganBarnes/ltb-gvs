@@ -58,4 +58,5 @@ ltb_include_directories(ltb_util
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
         "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
         )
+add_library(Ltb::Util ALIAS ltb_util)
 

@@ -56,6 +56,7 @@ endif ()
 ### GVS ###
 ###########
 add_library(ltb_gvs INTERFACE)
+add_library(Ltb::Gvs ALIAS ltb_gvs)
 
 configure_file(
         ${CMAKE_CURRENT_LIST_DIR}/src/gvs_cuda_includes.hpp.in
@@ -115,10 +116,8 @@ if (LTB_ENABLE_GVS_DISPLAY)
     ltb_link_libraries(ltb_gvs_display
             PUBLIC
             ltb_gvs_display_resources
-            ltb_util
+            Ltb::Util
             ltb_gvs_core
-            CUDA::OptiX
-            CUDA::nvrtc
             )
 
     target_link_libraries(ltb_gvs INTERFACE ltb_gvs_display)
@@ -126,6 +125,37 @@ if (LTB_ENABLE_GVS_DISPLAY)
     #####################
     ### OptiX Backend ###
     #####################
+    if (CUDAToolkit_FOUND)
+        file(GLOB_RECURSE LTB_OPTIX_SOURCE_FILES
+                LIST_DIRECTORIES false
+                CONFIGURE_DEPENDS
+                ${CMAKE_CURRENT_LIST_DIR}/src/ltb/cuda/optix/*
+                )
+
+        file(GLOB_RECURSE LTB_CUDA_SOURCE_FILES
+                LIST_DIRECTORIES false
+                CONFIGURE_DEPENDS
+                ${CMAKE_CURRENT_LIST_DIR}/src/ltb/cuda/*
+                )
+
+        list(REMOVE_ITEM LTB_CUDA_SOURCE_FILES ${LTB_OPTIX_SOURCE_FILES})
+
+        ltb_add_library(ltb_gvs_cuda 17 ${LTB_CUDA_SOURCE_FILES})
+
+        if (OptiX_INCLUDE)
+            target_sources(ltb_gvs_cuda PUBLIC ${LTB_OPTIX_SOURCE_FILES})
+        endif ()
+
+        ltb_link_libraries(ltb_gvs_cuda
+                PUBLIC
+                ltb_gvs_display_deps
+                $<$<BOOL:CUDAToolkit_FOUND>:CUDA::toolkit>
+                $<$<BOOL:CUDAToolkit_FOUND>:CUDA::nvrtc>
+                $<$<BOOL:OptiX_INCLUDE>:External::OptiX>
+                )
+
+        target_link_libraries(ltb_gvs INTERFACE ltb_gvs_cuda)
+    endif ()
 
     ###############
     ### Testing ###

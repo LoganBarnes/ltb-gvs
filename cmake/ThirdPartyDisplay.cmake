@@ -37,24 +37,27 @@ FetchContent_Declare(magnum_dl
         GIT_TAG v2020.06
         )
 FetchContent_Declare(magnum_integration_dl
-        GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
-        GIT_TAG v2020.06
+        GIT_REPOSITORY https://gitlab.com/LoganBarnes/magnum-integration.git
+        GIT_TAG master
         )
 
 if (CMAKE_CUDA_COMPILER)
-    find_package(CUDAToolkit 10 REQUIRED)
+    find_package(CUDAToolkit 11 REQUIRED)
     set(LTB_CUDA_ENABLED TRUE)
 
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
-    find_package(OptiX REQUIRED)
-    set(LTB_OPTIX_ENABLED TRUE)
 
-    add_library(cuda-optix INTERFACE)
-    target_include_directories(cuda-optix
-            SYSTEM INTERFACE
-            "$<BUILD_INTERFACE:${OptiX_INCLUDE}>"
-            )
-    add_library(CUDA::OptiX ALIAS cuda-optix)
+    find_package(OptiX)
+    if (OptiX_INCLUDE)
+        set(LTB_OPTIX_ENABLED TRUE)
+
+        add_library(external-optix INTERFACE)
+        target_include_directories(external-optix
+                SYSTEM INTERFACE
+                "$<BUILD_INTERFACE:${OptiX_INCLUDE}>"
+                )
+        add_library(External::OptiX ALIAS external-optix)
+    endif ()
 endif ()
 
 if (MSVC)
