@@ -22,36 +22,32 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// external
-#include <boost/uuid/uuid.hpp>
+// project
+#include "scene.hpp"
 
 // standard
-#include <iostream>
-#include <random>
+#include <memory>
 
 namespace ltb {
 namespace gvs {
 
-using SceneId = boost::uuids::uuid;
+/// \todo Implement item removal from scenes before this can be used
+struct SelfDeletingSceneID {
+public:
+    /// \brief Creates a type that deletes the given id from the provided scene on destruction.
+    /// \param scene - the scene
+    /// \param id - the id in the scene
+    /// \warning {This scene pointer must remain valid for the lifetime of the SelfDeletingSceneID}
+    explicit SelfDeletingSceneID(Scene* scene = nullptr, SceneId scene_id = nil_id());
 
-auto nil_id() -> SceneId;
+    /// \brief Deletes the item from the scene if this is the last `SelfDeletingSceneID` for this item.
+    ~SelfDeletingSceneID();
 
-auto generate_scene_id(std::mt19937& generator) -> SceneId;
+    auto raw_id() const -> const SceneId&;
 
-auto to_string(SceneId const& id) -> std::string;
-
-auto from_string(std::string const& id) -> SceneId;
-
-auto operator<<(std::ostream& os, SceneId const& id) -> std::ostream&;
+private:
+    std::shared_ptr<SceneId> scene_id_ = nullptr;
+};
 
 } // namespace gvs
 } // namespace ltb
-
-namespace std {
-
-template <>
-struct hash<ltb::gvs::SceneId> {
-    auto operator()(ltb::gvs::SceneId const& id) const -> size_t { return boost::uuids::hash_value(id); }
-};
-
-} // namespace std
