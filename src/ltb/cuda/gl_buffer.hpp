@@ -28,7 +28,8 @@
 // standard
 #include <vector>
 
-namespace ltb::cuda {
+namespace ltb {
+namespace cuda {
 
 /// @brief Maps an allocated OpenGL buffer for use with CUDA
 template <typename T>
@@ -107,4 +108,5 @@ auto GLBuffer<T>::gl_buffer() -> Magnum::GL::Buffer& {
     return gl_buffer_;
 }
 
-} // namespace ltb::cuda
+} // namespace cuda
+} // namespace ltb
