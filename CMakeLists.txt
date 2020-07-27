@@ -28,6 +28,11 @@ option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
 
 include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
 
+############
+### Util ###
+############
+add_subdirectory(ltb-util)
+
 ########################
 ### External Targets ###
 ########################
@@ -39,9 +44,6 @@ if (LTB_ENABLE_GVS_DISPLAY)
     include(cmake/ThirdPartyGraphics.cmake)
     include(cmake/ThirdPartyGui.cmake)
     include(cmake/ThirdPartyCuda.cmake)
-
-    ### Util ###
-    add_subdirectory(ltb-util)
 
     ### GVS Display Resources ###
     # Compile resources separately to avoid linting issues on generated code
