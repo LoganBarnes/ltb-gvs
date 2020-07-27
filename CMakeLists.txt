@@ -108,10 +108,10 @@ list(REMOVE_ITEM LTB_CUDA_SOURCE_FILES ${LTB_OPTIX_SOURCE_FILES})
 ltb_add_library(ltb_gvs
         17
         ${LTB_CORE_SOURCE_FILES}
-        $<$<BOOL:LTB_ENABLE_GVS_DISPLAY>:${LTB_DISPLAY_SOURCE_FILES}>
-        $<$<BOOL:CUDAToolkit_FOUND>:${LTB_CUDA_SOURCE_FILES}>
-        $<$<BOOL:OptiX_INCLUDE>:${LTB_OPTIX_SOURCE_FILES}>
-        $<$<BOOL:LTB_BUILD_TESTS>:${LTB_TEST_SOURCE_FILES}>
+        $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:${LTB_DISPLAY_SOURCE_FILES}>
+        $<$<BOOL:${CUDAToolkit_FOUND}>:${LTB_CUDA_SOURCE_FILES}>
+        $<$<BOOL:${OptiX_INCLUDE}>:${LTB_OPTIX_SOURCE_FILES}>
+        $<$<AND:$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>,$<BOOL:${LTB_BUILD_TESTS}>>:${LTB_TEST_SOURCE_FILES}>
         )
 
 ltb_include_directories(ltb_gvs
@@ -124,10 +124,10 @@ ltb_link_libraries(ltb_gvs
         LtbExternal::Doctest
         LtbExternal::BoostUuid
         LtbExternal::Mapbox
-        $<$<BOOL:LTB_ENABLE_GVS_DISPLAY>:ltb_util>
-        $<$<BOOL:LTB_ENABLE_GVS_DISPLAY>:ltb_gvs_display_resources>
-        $<$<BOOL:LTB_ENABLE_GVS_DISPLAY>:ltb_external_gui>
-        $<$<BOOL:CUDAToolkit_FOUND>:ltb_external_cuda>
+        $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_util>
+        $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_gvs_display_resources>
+        $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_external_gui>
+        $<$<BOOL:${CUDAToolkit_FOUND}>:ltb_external_cuda>
         )
 
 add_library(Ltb::Gvs ALIAS ltb_gvs)
