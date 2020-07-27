@@ -1,6 +1,6 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 //                                                                           |________|
-//  Copyright (c) 2019 CloudNC Ltd - All Rights Reserved                        |  |
+//  Copyright (c) 2020 CloudNC Ltd - All Rights Reserved                        |  |
 //                                                                              |__|
 //        ____                                                                .  ||
 //       / __ \                                                               .`~||$$$$
@@ -16,26 +16,25 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// external
-#include <Magnum/Platform/GLContext.h>
-#ifdef _MSC_VER
-#include <Magnum/Platform/WindowlessWglApplication.h>
-#else
-#include <Magnum/Platform/WindowlessEglApplication.h>
-#endif
+#include <optix_types.h>
 
-// standard
-#include <memory>
-
-namespace testing {
-
-class ScopedGLContext {
-public:
-    ScopedGLContext();
-
-private:
-    std::shared_ptr<Magnum::Platform::WindowlessGLContext> windowless_gl_context_;
-    std::shared_ptr<Magnum::Platform::GLContext> gl_context_;
+struct Params {
+    uchar4*                image;
+    unsigned int           image_width;
+    unsigned int           image_height;
+    float3                 cam_eye;
+    float3                 cam_u, cam_v, cam_w;
+    OptixTraversableHandle handle;
 };
 
-} // namespace testing
+struct RayGenData {
+    // No data needed
+};
+
+struct MissData {
+    float3 bg_color;
+};
+
+struct HitGroupData {
+    // No data needed
+};
