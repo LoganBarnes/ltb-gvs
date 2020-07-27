@@ -32,18 +32,35 @@
 
 #define LTB_CUDA_CHECK(val) ::ltb::cuda::check((val), #val, __FILE__, __LINE__)
 
+#define LTB_SAFE_CUDA_CHECK(val)                                                                                       \
+    {                                                                                                                  \
+        auto error_message = ::ltb::cuda::error_string((val), #val, __FILE__, __LINE__);                               \
+        if (!error_message.empty()) {                                                                                  \
+            return tl::make_unexpected(LTB_MAKE_ERROR(error_message));                                                 \
+        }                                                                                                              \
+    }
+
 namespace ltb {
 namespace cuda {
 
 template <typename T>
-void check(T result, char const* const func, const char* const file, int const line) {
+auto error_string(T result, char const* const func, const char* const file, int const line) -> std::string {
     if (result != cudaSuccess) {
         std::stringstream error_str;
         error_str << "CUDA error at " << file << ":" << line;
         error_str << " code=" << static_cast<unsigned int>(result) << "(" << cudaGetErrorString(result) << ") ";
         error_str << "\"" << func << "\"";
 
-        throw std::runtime_error(error_str.str());
+        return error_str.str();
+    }
+    return "";
+}
+
+template <typename T>
+auto check(T result, char const* const func, const char* const file, int const line) -> void {
+    auto error_message = error_string(result, func, file, line);
+    if (!error_message.empty()) {
+        throw std::runtime_error(error_message);
     }
 }
 

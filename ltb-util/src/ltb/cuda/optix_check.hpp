@@ -32,20 +32,34 @@
 
 #define LTB_OPTIX_CHECK(val) ::ltb::optix::check((val), #val, __FILE__, __LINE__)
 
-namespace ltb {
-namespace optix {
+#define LTB_SAFE_OPTIX_CHECK(val)                                                                                      \
+    {                                                                                                                  \
+        auto error_message = ::ltb::optix::error_string((val), #val, __FILE__, __LINE__);                              \
+        if (!error_message.empty()) {                                                                                  \
+            return tl::make_unexpected(LTB_MAKE_ERROR(error_message));                                                 \
+        }                                                                                                              \
+    }
+
+namespace ltb::optix {
 
 template <typename T>
-void check(T result, char const* const func, const char* const file, int const line) {
+auto error_string(T result, char const* const func, const char* const file, int const line) -> std::string {
     if (result != OPTIX_SUCCESS) {
         std::stringstream error_str;
         error_str << "OPTIX error at " << file << ":" << line;
         error_str << " code=" << static_cast<unsigned int>(result) << "(" << optixGetErrorString(result) << ") ";
         error_str << "\"" << func << "\"";
+        return error_str.str();
+    }
+    return "";
+}
 
-        throw std::runtime_error(error_str.str());
+template <typename T>
+auto check(T result, char const* const func, const char* const file, int const line) -> void {
+    auto error_message = error_string(result, func, file, line);
+    if (!error_message.empty()) {
+        throw std::runtime_error((error_message));
     }
 }
 
-} // namespace optix
-} // namespace ltb
+} // namespace ltb::optix
