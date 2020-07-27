@@ -18,6 +18,8 @@
 
 #include <optix_types.h>
 
+namespace tmp {
+
 struct Params {
     uchar4*                image;
     unsigned int           image_width;
@@ -38,3 +40,5 @@ struct MissData {
 struct HitGroupData {
     // No data needed
 };
+
+} // namespace tmp

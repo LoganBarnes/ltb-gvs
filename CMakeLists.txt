@@ -28,29 +28,7 @@ option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
 
 include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
 
-################################
-### Third Party Dependencies ###
-################################
-include(cmake/ThirdParty.cmake)
-
-if (LTB_ENABLE_GVS_DISPLAY)
-    # All GUI thirdparty libraries put into a single target
-    file(GLOB_RECURSE LTB_SOURCE_FILES
-            LIST_DIRECTORIES false
-            CONFIGURE_DEPENDS
-            ${CMAKE_CURRENT_LIST_DIR}/external/*
-            )
-
-    add_library(ltb_gvs_display_deps ${LTB_SOURCE_FILES})
-
-    # Set the include directory as system headers to avoid compiler warnings
-    target_include_directories(ltb_gvs_display_deps
-            SYSTEM PUBLIC
-            ${CMAKE_CURRENT_LIST_DIR}/external
-            )
-
-    include(cmake/ThirdPartyDisplay.cmake)
-endif ()
+set(LTB_GVS_PROJECT_ROOT ${CMAKE_CURRENT_LIST_DIR})
 
 ###########
 ### GVS ###
@@ -59,10 +37,6 @@ add_library(ltb_gvs INTERFACE)
 add_library(Ltb::Gvs ALIAS ltb_gvs)
 
 configure_file(
-        ${CMAKE_CURRENT_LIST_DIR}/src/gvs_cuda_includes.hpp.in
-        ${CMAKE_BINARY_DIR}/generated/ltb/gvs_cuda_includes.hpp
-)
-configure_file(
         ${CMAKE_CURRENT_LIST_DIR}/src/gvs_paths.hpp.in
         ${CMAKE_BINARY_DIR}/generated/ltb/gvs_paths.hpp
 )
@@ -70,6 +44,8 @@ configure_file(
 ################
 ### GVS Core ###
 ################
+include(cmake/ThirdPartyCore.cmake)
+
 file(GLOB_RECURSE LTB_SOURCE_FILES
         LIST_DIRECTORIES false
         CONFIGURE_DEPENDS
@@ -79,21 +55,42 @@ file(GLOB_RECURSE LTB_SOURCE_FILES
 ltb_add_library(ltb_gvs_core 11 ${LTB_SOURCE_FILES})
 ltb_link_libraries(ltb_gvs_core
         PUBLIC
-        boost_uuid
-        mapbox
+        LtbExternal::BoostUuid
+        LtbExternal::Mapbox
         )
 ltb_include_directories(ltb_gvs_core
         PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>
         )
+
+add_library(LtbGvs::Core ALIAS ltb_gvs_core)
 
 target_link_libraries(ltb_gvs INTERFACE ltb_gvs_core)
 
 if (LTB_ENABLE_GVS_DISPLAY)
+    include(cmake/ThirdPartyGraphics.cmake)
+    include(cmake/ThirdPartyGui.cmake)
+
     ############
     ### Util ###
     ############
     add_subdirectory(ltb-util)
+
+    ###############
+    ### Testing ###
+    ###############
+    if (LTB_BUILD_TESTS)
+        file(GLOB_RECURSE LTB_SOURCE_FILES
+                LIST_DIRECTORIES false
+                CONFIGURE_DEPENDS
+                ${CMAKE_CURRENT_LIST_DIR}/src/ltb/testing/*
+                )
+
+        add_library(ltb_gvs_testing ${LTB_SOURCE_FILES})
+        ltb_set_properties(ltb_gvs_testing 17)
+        target_link_libraries(ltb_gvs_testing PUBLIC LtbExternal::Graphics)
+        add_library(LtbGvs::Testing ALIAS ltb_gvs_testing)
+    endif ()
 
     #############################
     ### GVS Display Resources ###
@@ -101,7 +98,11 @@ if (LTB_ENABLE_GVS_DISPLAY)
     # Compile resources separately to avoid linting issues on generated code
     corrade_add_resource(ltb_gvs_display_RESOURCES ${CMAKE_CURRENT_LIST_DIR}/src/resources.conf)
     add_library(ltb_gvs_display_resources ${ltb_gvs_display_RESOURCES})
-    target_link_libraries(ltb_gvs_display_resources PUBLIC ltb_gvs_display_deps)
+    target_link_libraries(ltb_gvs_display_resources
+            PUBLIC
+            LtbExternal::Graphics
+            )
+    add_library(LtbGvs::DisplayResources ALIAS ltb_gvs_display_resources)
 
     ###################
     ### GVS Display ###
@@ -115,9 +116,10 @@ if (LTB_ENABLE_GVS_DISPLAY)
     ltb_add_library(ltb_gvs_display 17 ${LTB_SOURCE_FILES})
     ltb_link_libraries(ltb_gvs_display
             PUBLIC
-            ltb_gvs_display_resources
+            LtbExternal::Gui
+            LtbGvs::DisplayResources
             Ltb::Util
-            ltb_gvs_core
+            LtbGvs::Core
             )
 
     target_link_libraries(ltb_gvs INTERFACE ltb_gvs_display)
@@ -125,6 +127,13 @@ if (LTB_ENABLE_GVS_DISPLAY)
     #####################
     ### OptiX Backend ###
     #####################
+    include(cmake/ThirdPartyCuda.cmake)
+
+    configure_file(
+            ${CMAKE_CURRENT_LIST_DIR}/src/gvs_cuda_includes.hpp.in
+            ${CMAKE_BINARY_DIR}/generated/ltb/gvs_cuda_includes.hpp
+    )
+
     if (CUDAToolkit_FOUND)
         file(GLOB_RECURSE LTB_OPTIX_SOURCE_FILES
                 LIST_DIRECTORIES false
@@ -140,36 +149,21 @@ if (LTB_ENABLE_GVS_DISPLAY)
 
         list(REMOVE_ITEM LTB_CUDA_SOURCE_FILES ${LTB_OPTIX_SOURCE_FILES})
 
-        ltb_add_library(ltb_gvs_cuda 17 ${LTB_CUDA_SOURCE_FILES})
-
-        if (OptiX_INCLUDE)
-            target_sources(ltb_gvs_cuda PUBLIC ${LTB_OPTIX_SOURCE_FILES})
-        endif ()
+        ltb_add_library(ltb_gvs_cuda 17 ${LTB_CUDA_SOURCE_FILES}
+                $<$<BOOL:OptiX_INCLUDE>:${LTB_OPTIX_SOURCE_FILES}>
+                )
 
         ltb_link_libraries(ltb_gvs_cuda
                 PUBLIC
-                ltb_gvs_display_deps
-                $<$<BOOL:CUDAToolkit_FOUND>:CUDA::toolkit>
-                $<$<BOOL:CUDAToolkit_FOUND>:CUDA::nvrtc>
-                $<$<BOOL:OptiX_INCLUDE>:External::OptiX>
+                Ltb::Util
+                LtbGvs::Core
+                LtbExternal::Graphics
+                LtbExternal::Cuda
+                $<$<BOOL:LTB_BUILD_TESTS>:ltb_gvs_testing>
+                LtbExternal::Doctest
                 )
 
         target_link_libraries(ltb_gvs INTERFACE ltb_gvs_cuda)
-    endif ()
-
-    ###############
-    ### Testing ###
-    ###############
-    if (LTB_BUILD_TESTS)
-        file(GLOB_RECURSE LTB_SOURCE_FILES
-                LIST_DIRECTORIES false
-                CONFIGURE_DEPENDS
-                ${CMAKE_CURRENT_LIST_DIR}/src/ltb/testing/*
-                )
-
-        add_library(ltb_gvs_testing ${LTB_SOURCE_FILES})
-        ltb_set_properties(ltb_gvs_testing 17)
-        target_link_libraries(ltb_gvs_testing PUBLIC ltb_gvs_display_deps)
     endif ()
 
 endif (LTB_ENABLE_GVS_DISPLAY)

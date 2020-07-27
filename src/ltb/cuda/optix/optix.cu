@@ -4,11 +4,11 @@
 #include "optix.hpp"
 
 // project
-#include "common/params.hpp"
-#include "ltb/cuda/buffer_map_guard.h"
+#include "ltb/cuda/buffer_map_guard.hpp"
 #include "ltb/cuda/cuda_check.hpp"
 #include "ltb/cuda/optix_check.hpp"
 #include "ltb/gvs_cuda_includes.hpp"
+#include "tmp_params.hpp"
 
 // external
 #include <cuda/helpers.h>
@@ -49,9 +49,9 @@ struct SbtRecord {
     T data;
 };
 
-typedef SbtRecord<RayGenData>   RayGenSbtRecord;
-typedef SbtRecord<MissData>     MissSbtRecord;
-typedef SbtRecord<HitGroupData> HitGroupSbtRecord;
+typedef SbtRecord<tmp::RayGenData>   RayGenSbtRecord;
+typedef SbtRecord<tmp::MissData>     MissSbtRecord;
+typedef SbtRecord<tmp::HitGroupData> HitGroupSbtRecord;
 
 std::string g_nvrtc_log;
 
@@ -248,7 +248,7 @@ auto OptiX::init(const std::string& programs_str) -> void {
         pipeline_compile_options.usesPrimitiveTypeFlags = static_cast<unsigned>(OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE);
 
         //        auto ptx = getPtxFromCuString(programs_str);
-        auto   ptx        = get_ptx_from_cu_string(programs_str, "", {ltb::paths::project_root() + "src"}, nullptr);
+        auto   ptx        = get_ptx_from_cu_string(programs_str, "", {ltb::paths::gvs_root() + "src"}, nullptr);
         size_t sizeof_log = sizeof(log);
 
         LTB_OPTIX_CHECK(optixModuleCreateFromPTX(data_->context,
@@ -416,7 +416,7 @@ auto OptiX::stream() const -> cudaStream_t {
 auto OptiX::launch(ltb::cuda::GLBufferImage<uchar4>& output_buffer) -> void {
     auto guard = ltb::cuda::make_gl_buffer_map_guard(output_buffer);
 
-    Params params;
+    tmp::Params params;
     params.image        = output_buffer.cuda_buffer();
     params.image_width  = output_buffer.gl_buffer_image().size().x();
     params.image_height = output_buffer.gl_buffer_image().size().y();
@@ -439,13 +439,13 @@ auto OptiX::launch(ltb::cuda::GLBufferImage<uchar4>& output_buffer) -> void {
     params.cam_u *= ulen;
 
     CUdeviceptr d_param;
-    LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_param), sizeof(Params)));
+    LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_param), sizeof(tmp::Params)));
     LTB_CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_param), &params, sizeof(params), cudaMemcpyHostToDevice));
 
     LTB_OPTIX_CHECK(optixLaunch(data_->pipeline,
                                 data_->stream,
                                 d_param,
-                                sizeof(Params),
+                                sizeof(tmp::Params),
                                 &data_->sbt,
                                 params.image_width,
                                 params.image_height,

@@ -16,8 +16,8 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "gl_buffer.h"
-#include "gl_buffer_image.h"
+#include "gl_buffer.hpp"
+#include "gl_buffer_image.hpp"
 
 namespace ltb {
 namespace cuda {

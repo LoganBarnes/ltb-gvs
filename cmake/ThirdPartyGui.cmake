@@ -20,137 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-if (CMAKE_CUDA_COMPILER)
-    find_package(CUDAToolkit 11)
-
-    if (CUDAToolkit_FOUND)
-        set(LTB_CUDA_ENABLED TRUE)
-
-        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
-
-        find_package(OptiX)
-
-        if (OptiX_INCLUDE)
-            set(LTB_OPTIX_ENABLED TRUE)
-
-            add_library(external-optix INTERFACE)
-            target_include_directories(external-optix
-                    SYSTEM INTERFACE
-                    "$<BUILD_INTERFACE:${OptiX_INCLUDE}>"
-                    )
-            add_library(External::OptiX ALIAS external-optix)
-        endif ()
-    endif ()
-endif ()
-
-
-FetchContent_Declare(ltb_glfw_dl
-        GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.3.2
-        )
 FetchContent_Declare(ltb_imgui_dl
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
         GIT_TAG docking
-        )
-FetchContent_Declare(ltb_corrade_dl
-        GIT_REPOSITORY https://github.com/mosra/corrade.git
-        GIT_TAG v2020.06
-        )
-FetchContent_Declare(ltb_magnum_dl
-        GIT_REPOSITORY https://github.com/mosra/magnum.git
-        GIT_TAG v2020.06
         )
 FetchContent_Declare(ltb_magnum_integration_dl
         GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
         GIT_TAG v2020.06
         )
 
-# All GUI thirdparty libraries put into a single target
-file(GLOB_RECURSE LTB_SOURCE_FILES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        ${LTB_GVS_PROJECT_ROOT}/external/*
-        )
-
-add_library(ltb_gvs_display_deps ${LTB_SOURCE_FILES})
-
-# Set the include directory as system headers to avoid compiler warnings
-target_include_directories(ltb_gvs_display_deps
-        SYSTEM PUBLIC
-        ${LTB_GVS_PROJECT_ROOT}/external
-        )
-
-if (MSVC)
-    set(LTB_GVS_TEST_GL_CONTEXT WglContext)
-    set(LTB_GVS_WINDOWLESS_APP WindowlessWglApplication)
-else ()
-    set(LTB_GVS_TEST_GL_CONTEXT EglContext)
-    set(LTB_GVS_WINDOWLESS_APP WindowlessEglApplication)
-endif ()
-
-### GLFW ###
-FetchContent_GetProperties(ltb_glfw_dl)
-if (NOT ltb_glfw_dl_POPULATED)
-    FetchContent_Populate(ltb_glfw_dl)
-
-    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-    add_subdirectory(${ltb_glfw_dl_SOURCE_DIR} ${ltb_glfw_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif ()
+ltb_add_external(gui Gui)
 
 ### ImGui ###
 FetchContent_GetProperties(ltb_imgui_dl)
 if (NOT ltb_imgui_dl_POPULATED)
     FetchContent_Populate(ltb_imgui_dl)
-endif ()
-
-### Corrade ###
-set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
-
-FetchContent_GetProperties(ltb_corrade_dl)
-if (NOT ltb_corrade_dl_POPULATED)
-    FetchContent_Populate(ltb_corrade_dl)
-
-    if (MSVC_VERSION GREATER_EQUAL 1900)
-        set(CORRADE_MSVC2019_COMPATIBILITY ON CACHE BOOL "" FORCE)
-        set(MSVC2019_COMPATIBILITY ON CACHE BOOL "" FORCE)
-    endif ()
-
-    add_subdirectory(${ltb_corrade_dl_SOURCE_DIR} ${ltb_corrade_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-    # Tell cmake where to find this library
-    set(Corrade_DIR ${ltb_corrade_dl_SOURCE_DIR}/modules)
-endif ()
-
-### Magnum ###
-FetchContent_GetProperties(ltb_magnum_dl)
-if (NOT ltb_magnum_dl_POPULATED)
-    FetchContent_Populate(ltb_magnum_dl)
-
-    set(BUILD_DEPRECATED OFF CACHE BOOL "" FORCE)
-    set(WITH_GLFWAPPLICATION ON CACHE BOOL "" FORCE)
-
-    if (MSVC)
-        set(WITH_WGLCONTEXT ON CACHE BOOL "" FORCE)
-        set(WITH_WINDOWLESSWGLAPPLICATION ON CACHE BOOL "" FORCE)
-    else ()
-        set(WITH_EGLCONTEXT ON CACHE BOOL "" FORCE)
-        set(WITH_WINDOWLESSEGLAPPLICATION ON CACHE BOOL "" FORCE)
-    endif ()
-
-    add_subdirectory(${ltb_magnum_dl_SOURCE_DIR} ${ltb_magnum_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-    # Tell cmake where to find this library
-    set(Magnum_DIR ${ltb_magnum_dl_SOURCE_DIR}/modules)
-
-    find_package(Magnum REQUIRED
-            GL
-            GlfwApplication
-            ${LTB_GVS_TEST_GL_CONTEXT}
-            ${LTB_GVS_WINDOWLESS_APP}
-            )
 endif ()
 
 ### Magnum Integration ###
@@ -169,24 +53,8 @@ if (NOT ltb_magnum_integration_dl_POPULATED)
     find_package(MagnumIntegration REQUIRED ImGui)
 endif ()
 
-# Set the include directory as system headers to avoid compiler warnings
-target_include_directories(ltb_gvs_display_deps
-        SYSTEM PUBLIC
-        ${ltb_corrade_dl_SOURCE_DIR}/src
-        ${ltb_magnum_dl_SOURCE_DIR}/src
-        )
-
 # Add the necessary libraries
-target_link_libraries(ltb_gvs_display_deps PUBLIC
-        Corrade::Utility
-        Magnum::Application
-        Magnum::Magnum
-        Magnum::MeshTools
-        Magnum::Primitives
-        Magnum::SceneGraph
-        Magnum::Shaders
-        Magnum::Trade
+target_link_libraries(ltb_external_gui
+        INTERFACE
         MagnumIntegration::ImGui
-        Magnum::${LTB_GVS_TEST_GL_CONTEXT}
-        Magnum::${LTB_GVS_WINDOWLESS_APP}
         )

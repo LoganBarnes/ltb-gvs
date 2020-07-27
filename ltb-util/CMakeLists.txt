@@ -23,8 +23,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(LtbUtilities LANGUAGES CXX)
 
-include(cmake/ThirdParty.cmake)
 include(cmake/LtbConfig.cmake) # <-- Additional project options are in here.
+include(cmake/ThirdParty.cmake)
 
 ############
 ### Util ###
@@ -48,10 +48,10 @@ endif ()
 ltb_add_library(ltb_util 17 ${LTB_SOURCE_FILES})
 ltb_link_libraries(ltb_util
         PUBLIC
-        expected
-        range-v3
+        LtbExternal::Expected
+        LtbExternal::RangeV3
         Threads::Threads
-        doctest
+        LtbExternal::Doctest
         )
 ltb_include_directories(ltb_util
         PUBLIC

@@ -14,10 +14,12 @@
 //   \___/ ________/    \______/ |__/ \______/  \______/  \_______/|__/  \__/ \______/
 //
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "gl_buffer.h"
+#include "gl_buffer.hpp"
 
 // project
-#include "scoped_gl_context.h"
+//#ifndef DOCTEST_CONFIG_DISABLE
+#include "ltb/testing/gvs/scoped_gl_context.hpp"
+//#endif
 
 // external
 #include <doctest/doctest.h>
@@ -25,7 +27,7 @@
 namespace {
 
 TEST_CASE("[interop] Test empty buffer creation throws") {
-    testing::ScopedGLContext scoped_gl_context;
+    auto scoped_gl_context = ltb::testing::ScopedGLContext{};
     CHECK_THROWS_AS(ltb::cuda::GLBuffer<float> buffer({}), std::invalid_argument);
 }
 

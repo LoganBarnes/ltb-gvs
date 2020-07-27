@@ -4,7 +4,7 @@
 #pragma once
 
 // project
-#include "ltb/cuda/gl_buffer_image.h"
+#include "ltb/cuda/gl_buffer_image.hpp"
 
 // standard
 #include <memory>

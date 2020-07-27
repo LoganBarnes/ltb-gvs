@@ -20,37 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-if (CMAKE_CUDA_COMPILER)
-    find_package(CUDAToolkit 11)
-
-    if (CUDAToolkit_FOUND)
-        set(LTB_CUDA_ENABLED TRUE)
-
-        list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
-
-        find_package(OptiX)
-
-        if (OptiX_INCLUDE)
-            set(LTB_OPTIX_ENABLED TRUE)
-
-            add_library(external-optix INTERFACE)
-            target_include_directories(external-optix
-                    SYSTEM INTERFACE
-                    "$<BUILD_INTERFACE:${OptiX_INCLUDE}>"
-                    )
-            add_library(External::OptiX ALIAS external-optix)
-        endif ()
-    endif ()
-endif ()
-
-
 FetchContent_Declare(ltb_glfw_dl
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG 3.3.2
-        )
-FetchContent_Declare(ltb_imgui_dl
-        GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG docking
         )
 FetchContent_Declare(ltb_corrade_dl
         GIT_REPOSITORY https://github.com/mosra/corrade.git
@@ -60,25 +32,16 @@ FetchContent_Declare(ltb_magnum_dl
         GIT_REPOSITORY https://github.com/mosra/magnum.git
         GIT_TAG v2020.06
         )
-FetchContent_Declare(ltb_magnum_integration_dl
-        GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
-        GIT_TAG v2020.06
-        )
 
-# All GUI thirdparty libraries put into a single target
+# All external graphics libraries put into a single target
 file(GLOB_RECURSE LTB_SOURCE_FILES
         LIST_DIRECTORIES false
         CONFIGURE_DEPENDS
         ${LTB_GVS_PROJECT_ROOT}/external/*
         )
 
-add_library(ltb_gvs_display_deps ${LTB_SOURCE_FILES})
-
-# Set the include directory as system headers to avoid compiler warnings
-target_include_directories(ltb_gvs_display_deps
-        SYSTEM PUBLIC
-        ${LTB_GVS_PROJECT_ROOT}/external
-        )
+add_library(ltb_external_graphics ${LTB_SOURCE_FILES})
+add_library(LtbExternal::Graphics ALIAS ltb_external_graphics)
 
 if (MSVC)
     set(LTB_GVS_TEST_GL_CONTEXT WglContext)
@@ -100,14 +63,8 @@ if (NOT ltb_glfw_dl_POPULATED)
     add_subdirectory(${ltb_glfw_dl_SOURCE_DIR} ${ltb_glfw_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif ()
 
-### ImGui ###
-FetchContent_GetProperties(ltb_imgui_dl)
-if (NOT ltb_imgui_dl_POPULATED)
-    FetchContent_Populate(ltb_imgui_dl)
-endif ()
-
 ### Corrade ###
-set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
+set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS OFF)
 
 FetchContent_GetProperties(ltb_corrade_dl)
 if (NOT ltb_corrade_dl_POPULATED)
@@ -153,31 +110,17 @@ if (NOT ltb_magnum_dl_POPULATED)
             )
 endif ()
 
-### Magnum Integration ###
-FetchContent_GetProperties(ltb_magnum_integration_dl)
-if (NOT ltb_magnum_integration_dl_POPULATED)
-    FetchContent_Populate(ltb_magnum_integration_dl)
-
-    set(WITH_IMGUI ON CACHE BOOL "" FORCE)
-    set(IMGUI_DIR "${ltb_imgui_dl_SOURCE_DIR}" CACHE STRING "" FORCE)
-
-    add_subdirectory(${ltb_magnum_integration_dl_SOURCE_DIR} ${ltb_magnum_integration_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-    # Tell cmake where to find this library
-    set(MagnumIntegration_DIR ${ltb_magnum_integration_dl_SOURCE_DIR}/modules)
-
-    find_package(MagnumIntegration REQUIRED ImGui)
-endif ()
-
 # Set the include directory as system headers to avoid compiler warnings
-target_include_directories(ltb_gvs_display_deps
+target_include_directories(ltb_external_graphics
         SYSTEM PUBLIC
-        ${ltb_corrade_dl_SOURCE_DIR}/src
-        ${ltb_magnum_dl_SOURCE_DIR}/src
+        $<BUILD_INTERFACE:${LTB_GVS_PROJECT_ROOT}/external>
+        $<BUILD_INTERFACE:${ltb_corrade_dl_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${ltb_magnum_dl_SOURCE_DIR}/src>
         )
 
 # Add the necessary libraries
-target_link_libraries(ltb_gvs_display_deps PUBLIC
+target_link_libraries(ltb_external_graphics
+        PUBLIC
         Corrade::Utility
         Magnum::Application
         Magnum::Magnum
@@ -186,7 +129,6 @@ target_link_libraries(ltb_gvs_display_deps PUBLIC
         Magnum::SceneGraph
         Magnum::Shaders
         Magnum::Trade
-        MagnumIntegration::ImGui
         Magnum::${LTB_GVS_TEST_GL_CONTEXT}
         Magnum::${LTB_GVS_WINDOWLESS_APP}
         )
