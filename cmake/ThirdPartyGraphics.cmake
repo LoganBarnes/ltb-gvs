@@ -37,7 +37,7 @@ FetchContent_Declare(ltb_magnum_dl
 file(GLOB_RECURSE LTB_SOURCE_FILES
         LIST_DIRECTORIES false
         CONFIGURE_DEPENDS
-        ${LTB_GVS_PROJECT_ROOT}/external/*
+        ${LTB_GVS_ROOT}/external/*
         )
 
 add_library(ltb_external_graphics ${LTB_SOURCE_FILES})
@@ -113,7 +113,7 @@ endif ()
 # Set the include directory as system headers to avoid compiler warnings
 target_include_directories(ltb_external_graphics
         SYSTEM PUBLIC
-        $<BUILD_INTERFACE:${LTB_GVS_PROJECT_ROOT}/external>
+        $<BUILD_INTERFACE:${LTB_GVS_ROOT}/external>
         $<BUILD_INTERFACE:${ltb_corrade_dl_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${ltb_magnum_dl_SOURCE_DIR}/src>
         )

@@ -45,8 +45,8 @@ public:
 
     auto cuda_buffer(std::size_t* size = nullptr) const -> T*;
 
-    auto gl_buffer_image() const -> Magnum::GL::BufferImage2D const&;
-    auto gl_buffer_image() -> Magnum::GL::BufferImage2D&;
+    [[nodiscard]] auto gl_buffer_image() const -> Magnum::GL::BufferImage2D const&;
+    auto               gl_buffer_image() -> Magnum::GL::BufferImage2D&;
 
 private:
     Magnum::GL::BufferImage2D gl_buffer_image_;

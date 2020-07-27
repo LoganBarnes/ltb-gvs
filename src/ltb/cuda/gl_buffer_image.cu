@@ -14,7 +14,7 @@
 //   \___/ ________/    \______/ |__/ \______/  \______/  \_______/|__/  \__/ \______/
 //
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "gl_buffer.hpp"
+#include "gl_buffer_image.hpp"
 
 // project
 #include "ltb/testing/gvs/scoped_gl_context.hpp"
@@ -24,9 +24,9 @@
 
 namespace {
 
-TEST_CASE("[interop] Test uninitialized GLBuffer throws") {
+TEST_CASE("[interop] Test uninitialized GLBufferImage throws") {
     auto scoped_gl_context = ltb::testing::ScopedGLContext{};
-    CHECK_THROWS(ltb::cuda::GLBuffer<float> buffer(Magnum::GL::Buffer{Magnum::NoCreate}));
+    CHECK_THROWS(ltb::cuda::GLBufferImage<float> buffer(Magnum::GL::BufferImage2D{Magnum::NoCreate}));
 }
 
 } // namespace

@@ -28,8 +28,7 @@
 // standard
 #include <vector>
 
-namespace ltb {
-namespace cuda {
+namespace ltb::cuda {
 
 /// @brief Maps an allocated OpenGL buffer for use with CUDA
 template <typename T>
@@ -43,10 +42,10 @@ public:
     auto map_for_cuda() -> void;
     auto unmap_from_cuda() -> void;
 
-    auto cuda_buffer(std::size_t* size) const -> T*;
-    auto gl_buffer() const -> Magnum::GL::Buffer const&;
+    auto cuda_buffer(std::size_t* size = nullptr) const -> T*;
 
-    auto size() const -> std::size_t;
+    [[nodiscard]] auto gl_buffer() const -> Magnum::GL::Buffer const&;
+    auto               gl_buffer() -> Magnum::GL::Buffer&;
 
 private:
     Magnum::GL::Buffer     gl_buffer_;
@@ -92,7 +91,9 @@ auto GLBuffer<T>::cuda_buffer(std::size_t* size) const -> T* {
     std::size_t byte_size = 0;
     LTB_CUDA_CHECK(
         cudaGraphicsResourceGetMappedPointer(reinterpret_cast<void**>(&dev_ptr), &byte_size, graphics_resource_));
-    *size = byte_size / sizeof(T);
+    if (size) {
+        *size = byte_size / sizeof(T);
+    }
     return dev_ptr;
 }
 
@@ -102,9 +103,8 @@ auto GLBuffer<T>::gl_buffer() const -> Magnum::GL::Buffer const& {
 }
 
 template <typename T>
-auto GLBuffer<T>::size() const -> std::size_t {
-    return gl_buffer().size();
+auto GLBuffer<T>::gl_buffer() -> Magnum::GL::Buffer& {
+    return gl_buffer_;
 }
 
-} // namespace cuda
-} // namespace ltb
+} // namespace ltb::cuda
