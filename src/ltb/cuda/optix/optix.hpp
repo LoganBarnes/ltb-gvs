@@ -8,10 +8,8 @@
 #include "ltb/util/result.hpp"
 
 // external
+#include <driver_types.h>
 #include <optix_types.h>
-
-// standard
-#include <memory>
 
 namespace ltb::cuda {
 
@@ -34,8 +32,23 @@ public:
     auto launch(GLBufferImage<uchar4>& output_buffer) -> void;
 
 private:
-    struct Data;
-    std::unique_ptr<Data> data_;
+    cudaStream_t stream_ = nullptr;
+
+    OptixDeviceContext context_ = nullptr;
+
+    OptixAccelBuildOptions accel_options_ = {};
+
+    OptixModule module_ = nullptr;
+
+    OptixTraversableHandle gas_handle_          = {};
+    CUdeviceptr            d_gas_output_buffer_ = {};
+
+    OptixShaderBindingTable sbt_ = {};
+
+    OptixProgramGroup raygen_prog_group_   = nullptr;
+    OptixProgramGroup miss_prog_group_     = nullptr;
+    OptixProgramGroup hitgroup_prog_group_ = nullptr;
+    OptixPipeline     pipeline_            = nullptr;
 };
 
 } // namespace ltb::cuda

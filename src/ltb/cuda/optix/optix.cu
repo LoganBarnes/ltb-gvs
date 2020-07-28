@@ -64,7 +64,7 @@ auto get_ptx_from_cu_string(const std::string&       cu_source,
                             std::vector<std::string> include_dirs,
                             const char**             log_string) -> std::string {
     // Create program
-    nvrtcProgram prog = 0;
+    nvrtcProgram prog = nullptr;
     NVRTC_CHECK_ERROR(nvrtcCreateProgram(&prog, cu_source.c_str(), name.c_str(), 0, nullptr, nullptr));
 
     include_dirs.emplace_back(paths::cuda_include_dir());
@@ -122,32 +122,11 @@ auto get_ptx_from_cu_string(const std::string&       cu_source,
 
 } // namespace
 
-struct OptiX::Data {
-    cudaStream_t stream = nullptr;
-
-    OptixDeviceContext context = nullptr;
-
-    OptixAccelBuildOptions accel_options = {};
-
-    OptixModule module = nullptr;
-
-    OptixTraversableHandle gas_handle          = {};
-    CUdeviceptr            d_gas_output_buffer = {};
-
-    OptixShaderBindingTable sbt = {};
-
-    OptixProgramGroup raygen_prog_group   = nullptr;
-    OptixProgramGroup miss_prog_group     = nullptr;
-    OptixProgramGroup hitgroup_prog_group = nullptr;
-    OptixPipeline     pipeline            = nullptr;
-};
-
-OptiX::OptiX() : data_(std::make_unique<Data>()) {}
-
+OptiX::OptiX()  = default;
 OptiX::~OptiX() = default;
 
 auto OptiX::init() -> util::Result<OptiX*> {
-    LTB_SAFE_CUDA_CHECK(cudaStreamCreate(&data_->stream));
+    LTB_SAFE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
     {
         // Initialize CUDA
@@ -161,7 +140,7 @@ auto OptiX::init() -> util::Result<OptiX*> {
         options.logCallbackFunction       = &context_log_cb;
         options.logCallbackLevel          = 4;
 
-        LTB_SAFE_OPTIX_CHECK(optixDeviceContextCreate(cu_ctx, &options, &data_->context));
+        LTB_SAFE_OPTIX_CHECK(optixDeviceContextCreate(cu_ctx, &options, &context_));
     }
 
     return this;
@@ -177,14 +156,14 @@ auto OptiX::create_module(OptixPipelineCompileOptions const& pipeline_compile_op
     char   log[2048];
     size_t sizeof_log = sizeof(log);
 
-    LTB_SAFE_OPTIX_CHECK(optixModuleCreateFromPTX(data_->context,
+    LTB_SAFE_OPTIX_CHECK(optixModuleCreateFromPTX(context_,
                                                   &module_compile_options,
                                                   &pipeline_compile_options,
                                                   ptx.c_str(),
                                                   ptx.size(),
                                                   log,
                                                   &sizeof_log,
-                                                  &data_->module));
+                                                  &module_));
 
     return this;
 }
@@ -201,8 +180,8 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
     {
         // Use default options for simplicity.  In a real use case we would want to
         // enable compaction, etc
-        data_->accel_options.buildFlags = OPTIX_BUILD_FLAG_NONE;
-        data_->accel_options.operation  = OPTIX_BUILD_OPERATION_BUILD;
+        accel_options_.buildFlags = OPTIX_BUILD_FLAG_NONE;
+        accel_options_.operation  = OPTIX_BUILD_OPERATION_BUILD;
 
         // Triangle build input: simple list of three vertices
         const std::vector<float3> vertices = {
@@ -224,26 +203,25 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         triangle_input.triangleArray.numSbtRecords = 1;
 
         OptixAccelBufferSizes gas_buffer_sizes;
-        LTB_OPTIX_CHECK(optixAccelComputeMemoryUsage(data_->context,
-                                                     &data_->accel_options,
+        LTB_OPTIX_CHECK(optixAccelComputeMemoryUsage(context_,
+                                                     &accel_options_,
                                                      &triangle_input,
                                                      1, // Number of build inputs
                                                      &gas_buffer_sizes));
         CUdeviceptr d_temp_buffer_gas = 0;
         LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_temp_buffer_gas), gas_buffer_sizes.tempSizeInBytes));
-        LTB_CUDA_CHECK(
-            cudaMalloc(reinterpret_cast<void**>(&data_->d_gas_output_buffer), gas_buffer_sizes.outputSizeInBytes));
+        LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_gas_output_buffer_), gas_buffer_sizes.outputSizeInBytes));
 
-        LTB_OPTIX_CHECK(optixAccelBuild(data_->context,
+        LTB_OPTIX_CHECK(optixAccelBuild(context_,
                                         0, // CUDA stream
-                                        &data_->accel_options,
+                                        &accel_options_,
                                         &triangle_input,
                                         1, // num build inputs
                                         d_temp_buffer_gas,
                                         gas_buffer_sizes.tempSizeInBytes,
-                                        data_->d_gas_output_buffer,
+                                        d_gas_output_buffer_,
                                         gas_buffer_sizes.outputSizeInBytes,
-                                        &data_->gas_handle,
+                                        &gas_handle_,
                                         nullptr, // emitted property list
                                         0 // num emitted properties
                                         ));
@@ -288,42 +266,42 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
 
         OptixProgramGroupDesc raygen_prog_group_desc    = {}; //
         raygen_prog_group_desc.kind                     = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
-        raygen_prog_group_desc.raygen.module            = data_->module;
+        raygen_prog_group_desc.raygen.module            = module_;
         raygen_prog_group_desc.raygen.entryFunctionName = "__raygen__rg";
         size_t sizeof_log                               = sizeof(log);
-        LTB_OPTIX_CHECK(optixProgramGroupCreate(data_->context,
+        LTB_OPTIX_CHECK(optixProgramGroupCreate(context_,
                                                 &raygen_prog_group_desc,
                                                 1, // num program groups
                                                 &program_group_options,
                                                 log,
                                                 &sizeof_log,
-                                                &data_->raygen_prog_group));
+                                                &raygen_prog_group_));
 
         OptixProgramGroupDesc miss_prog_group_desc  = {};
         miss_prog_group_desc.kind                   = OPTIX_PROGRAM_GROUP_KIND_MISS;
-        miss_prog_group_desc.miss.module            = data_->module;
+        miss_prog_group_desc.miss.module            = module_;
         miss_prog_group_desc.miss.entryFunctionName = "__miss__ms";
         sizeof_log                                  = sizeof(log);
-        LTB_OPTIX_CHECK(optixProgramGroupCreate(data_->context,
+        LTB_OPTIX_CHECK(optixProgramGroupCreate(context_,
                                                 &miss_prog_group_desc,
                                                 1, // num program groups
                                                 &program_group_options,
                                                 log,
                                                 &sizeof_log,
-                                                &data_->miss_prog_group));
+                                                &miss_prog_group_));
 
         OptixProgramGroupDesc hitgroup_prog_group_desc        = {};
         hitgroup_prog_group_desc.kind                         = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
-        hitgroup_prog_group_desc.hitgroup.moduleCH            = data_->module;
+        hitgroup_prog_group_desc.hitgroup.moduleCH            = module_;
         hitgroup_prog_group_desc.hitgroup.entryFunctionNameCH = "__closesthit__ch";
         sizeof_log                                            = sizeof(log);
-        LTB_OPTIX_CHECK(optixProgramGroupCreate(data_->context,
+        LTB_OPTIX_CHECK(optixProgramGroupCreate(context_,
                                                 &hitgroup_prog_group_desc,
                                                 1, // num program groups
                                                 &program_group_options,
                                                 log,
                                                 &sizeof_log,
-                                                &data_->hitgroup_prog_group));
+                                                &hitgroup_prog_group_));
     }
 
     //
@@ -331,22 +309,21 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
     //
     {
         const uint32_t max_trace_depth = 1;
-        auto           program_groups  = std::array<OptixProgramGroup, 3>{data_->raygen_prog_group,
-                                                               data_->miss_prog_group,
-                                                               data_->hitgroup_prog_group};
+        auto           program_groups
+            = std::array<OptixProgramGroup, 3>{raygen_prog_group_, miss_prog_group_, hitgroup_prog_group_};
 
         OptixPipelineLinkOptions pipeline_link_options = {};
         pipeline_link_options.maxTraceDepth            = max_trace_depth;
         pipeline_link_options.debugLevel               = OPTIX_COMPILE_DEBUG_LEVEL_FULL;
         size_t sizeof_log                              = sizeof(log);
-        LTB_OPTIX_CHECK(optixPipelineCreate(data_->context,
+        LTB_OPTIX_CHECK(optixPipelineCreate(context_,
                                             &pipeline_compile_options,
                                             &pipeline_link_options,
                                             program_groups.data(),
                                             program_groups.size(),
                                             log,
                                             &sizeof_log,
-                                            &data_->pipeline));
+                                            &pipeline_));
 
         OptixStackSizes stack_sizes = {};
         for (auto& prog_group : program_groups) {
@@ -363,7 +340,7 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
                                                    &direct_callable_stack_size_from_traversal,
                                                    &direct_callable_stack_size_from_state,
                                                    &continuation_stack_size));
-        LTB_OPTIX_CHECK(optixPipelineSetStackSize(data_->pipeline,
+        LTB_OPTIX_CHECK(optixPipelineSetStackSize(pipeline_,
                                                   direct_callable_stack_size_from_traversal,
                                                   direct_callable_stack_size_from_state,
                                                   continuation_stack_size,
@@ -379,7 +356,7 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         const size_t raygen_record_size = sizeof(RayGenSbtRecord);
         LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&raygen_record), raygen_record_size));
         RayGenSbtRecord rg_sbt;
-        LTB_OPTIX_CHECK(optixSbtRecordPackHeader(data_->raygen_prog_group, &rg_sbt));
+        LTB_OPTIX_CHECK(optixSbtRecordPackHeader(raygen_prog_group_, &rg_sbt));
         LTB_CUDA_CHECK(
             cudaMemcpy(reinterpret_cast<void*>(raygen_record), &rg_sbt, raygen_record_size, cudaMemcpyHostToDevice));
 
@@ -388,7 +365,7 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&miss_record), miss_record_size));
         MissSbtRecord ms_sbt;
         ms_sbt.data = {0.3f, 0.1f, 0.2f};
-        LTB_OPTIX_CHECK(optixSbtRecordPackHeader(data_->miss_prog_group, &ms_sbt));
+        LTB_OPTIX_CHECK(optixSbtRecordPackHeader(miss_prog_group_, &ms_sbt));
         LTB_CUDA_CHECK(
             cudaMemcpy(reinterpret_cast<void*>(miss_record), &ms_sbt, miss_record_size, cudaMemcpyHostToDevice));
 
@@ -396,43 +373,43 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         size_t      hitgroup_record_size = sizeof(HitGroupSbtRecord);
         LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&hitgroup_record), hitgroup_record_size));
         HitGroupSbtRecord hg_sbt;
-        LTB_OPTIX_CHECK(optixSbtRecordPackHeader(data_->hitgroup_prog_group, &hg_sbt));
+        LTB_OPTIX_CHECK(optixSbtRecordPackHeader(hitgroup_prog_group_, &hg_sbt));
         LTB_CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(hitgroup_record),
                                   &hg_sbt,
                                   hitgroup_record_size,
                                   cudaMemcpyHostToDevice));
 
-        data_->sbt.raygenRecord                = raygen_record;
-        data_->sbt.missRecordBase              = miss_record;
-        data_->sbt.missRecordStrideInBytes     = sizeof(MissSbtRecord);
-        data_->sbt.missRecordCount             = 1;
-        data_->sbt.hitgroupRecordBase          = hitgroup_record;
-        data_->sbt.hitgroupRecordStrideInBytes = sizeof(HitGroupSbtRecord);
-        data_->sbt.hitgroupRecordCount         = 1;
+        sbt_.raygenRecord                = raygen_record;
+        sbt_.missRecordBase              = miss_record;
+        sbt_.missRecordStrideInBytes     = sizeof(MissSbtRecord);
+        sbt_.missRecordCount             = 1;
+        sbt_.hitgroupRecordBase          = hitgroup_record;
+        sbt_.hitgroupRecordStrideInBytes = sizeof(HitGroupSbtRecord);
+        sbt_.hitgroupRecordCount         = 1;
     }
 
     return this;
 }
 
 auto OptiX::destroy() -> void {
-    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_->sbt.raygenRecord)));
-    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_->sbt.missRecordBase)));
-    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_->sbt.hitgroupRecordBase)));
-    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(data_->d_gas_output_buffer)));
+    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(sbt_.raygenRecord)));
+    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(sbt_.missRecordBase)));
+    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(sbt_.hitgroupRecordBase)));
+    LTB_CUDA_CHECK(cudaFree(reinterpret_cast<void*>(d_gas_output_buffer_)));
 
-    LTB_OPTIX_CHECK(optixPipelineDestroy(data_->pipeline));
-    LTB_OPTIX_CHECK(optixProgramGroupDestroy(data_->hitgroup_prog_group));
-    LTB_OPTIX_CHECK(optixProgramGroupDestroy(data_->miss_prog_group));
-    LTB_OPTIX_CHECK(optixProgramGroupDestroy(data_->raygen_prog_group));
-    LTB_OPTIX_CHECK(optixModuleDestroy(data_->module));
+    LTB_OPTIX_CHECK(optixPipelineDestroy(pipeline_));
+    LTB_OPTIX_CHECK(optixProgramGroupDestroy(hitgroup_prog_group_));
+    LTB_OPTIX_CHECK(optixProgramGroupDestroy(miss_prog_group_));
+    LTB_OPTIX_CHECK(optixProgramGroupDestroy(raygen_prog_group_));
+    LTB_OPTIX_CHECK(optixModuleDestroy(module_));
 
-    LTB_OPTIX_CHECK(optixDeviceContextDestroy(data_->context));
+    LTB_OPTIX_CHECK(optixDeviceContextDestroy(context_));
 
-    LTB_CUDA_CHECK(cudaStreamDestroy(data_->stream));
+    LTB_CUDA_CHECK(cudaStreamDestroy(stream_));
 }
 
 auto OptiX::stream() const -> cudaStream_t {
-    return data_->stream;
+    return stream_;
 }
 
 auto OptiX::launch(GLBufferImage<uchar4>& output_buffer) -> void {
@@ -442,7 +419,7 @@ auto OptiX::launch(GLBufferImage<uchar4>& output_buffer) -> void {
     params.image        = output_buffer.cuda_buffer();
     params.image_width  = output_buffer.gl_buffer_image().size().x();
     params.image_height = output_buffer.gl_buffer_image().size().y();
-    params.handle       = data_->gas_handle;
+    params.handle       = gas_handle_;
     params.cam_eye      = {0.0f, 0.0f, 2.0f};
 
     auto look_at      = float3{0.0f, 0.0f, 0.0f};
@@ -464,11 +441,11 @@ auto OptiX::launch(GLBufferImage<uchar4>& output_buffer) -> void {
     LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_param), sizeof(tmp::Params)));
     LTB_CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_param), &params, sizeof(params), cudaMemcpyHostToDevice));
 
-    LTB_OPTIX_CHECK(optixLaunch(data_->pipeline,
-                                data_->stream,
+    LTB_OPTIX_CHECK(optixLaunch(pipeline_,
+                                stream_,
                                 d_param,
                                 sizeof(tmp::Params),
-                                &data_->sbt,
+                                &sbt_,
                                 params.image_width,
                                 params.image_height,
                                 /*depth=*/1));
