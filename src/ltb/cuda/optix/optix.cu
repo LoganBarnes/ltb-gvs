@@ -213,7 +213,7 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         LTB_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_gas_output_buffer_), gas_buffer_sizes.outputSizeInBytes));
 
         LTB_OPTIX_CHECK(optixAccelBuild(context_,
-                                        0, // CUDA stream
+                                        nullptr, // CUDA stream
                                         &accel_options_,
                                         &triangle_input,
                                         1, // num build inputs
