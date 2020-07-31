@@ -40,7 +40,8 @@
         }                                                                                                              \
     }
 
-namespace ltb::optix {
+namespace ltb {
+namespace optix {
 
 template <typename T>
 auto error_string(T result, char const* const func, const char* const file, int const line) -> std::string {
@@ -62,4 +63,5 @@ auto check(T result, char const* const func, const char* const file, int const l
     }
 }
 
-} // namespace ltb::optix
+} // namespace optix
+} // namespace ltb

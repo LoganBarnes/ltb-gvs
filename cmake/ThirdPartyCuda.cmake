@@ -39,6 +39,7 @@ if (CMAKE_CUDA_COMPILER)
         find_package(OptiX)
 
         if (OptiX_INCLUDE)
+            message(STATUS "OptiX FOUND: ${OptiX_INCLUDE}")
             set(LTB_OPTIX_ENABLED TRUE)
 
             target_include_directories(ltb_external_cuda
