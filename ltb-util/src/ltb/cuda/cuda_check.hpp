@@ -47,9 +47,9 @@ template <typename T>
 auto error_string(T result, char const* const func, const char* const file, int const line) -> std::string {
     if (result != cudaSuccess) {
         std::stringstream error_str;
-        error_str << "CUDA error at " << file << ":" << line;
-        error_str << " code=" << static_cast<unsigned int>(result) << "(" << cudaGetErrorString(result) << ") ";
-        error_str << "\"" << func << "\"";
+        error_str << "CUDA error at " << file << ":" << line << "\n";
+        error_str << "\tcode=" << static_cast<unsigned int>(result) << "(" << cudaGetErrorString(result) << ")\n";
+        error_str << "\t\"" << func << "\"";
 
         return error_str.str();
     }

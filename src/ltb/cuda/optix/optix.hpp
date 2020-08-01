@@ -3,9 +3,12 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+// project
+#include "ltb/util/result.hpp"
+
 // external
-#include <optix_types.h>
 #include <driver_types.h>
+#include <optix_types.h>
 
 // standard
 #include <memory>
@@ -16,12 +19,13 @@ class OptiX {
 public:
     /// \brief
     /// \return
-    static auto init() -> std::shared_ptr<CUstream_st>;
+    static auto init() -> util::Result<std::shared_ptr<CUstream_st>>;
 
     /// \brief
     /// \param options
     /// \return
-    static auto make_context(OptixDeviceContextOptions const& options) -> std::shared_ptr<OptixDeviceContext_t>;
+    static auto make_context(OptixDeviceContextOptions const& options)
+        -> util::Result<std::shared_ptr<OptixDeviceContext_t>>;
 
     /// \brief
     /// \param context
@@ -29,7 +33,7 @@ public:
     /// \return
     static auto build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
                                OptixAccelBuildOptions const&                accel_build_options)
-        -> std::shared_ptr<OptixTraversableHandle>;
+        -> util::Result<std::shared_ptr<OptixTraversableHandle>>;
 };
 
-} // namespace ltb
+} // namespace ltb::cuda

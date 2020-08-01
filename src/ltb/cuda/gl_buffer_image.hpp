@@ -95,8 +95,8 @@ GLBufferImage<T>::~GLBufferImage() {
 }
 
 template <typename T>
-auto GLBufferImage<T>::set_stream(cudaStream_t stream) -> void {
-    stream_ = stream;
+auto GLBufferImage<T>::set_stream(cudaStream_t /*stream*/) -> void {
+    //stream_ = stream;
 }
 
 template <typename T>

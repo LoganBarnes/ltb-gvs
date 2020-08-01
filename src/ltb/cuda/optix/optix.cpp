@@ -14,7 +14,10 @@
 #include <thrust/device_malloc.h>
 
 // standard
+#include <thread>
 #include <vector>
+
+//#define DEBUG_LOGGING
 
 namespace ltb::cuda {
 
@@ -25,8 +28,7 @@ auto to_cu_deviceptr(void const* ptr) -> CUdeviceptr {
 }
 
 struct ScopedDeviceMemory {
-    explicit ScopedDeviceMemory(std::size_t size_in_bytes)
-        : data_(thrust::raw_pointer_cast(thrust::device_malloc(size_in_bytes)), cudaFree) {}
+    explicit ScopedDeviceMemory(std::shared_ptr<void> data) : data_(std::move(data)) {}
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     operator CUdeviceptr() const { return to_cu_deviceptr(data_.get()); }
@@ -38,33 +40,68 @@ private:
     std::shared_ptr<void> data_;
 };
 
+auto make_scoped_device_memory(std::size_t size_in_bytes) -> util::Result<ScopedDeviceMemory> {
+    void* ptr = nullptr;
+    LTB_SAFE_CUDA_CHECK(cudaMalloc(&ptr, size_in_bytes));
+    return ScopedDeviceMemory(std::shared_ptr<void>(ptr, [](auto* _ptr) { LTB_CUDA_CHECK(cudaFree(_ptr)); }));
+}
+
+#define LTB_CHECK_RESULT(val)                                                                                          \
+    if (!(val)) {                                                                                                      \
+        return tl::make_unexpected((val).error());                                                                     \
+    }
+
 } // namespace
 
-auto OptiX::init() -> std::shared_ptr<CUstream_st> {
+auto OptiX::init() -> util::Result<std::shared_ptr<CUstream_st>> {
     CUstream_st* raw_stream = nullptr;
-    LTB_CUDA_CHECK(cudaStreamCreate(&raw_stream));
+    LTB_SAFE_CUDA_CHECK(cudaStreamCreate(&raw_stream))
+
+#ifdef DEBUG_LOGGING
+    std::cerr << "stream " << raw_stream << " created" << std::endl;
+    auto stream = std::shared_ptr<CUstream_st>(raw_stream, [](auto* ptr) {
+        std::cerr << "stream " << ptr << " destroyed" << std::endl;
+        LTB_CUDA_CHECK(cudaStreamDestroy(ptr));
+    });
+#else
     auto stream = std::shared_ptr<CUstream_st>(raw_stream, cudaStreamDestroy);
+#endif
 
     {
         // Initialize CUDA
-        LTB_CUDA_CHECK(cudaFree(nullptr));
+        LTB_SAFE_CUDA_CHECK(cudaFree(nullptr));
 
         // Initialize OptiX
-        LTB_OPTIX_CHECK(optixInit());
+        LTB_SAFE_OPTIX_CHECK(optixInit());
     }
 
     return stream;
 }
 
-auto OptiX::make_context(const OptixDeviceContextOptions& options) -> std::shared_ptr<OptixDeviceContext_t> {
+auto OptiX::make_context(const OptixDeviceContextOptions& options)
+    -> util::Result<std::shared_ptr<OptixDeviceContext_t>> {
+
     OptixDeviceContext_t* context = nullptr;
-    LTB_OPTIX_CHECK(optixDeviceContextCreate(nullptr, &options, &context));
+    LTB_SAFE_OPTIX_CHECK(optixDeviceContextCreate(nullptr, &options, &context))
+
+#ifdef DEBUG_LOGGING
+    std::cerr << "context " << context << " created" << std::endl;
+    return std::shared_ptr<OptixDeviceContext_t>(context, [](auto* ptr) {
+        std::cerr << "context " << ptr << " destroyed" << std::endl;
+        LTB_OPTIX_CHECK(optixDeviceContextDestroy(ptr));
+    });
+#else
     return std::shared_ptr<OptixDeviceContext_t>(context, optixDeviceContextDestroy);
+#endif
 }
 
 auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
                            OptixAccelBuildOptions const&                accel_build_options)
-    -> std::shared_ptr<OptixTraversableHandle> {
+    -> util::Result<std::shared_ptr<OptixTraversableHandle>> {
+
+#ifdef DEBUG_LOGGING
+    std::cout << "[" << std::this_thread::get_id() << "]: " << __FUNCTION__ << std::endl;
+#endif
 
     // Triangle build input: simple list of three vertices
     const std::vector<float3> vertices = {
@@ -73,10 +110,11 @@ auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
         {0.0f, 0.5f, 0.0f},
     };
     auto verts_byte_size = vertices.size() * sizeof(float3);
-    auto device_vertices = ScopedDeviceMemory(verts_byte_size);
-    LTB_CUDA_CHECK(cudaMemcpy(device_vertices, vertices.data(), verts_byte_size, cudaMemcpyHostToDevice));
+    auto device_vertices = make_scoped_device_memory(verts_byte_size);
+    LTB_CHECK_RESULT(device_vertices)
+    LTB_SAFE_CUDA_CHECK(cudaMemcpy(device_vertices.value(), vertices.data(), verts_byte_size, cudaMemcpyHostToDevice));
 
-    CUdeviceptr d_vertices = device_vertices;
+    CUdeviceptr d_vertices = device_vertices.value();
 
     // Our build input is a simple list of non-indexed triangle vertices
     const uint32_t  triangle_input_flags[1]    = {OPTIX_GEOMETRY_FLAG_NONE};
@@ -89,31 +127,44 @@ auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
     triangle_input.triangleArray.numSbtRecords = 1;
 
     OptixAccelBufferSizes gas_buffer_sizes;
-    LTB_OPTIX_CHECK(optixAccelComputeMemoryUsage(context.get(),
-                                                 &accel_build_options,
-                                                 &triangle_input,
-                                                 1, // Number of build inputs
-                                                 &gas_buffer_sizes));
+    LTB_SAFE_OPTIX_CHECK(optixAccelComputeMemoryUsage(context.get(),
+                                                      &accel_build_options,
+                                                      &triangle_input,
+                                                      1, // Number of build inputs
+                                                      &gas_buffer_sizes))
 
-    auto temp_buffer_gas   = ScopedDeviceMemory(gas_buffer_sizes.tempSizeInBytes);
-    auto gas_output_buffer = ScopedDeviceMemory(gas_buffer_sizes.outputSizeInBytes);
+    auto temp_buffer_gas = make_scoped_device_memory(gas_buffer_sizes.tempSizeInBytes);
+    LTB_CHECK_RESULT(temp_buffer_gas)
+    auto gas_output_buffer = make_scoped_device_memory(gas_buffer_sizes.outputSizeInBytes);
+    LTB_CHECK_RESULT(gas_output_buffer)
 
+#ifdef DEBUG_LOGGING
+    auto gas_handle = std::shared_ptr<OptixTraversableHandle>(new OptixTraversableHandle(0),
+                                                              [context, gas_output_buffer](auto* ptr) {
+                                                                  std::cerr << "gas_handle " << ptr << " destroyed"
+                                                                            << std::endl;
+                                                                  delete ptr;
+                                                              });
+    std::cerr << "gas_handle " << gas_handle.get() << " created" << std::endl;
+#else
     auto gas_handle = std::shared_ptr<OptixTraversableHandle>(new OptixTraversableHandle(0),
                                                               [context, gas_output_buffer](auto* ptr) { delete ptr; });
+#endif
 
-    LTB_OPTIX_CHECK(optixAccelBuild(context.get(),
-                                    nullptr, // CUDA stream
-                                    &accel_build_options,
-                                    &triangle_input,
-                                    1, // num build inputs
-                                    temp_buffer_gas,
-                                    gas_buffer_sizes.tempSizeInBytes,
-                                    gas_output_buffer,
-                                    gas_buffer_sizes.outputSizeInBytes,
-                                    gas_handle.get(),
-                                    nullptr, // emitted property list
-                                    0 // num emitted properties
-                                    ));
+    LTB_SAFE_OPTIX_CHECK(optixAccelBuild(context.get(),
+                                         nullptr, // CUDA stream
+                                         &accel_build_options,
+                                         &triangle_input,
+                                         1, // num build inputs
+                                         temp_buffer_gas.value(),
+                                         gas_buffer_sizes.tempSizeInBytes,
+                                         gas_output_buffer.value(),
+                                         gas_buffer_sizes.outputSizeInBytes,
+                                         gas_handle.get(),
+                                         nullptr, // emitted property list
+                                         0 // num emitted properties
+                                         ))
+
     return gas_handle;
 }
 

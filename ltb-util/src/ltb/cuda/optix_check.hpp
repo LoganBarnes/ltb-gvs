@@ -47,9 +47,9 @@ template <typename T>
 auto error_string(T result, char const* const func, const char* const file, int const line) -> std::string {
     if (result != OPTIX_SUCCESS) {
         std::stringstream error_str;
-        error_str << "OPTIX error at " << file << ":" << line;
-        error_str << " code=" << static_cast<unsigned int>(result) << "(" << optixGetErrorString(result) << ") ";
-        error_str << "\"" << func << "\"";
+        error_str << "OPTIX error at " << file << ":" << line << "\n";
+        error_str << "\tcode=" << static_cast<unsigned int>(result) << "(" << optixGetErrorString(result) << ")\n";
+        error_str << "\t\"" << func << "\"";
         return error_str.str();
     }
     return "";
