@@ -8,10 +8,13 @@
 #include "ltb/cuda/optix_check.hpp"
 
 // external
+#include <cuda_runtime_api.h>
 #include <optix_function_table_definition.h> // can only exist once in a translation unit
 #include <optix_stubs.h>
 #include <thrust/device_malloc.h>
-#include <thrust/device_vector.h>
+
+// standard
+#include <vector>
 
 namespace ltb::cuda {
 
@@ -27,6 +30,9 @@ struct ScopedDeviceMemory {
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     operator CUdeviceptr() const { return reinterpret_cast<CUdeviceptr>(data_.get()); }
+
+    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    operator void*() const { return data_.get(); }
 
 private:
     std::shared_ptr<void> data_;
@@ -66,8 +72,11 @@ auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
         {0.5f, -0.5f, 0.0f},
         {0.0f, 0.5f, 0.0f},
     };
-    const thrust::device_vector<float3> device_vertices = {vertices.begin(), vertices.end()};
-    const auto                          d_vertices = to_cu_deviceptr(thrust::raw_pointer_cast(device_vertices.data()));
+    auto verts_byte_size = vertices.size() * sizeof(float3);
+    auto device_vertices = ScopedDeviceMemory(verts_byte_size);
+    LTB_CUDA_CHECK(cudaMemcpy(device_vertices, vertices.data(), verts_byte_size, cudaMemcpyHostToDevice));
+
+    CUdeviceptr d_vertices = device_vertices;
 
     // Our build input is a simple list of non-indexed triangle vertices
     const uint32_t  triangle_input_flags[1]    = {OPTIX_GEOMETRY_FLAG_NONE};
@@ -105,7 +114,6 @@ auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
                                     nullptr, // emitted property list
                                     0 // num emitted properties
                                     ));
-
     return gas_handle;
 }
 
