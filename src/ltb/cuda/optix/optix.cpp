@@ -29,7 +29,7 @@ struct ScopedDeviceMemory {
         : data_(thrust::raw_pointer_cast(thrust::device_malloc(size_in_bytes)), cudaFree) {}
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    operator CUdeviceptr() const { return reinterpret_cast<CUdeviceptr>(data_.get()); }
+    operator CUdeviceptr() const { return to_cu_deviceptr(data_.get()); }
 
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
     operator void*() const { return data_.get(); }

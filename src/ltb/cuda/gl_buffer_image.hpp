@@ -41,8 +41,11 @@ namespace cuda {
 template <typename T>
 class GLBufferImage {
 public:
-    explicit GLBufferImage(Magnum::GL::BufferImage2D gl_buffer_image);
+    explicit GLBufferImage(Magnum::GL::BufferImage2D gl_buffer_image, bool delay_init = false);
     ~GLBufferImage();
+
+    auto init() -> void;
+    auto destroy() -> void;
 
     auto set_stream(cudaStream_t stream) -> void;
 
@@ -62,16 +65,33 @@ private:
 };
 
 template <typename T>
-GLBufferImage<T>::GLBufferImage(Magnum::GL::BufferImage2D gl_buffer_image)
+GLBufferImage<T>::GLBufferImage(Magnum::GL::BufferImage2D gl_buffer_image, bool delay_init)
     : gl_buffer_image_(std::move(gl_buffer_image)) {
-    LTB_CUDA_CHECK(cudaGraphicsGLRegisterBuffer(&graphics_resource_,
-                                                gl_buffer_image_.buffer().id(),
-                                                cudaGraphicsRegisterFlagsNone));
+    if (!delay_init) {
+        init();
+    }
+}
+
+template <typename T>
+auto GLBufferImage<T>::init() -> void {
+    if (!graphics_resource_) {
+        LTB_CUDA_CHECK(cudaGraphicsGLRegisterBuffer(&graphics_resource_,
+                                                    gl_buffer_image_.buffer().id(),
+                                                    cudaGraphicsRegisterFlagsNone));
+    }
+}
+
+template <typename T>
+auto GLBufferImage<T>::destroy() -> void {
+    if (graphics_resource_) {
+        LTB_CUDA_CHECK(cudaGraphicsUnregisterResource(graphics_resource_));
+        graphics_resource_ = nullptr;
+    }
 }
 
 template <typename T>
 GLBufferImage<T>::~GLBufferImage() {
-    LTB_CUDA_CHECK(cudaGraphicsUnregisterResource(graphics_resource_));
+    destroy();
 }
 
 template <typename T>
