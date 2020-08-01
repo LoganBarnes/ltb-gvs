@@ -1,9 +1,29 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
+// LTB Geometry Visualization Server
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "optix.hpp"
 
 // project
+#include "compile_ptx_from_cu_string.hpp"
 #include "ltb/cuda/cuda_check.hpp"
 #include "ltb/cuda/optix_check.hpp"
 
@@ -81,22 +101,22 @@ auto OptiX::init() -> util::Result<std::shared_ptr<CUstream_st>> {
 auto OptiX::make_context(const OptixDeviceContextOptions& options)
     -> util::Result<std::shared_ptr<OptixDeviceContext_t>> {
 
-    OptixDeviceContext_t* context = nullptr;
-    LTB_SAFE_OPTIX_CHECK(optixDeviceContextCreate(nullptr, &options, &context))
+    OptixDeviceContext_t* raw_context = nullptr;
+    LTB_SAFE_OPTIX_CHECK(optixDeviceContextCreate(nullptr, &options, &raw_context))
 
 #ifdef DEBUG_LOGGING
-    std::cerr << "context " << context << " created" << std::endl;
-    return std::shared_ptr<OptixDeviceContext_t>(context, [](auto* ptr) {
+    std::cerr << "context " << raw_context << " created" << std::endl;
+    return std::shared_ptr<OptixDeviceContext_t>(raw_context, [](auto* ptr) {
         std::cerr << "context " << ptr << " destroyed" << std::endl;
         LTB_OPTIX_CHECK(optixDeviceContextDestroy(ptr));
     });
 #else
-    return std::shared_ptr<OptixDeviceContext_t>(context, optixDeviceContextDestroy);
+    return std::shared_ptr<OptixDeviceContext_t>(raw_context, optixDeviceContextDestroy);
 #endif
 }
 
-auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
-                           OptixAccelBuildOptions const&                accel_build_options)
+auto OptiX::make_geometry_acceleration_structure(std::shared_ptr<OptixDeviceContext_t> const& context,
+                                                 OptixAccelBuildOptions const&                accel_build_options)
     -> util::Result<std::shared_ptr<OptixTraversableHandle>> {
 
 #ifdef DEBUG_LOGGING
@@ -166,6 +186,35 @@ auto OptiX::build_geometry(std::shared_ptr<OptixDeviceContext_t> const& context,
                                          ))
 
     return gas_handle;
+}
+
+auto OptiX::make_module(std::shared_ptr<OptixDeviceContext_t> const& context,
+                        OptixPipelineCompileOptions const&           pipeline_compile_options,
+                        OptixModuleCompileOptions const&             module_compile_options,
+                        std::string const& ptx_str) -> util::Result<std::shared_ptr<OptixModule_t>> {
+
+    char   log[2048];
+    size_t sizeof_log = sizeof(log);
+
+    OptixModule_t* raw_module = nullptr;
+    LTB_SAFE_OPTIX_CHECK(optixModuleCreateFromPTX(context.get(),
+                                                  &module_compile_options,
+                                                  &pipeline_compile_options,
+                                                  ptx_str.c_str(),
+                                                  ptx_str.size(),
+                                                  log,
+                                                  &sizeof_log,
+                                                  &raw_module));
+
+#ifdef DEBUG_LOGGING
+    std::cerr << "module " << raw_module << " created" << std::endl;
+    return std::shared_ptr<OptixModule_t>(raw_module, [](auto* ptr) {
+        std::cerr << "module " << ptr << " destroyed" << std::endl;
+        LTB_OPTIX_CHECK(optixModuleDestroy(ptr));
+    });
+#else
+    return std::shared_ptr<OptixModule_t>(raw_module, optixModuleDestroy);
+#endif
 }
 
 } // namespace ltb::cuda

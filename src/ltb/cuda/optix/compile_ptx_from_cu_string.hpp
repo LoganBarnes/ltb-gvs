@@ -25,45 +25,17 @@
 // project
 #include "ltb/util/result.hpp"
 
-// external
-#include <driver_types.h>
-#include <optix_types.h>
-
 // standard
-#include <memory>
+#include <string>
+#include <vector>
 
 namespace ltb::cuda {
 
-class OptiX {
-public:
-    /// \brief
-    /// \return
-    static auto init() -> util::Result<std::shared_ptr<CUstream_st>>;
-
-    /// \brief
-    /// \param options
-    /// \return
-    static auto make_context(OptixDeviceContextOptions const& options)
-        -> util::Result<std::shared_ptr<OptixDeviceContext_t>>;
-
-    /// \brief
-    /// \param context
-    /// \param accel_build_options
-    /// \return
-    static auto make_geometry_acceleration_structure(std::shared_ptr<OptixDeviceContext_t> const& context,
-                                                     OptixAccelBuildOptions const&                accel_build_options)
-        -> util::Result<std::shared_ptr<OptixTraversableHandle>>;
-
-    /// \brief
-    /// \param context
-    /// \param pipeline_compile_options
-    /// \param module_compile_options
-    /// \param ptx_str
-    /// \return
-    static auto make_module(std::shared_ptr<OptixDeviceContext_t> const& context,
-                            OptixPipelineCompileOptions const&           pipeline_compile_options,
-                            OptixModuleCompileOptions const&             module_compile_options,
-                            std::string const& ptx_str) -> util::Result<std::shared_ptr<OptixModule_t>>;
-};
+auto compile_ptx_from_cu_string(std::string const&       cu_source,
+                                std::string const&       name,
+                                std::vector<std::string> include_dirs,
+                                std::vector<std::string> compiler_flags
+                                = {"-std=c++17", "-use_fast_math", "-lineinfo", "-default-device"},
+                                const char** log_string = nullptr) -> ltb::util::Result<std::string>;
 
 } // namespace ltb::cuda

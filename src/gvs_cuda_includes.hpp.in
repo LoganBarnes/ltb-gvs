@@ -30,6 +30,7 @@
 #include "ltb/gvs_paths.hpp"
 
 #include <stdexcept>
+#include <vector>
 
 #cmakedefine LTB_OPTIX_ENABLED
 
@@ -40,7 +41,7 @@ inline auto cuda_include_dir() -> std::string {
 #ifdef LTB_CUDA_ENABLED
     return "@CUDAToolkit_INCLUDE_DIRS@";
 #else
-    throw std::runtime_error("optix is not enabled");
+    throw std::runtime_error("CUDA is not enabled");
 #endif
 }
 
@@ -48,7 +49,15 @@ inline auto optix_include_dir() -> std::string {
 #ifdef LTB_OPTIX_ENABLED
     return "@OptiX_INCLUDE@";
 #else
-    throw std::runtime_error("optix is not enabled");
+    throw std::runtime_error("OptiX is not enabled");
+#endif
+}
+
+inline auto cuda_architectures() -> std::vector<int> {
+#ifdef LTB_CUDA_ENABLED
+    return std::vector<int>{@CMAKE_CUDA_ARCHITECTURES@};
+#else
+    throw std::runtime_error("CUDA is not enabled");
 #endif
 }
 
