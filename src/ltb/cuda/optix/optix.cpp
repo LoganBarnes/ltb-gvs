@@ -217,4 +217,33 @@ auto OptiX::make_module(std::shared_ptr<OptixDeviceContext_t> const& context,
 #endif
 }
 
+auto OptiX::make_program_groups(std::shared_ptr<OptixDeviceContext_t> const& context,
+                                std::shared_ptr<OptixModule_t> const&        module,
+                                std::vector<OptixProgramGroupDesc> const&    program_group_descriptions)
+    -> ltb::util::Result<std::shared_ptr<std::vector<OptixProgramGroup>>> {
+
+    auto program_groups = std::shared_ptr<std::vector<OptixProgramGroup>>(new std::vector<OptixProgramGroup>(),
+                                                                          [context, module](auto* ptr) { delete ptr; });
+
+    char   log[4096];
+    size_t sizeof_log = sizeof(log);
+
+    OptixProgramGroupOptions program_group_options = {}; // Initialize to zeros
+
+    for (const auto& prog_group_desc : program_group_descriptions) {
+        program_groups->emplace_back();
+        auto& program_group = program_groups->back();
+
+        LTB_SAFE_OPTIX_CHECK(optixProgramGroupCreate(context.get(),
+                                                     &prog_group_desc,
+                                                     1, // num program groups
+                                                     &program_group_options,
+                                                     log,
+                                                     &sizeof_log,
+                                                     &program_group));
+    }
+
+    return program_groups;
+}
+
 } // namespace ltb::cuda

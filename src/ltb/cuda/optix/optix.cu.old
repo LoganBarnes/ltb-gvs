@@ -282,12 +282,12 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
     //
     {
         OptixProgramGroupOptions program_group_options = {}; // Initialize to zeros
+        size_t sizeof_log                               = sizeof(log);
 
         OptixProgramGroupDesc raygen_prog_group_desc    = {}; //
         raygen_prog_group_desc.kind                     = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
         raygen_prog_group_desc.raygen.module            = module_;
         raygen_prog_group_desc.raygen.entryFunctionName = "__raygen__rg";
-        size_t sizeof_log                               = sizeof(log);
         LTB_OPTIX_CHECK(optixProgramGroupCreate(context_,
                                                 &raygen_prog_group_desc,
                                                 1, // num program groups
@@ -300,7 +300,6 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         miss_prog_group_desc.kind                   = OPTIX_PROGRAM_GROUP_KIND_MISS;
         miss_prog_group_desc.miss.module            = module_;
         miss_prog_group_desc.miss.entryFunctionName = "__miss__ms";
-        sizeof_log                                  = sizeof(log);
         LTB_OPTIX_CHECK(optixProgramGroupCreate(context_,
                                                 &miss_prog_group_desc,
                                                 1, // num program groups
@@ -313,7 +312,6 @@ auto OptiX::init(const std::string& programs_str) -> util::Result<OptiX*> {
         hitgroup_prog_group_desc.kind                         = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
         hitgroup_prog_group_desc.hitgroup.moduleCH            = module_;
         hitgroup_prog_group_desc.hitgroup.entryFunctionNameCH = "__closesthit__ch";
-        sizeof_log                                            = sizeof(log);
         LTB_OPTIX_CHECK(optixProgramGroupCreate(context_,
                                                 &hitgroup_prog_group_desc,
                                                 1, // num program groups
