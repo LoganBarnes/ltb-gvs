@@ -30,6 +30,7 @@
 // external
 #include <cuda_runtime_api.h>
 #include <optix_function_table_definition.h> // can only exist once in a translation unit
+#include <optix_stack_size.h>
 #include <optix_stubs.h>
 #include <thrust/device_malloc.h>
 
@@ -254,6 +255,66 @@ auto OptiX::make_program_groups(std::shared_ptr<OptixDeviceContext_t> const& con
     }
 
     return program_groups;
+}
+
+auto OptiX::make_pipeline(std::shared_ptr<OptixDeviceContext_t> const&           context,
+                          std::shared_ptr<std::vector<OptixProgramGroup>> const& program_groups,
+                          OptixPipelineCompileOptions const&                     pipeline_compile_options,
+                          OptixPipelineLinkOptions const&                        pipeline_link_options)
+    -> ltb::util::Result<std::shared_ptr<OptixPipeline_t>> {
+
+    auto pipeline = std::shared_ptr<OptixPipeline_t>{};
+    {
+        char   log[4096];
+        size_t sizeof_log = sizeof(log);
+
+        OptixPipeline_t* raw_pipeline = nullptr;
+        LTB_OPTIX_CHECK(optixPipelineCreate(context.get(),
+                                            &pipeline_compile_options,
+                                            &pipeline_link_options,
+                                            program_groups->data(),
+                                            program_groups->size(),
+                                            log,
+                                            &sizeof_log,
+                                            &raw_pipeline));
+
+#ifdef DEBUG_LOGGING
+        std::cerr << "pipeline " << raw_pipeline << " created" << std::endl;
+        pipeline = std::shared_ptr<OptixPipeline_t>(raw_pipeline, [](auto* ptr) {
+            std::cerr << "pipeline " << ptr << " destroyed" << std::endl;
+            LTB_OPTIX_CHECK(optixPipelineDestroy(ptr));
+        });
+#else
+        pipeline = std::shared_ptr<OptixModule_t>(raw_pipeline, optixPipelineDestroy);
+#endif
+    }
+
+    {
+        OptixStackSizes stack_sizes = {};
+        for (auto const& prog_group : *program_groups) {
+            LTB_OPTIX_CHECK(optixUtilAccumulateStackSizes(prog_group, &stack_sizes));
+        }
+
+        uint32_t direct_callable_stack_size_from_traversal = 0u;
+        uint32_t direct_callable_stack_size_from_state     = 0u;
+        uint32_t continuation_stack_size                   = 0u;
+        LTB_OPTIX_CHECK(optixUtilComputeStackSizes(&stack_sizes,
+                                                   pipeline_link_options.maxTraceDepth,
+                                                   0, // maxCCDepth
+                                                   0, // maxDCDEpth
+                                                   &direct_callable_stack_size_from_traversal,
+                                                   &direct_callable_stack_size_from_state,
+                                                   &continuation_stack_size));
+        LTB_OPTIX_CHECK(optixPipelineSetStackSize(pipeline.get(),
+                                                  direct_callable_stack_size_from_traversal,
+                                                  direct_callable_stack_size_from_state,
+                                                  continuation_stack_size,
+                                                  1 // maxTraversableDepth
+                                                  /// \todo: ^ What should this be?
+                                                  ));
+    }
+
+    return pipeline;
 }
 
 } // namespace ltb::cuda

@@ -74,6 +74,18 @@ public:
                                     std::shared_ptr<OptixModule_t> const&        module,
                                     std::vector<OptixProgramGroupDesc> const&    program_group_descriptions)
         -> ltb::util::Result<std::shared_ptr<std::vector<OptixProgramGroup>>>;
+
+    /// \brief
+    /// \param context
+    /// \param program_groups
+    /// \param pipeline_compile_options
+    /// \param pipeline_link_options
+    /// \return
+    static auto make_pipeline(std::shared_ptr<OptixDeviceContext_t> const&           context,
+                              std::shared_ptr<std::vector<OptixProgramGroup>> const& program_groups,
+                              OptixPipelineCompileOptions const&                     pipeline_compile_options,
+                              OptixPipelineLinkOptions const&                        pipeline_link_options)
+        -> ltb::util::Result<std::shared_ptr<OptixPipeline_t>>;
 };
 
 } // namespace ltb::cuda
