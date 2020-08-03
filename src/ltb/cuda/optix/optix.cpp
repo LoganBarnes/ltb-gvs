@@ -37,7 +37,7 @@
 #include <thread>
 #include <vector>
 
-//#define DEBUG_LOGGING
+#define DEBUG_LOGGING
 
 namespace ltb::cuda {
 
@@ -222,8 +222,18 @@ auto OptiX::make_program_groups(std::shared_ptr<OptixDeviceContext_t> const& con
                                 std::vector<OptixProgramGroupDesc> const&    program_group_descriptions)
     -> ltb::util::Result<std::shared_ptr<std::vector<OptixProgramGroup>>> {
 
+#ifdef DEBUG_LOGGING
+    auto program_groups = std::shared_ptr<std::vector<OptixProgramGroup>>(new std::vector<OptixProgramGroup>(),
+                                                                          [context, module](auto* ptr) {
+                                                                              std::cerr << "program_groups " << ptr
+                                                                                        << " destroyed" << std::endl;
+                                                                              delete ptr;
+                                                                          });
+    std::cerr << "program_groups " << program_groups.get() << " created" << std::endl;
+#else
     auto program_groups = std::shared_ptr<std::vector<OptixProgramGroup>>(new std::vector<OptixProgramGroup>(),
                                                                           [context, module](auto* ptr) { delete ptr; });
+#endif
 
     char   log[4096];
     size_t sizeof_log = sizeof(log);
