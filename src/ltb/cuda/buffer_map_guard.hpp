@@ -31,13 +31,13 @@ namespace cuda {
 template <typename T>
 class GLBufferMapGuard {
 public:
-    explicit GLBufferMapGuard(GLBuffer<T>& interop_buffer) : interop_buffer(interop_buffer) {
+    explicit GLBufferMapGuard(GLBuffer<T>& interop_buffer) : interop_buffer_(interop_buffer) {
         interop_buffer.map_for_cuda();
     }
-    ~GLBufferMapGuard() { interop_buffer.unmap_from_cuda(); }
+    ~GLBufferMapGuard() { interop_buffer_.unmap_from_cuda(); }
 
 private:
-    GLBuffer<T>& interop_buffer;
+    GLBuffer<T>& interop_buffer_;
 };
 
 // Allows the guard to be created without having to specify the template type
@@ -49,13 +49,13 @@ GLBufferMapGuard<T> make_gl_buffer_map_guard(GLBuffer<T>& interop_buffer) {
 template <typename T>
 class GLBufferImageMapGuard {
 public:
-    explicit GLBufferImageMapGuard(GLBufferImage<T>& interop_buffer) : interop_buffer(interop_buffer) {
+    explicit GLBufferImageMapGuard(GLBufferImage<T>& interop_buffer) : interop_buffer_(interop_buffer) {
         interop_buffer.map_for_cuda();
     }
-    ~GLBufferImageMapGuard() { interop_buffer.unmap_from_cuda(); }
+    ~GLBufferImageMapGuard() { interop_buffer_.unmap_from_cuda(); }
 
 private:
-    GLBufferImage<T>& interop_buffer;
+    GLBufferImage<T>& interop_buffer_;
 };
 
 // Allows the guard to be created without having to specify the template type
