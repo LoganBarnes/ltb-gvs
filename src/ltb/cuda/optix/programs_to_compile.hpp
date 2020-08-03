@@ -22,29 +22,16 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <optix_types.h>
+#include <string>
+#include <vector>
 
-namespace tmp {
+namespace ltb::cuda {
 
-struct Params {
-    uchar4*                image;
-    unsigned int           image_width;
-    unsigned int           image_height;
-    float3                 cam_eye;
-    float3                 cam_u, cam_v, cam_w;
-    OptixTraversableHandle handle;
+struct ProgramsToCompile {
+    std::string              cu_filename;
+    std::string              program_name;
+    std::vector<std::string> include_dirs;
+    std::vector<std::string> compiler_flags;
 };
 
-struct RayGenData {
-    // No data needed
-};
-
-struct MissData {
-    float3 bg_color;
-};
-
-struct HitGroupData {
-    // No data needed
-};
-
-} // namespace tmp
+} // namespace ltb::cuda

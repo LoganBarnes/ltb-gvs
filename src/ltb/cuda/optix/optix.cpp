@@ -289,30 +289,31 @@ auto OptiX::make_pipeline(std::shared_ptr<OptixDeviceContext_t> const&          
 #endif
     }
 
-    {
-        OptixStackSizes stack_sizes = {};
-        for (auto const& prog_group : *program_groups) {
-            LTB_OPTIX_CHECK(optixUtilAccumulateStackSizes(prog_group, &stack_sizes));
-        }
-
-        uint32_t direct_callable_stack_size_from_traversal = 0u;
-        uint32_t direct_callable_stack_size_from_state     = 0u;
-        uint32_t continuation_stack_size                   = 0u;
-        LTB_OPTIX_CHECK(optixUtilComputeStackSizes(&stack_sizes,
-                                                   pipeline_link_options.maxTraceDepth,
-                                                   0, // maxCCDepth
-                                                   0, // maxDCDEpth
-                                                   &direct_callable_stack_size_from_traversal,
-                                                   &direct_callable_stack_size_from_state,
-                                                   &continuation_stack_size));
-        LTB_OPTIX_CHECK(optixPipelineSetStackSize(pipeline.get(),
-                                                  direct_callable_stack_size_from_traversal,
-                                                  direct_callable_stack_size_from_state,
-                                                  continuation_stack_size,
-                                                  1 // maxTraversableDepth
-                                                  /// \todo: ^ What should this be?
-                                                  ));
-    }
+    // This is optional and should be set by the application for optimal sizes.
+    //    {
+    //        OptixStackSizes stack_sizes = {};
+    //        for (auto const& prog_group : *program_groups) {
+    //            LTB_OPTIX_CHECK(optixUtilAccumulateStackSizes(prog_group, &stack_sizes));
+    //        }
+    //
+    //        uint32_t direct_callable_stack_size_from_traversal = 0u;
+    //        uint32_t direct_callable_stack_size_from_state     = 0u;
+    //        uint32_t continuation_stack_size                   = 0u;
+    //        LTB_OPTIX_CHECK(optixUtilComputeStackSizes(&stack_sizes,
+    //                                                   pipeline_link_options.maxTraceDepth,
+    //                                                   0, // maxCCDepth
+    //                                                   0, // maxDCDEpth
+    //                                                   &direct_callable_stack_size_from_traversal,
+    //                                                   &direct_callable_stack_size_from_state,
+    //                                                   &continuation_stack_size));
+    //        LTB_OPTIX_CHECK(optixPipelineSetStackSize(pipeline.get(),
+    //                                                  direct_callable_stack_size_from_traversal,
+    //                                                  direct_callable_stack_size_from_state,
+    //                                                  continuation_stack_size,
+    //                                                  1 // maxTraversableDepth
+    //                                                  /// \todo: ^ What should this be?
+    //                                                  ));
+    //    }
 
     return pipeline;
 }
