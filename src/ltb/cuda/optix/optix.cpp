@@ -138,6 +138,8 @@ auto OptiX::make_geometry_acceleration_structure(std::shared_ptr<OptixDeviceCont
                                          0 // num emitted properties
                                          ))
 
+    /// \todo handle compaction like in "optixSphere" SDK sample
+
     return gas_handle;
 }
 
