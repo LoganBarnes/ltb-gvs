@@ -31,7 +31,8 @@ namespace ltb {
 namespace gvs {
 
 struct CameraPackage {
-    Magnum::SceneGraph::Camera3D* camera = nullptr;
+    Magnum::SceneGraph::Camera3D* camera         = nullptr;
+    float                         focal_distance = 0.f;
 };
 
 } // namespace gvs
