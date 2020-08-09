@@ -269,14 +269,14 @@ auto OptiX::make_pipeline(std::shared_ptr<OptixDeviceContext_t> const&          
         size_t sizeof_log = sizeof(log);
 
         OptixPipeline_t* raw_pipeline = nullptr;
-        LTB_OPTIX_CHECK(optixPipelineCreate(context.get(),
-                                            &pipeline_compile_options,
-                                            &pipeline_link_options,
-                                            program_groups->data(),
-                                            program_groups->size(),
-                                            log,
-                                            &sizeof_log,
-                                            &raw_pipeline));
+        LTB_SAFE_OPTIX_CHECK(optixPipelineCreate(context.get(),
+                                                 &pipeline_compile_options,
+                                                 &pipeline_link_options,
+                                                 program_groups->data(),
+                                                 program_groups->size(),
+                                                 log,
+                                                 &sizeof_log,
+                                                 &raw_pipeline));
 
 #ifdef DEBUG_LOGGING
         std::cerr << "pipeline " << raw_pipeline << " created" << std::endl;
