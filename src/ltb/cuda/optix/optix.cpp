@@ -24,6 +24,7 @@
 
 // project
 #include "compile_ptx_from_cu_string.hpp"
+#include "device_memory.h"
 #include "ltb/cuda/cuda_check.hpp"
 #include "ltb/cuda/optix_check.hpp"
 
@@ -40,39 +41,12 @@
 
 #define DEBUG_LOGGING
 
-namespace ltb::cuda {
-
-namespace {
-
-auto to_cu_deviceptr(void const* ptr) -> CUdeviceptr {
-    return reinterpret_cast<CUdeviceptr>(ptr);
-}
-
-struct ScopedDeviceMemory {
-    explicit ScopedDeviceMemory(std::shared_ptr<void> data) : data_(std::move(data)) {}
-
-    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    operator CUdeviceptr() const { return to_cu_deviceptr(data_.get()); }
-
-    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    operator void*() const { return data_.get(); }
-
-private:
-    std::shared_ptr<void> data_;
-};
-
-auto make_scoped_device_memory(std::size_t size_in_bytes) -> util::Result<ScopedDeviceMemory> {
-    void* ptr = nullptr;
-    LTB_SAFE_CUDA_CHECK(cudaMalloc(&ptr, size_in_bytes));
-    return ScopedDeviceMemory(std::shared_ptr<void>(ptr, [](auto* _ptr) { LTB_CUDA_CHECK(cudaFree(_ptr)); }));
-}
-
 #define LTB_CHECK_RESULT(val)                                                                                          \
     if (!(val)) {                                                                                                      \
         return tl::make_unexpected((val).error());                                                                     \
     }
 
-} // namespace
+namespace ltb::cuda {
 
 auto OptiX::init() -> util::Result<std::shared_ptr<CUstream_st>> {
     CUstream_st* raw_stream = nullptr;
@@ -117,40 +91,18 @@ auto OptiX::make_context(const OptixDeviceContextOptions& options)
 }
 
 auto OptiX::make_geometry_acceleration_structure(std::shared_ptr<OptixDeviceContext_t> const& context,
-                                                 OptixAccelBuildOptions const&                accel_build_options)
+                                                 OptixAccelBuildOptions const&                accel_build_options,
+                                                 OptixBuildInput const&                       build_input)
     -> util::Result<std::shared_ptr<OptixTraversableHandle>> {
 
 #ifdef DEBUG_LOGGING
     std::cout << "[" << std::this_thread::get_id() << "]: " << __FUNCTION__ << std::endl;
 #endif
 
-    // Triangle build input: simple list of three vertices
-    const std::vector<float3> vertices = {
-        {-0.5f, -0.5f, 0.0f},
-        {0.5f, -0.5f, 0.0f},
-        {0.0f, 0.5f, 0.0f},
-    };
-    auto verts_byte_size = vertices.size() * sizeof(float3);
-    auto device_vertices = make_scoped_device_memory(verts_byte_size);
-    LTB_CHECK_RESULT(device_vertices)
-    LTB_SAFE_CUDA_CHECK(cudaMemcpy(device_vertices.value(), vertices.data(), verts_byte_size, cudaMemcpyHostToDevice));
-
-    CUdeviceptr d_vertices = device_vertices.value();
-
-    // Our build input is a simple list of non-indexed triangle vertices
-    const uint32_t  triangle_input_flags[1]    = {OPTIX_GEOMETRY_FLAG_NONE};
-    OptixBuildInput triangle_input             = {};
-    triangle_input.type                        = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
-    triangle_input.triangleArray.vertexFormat  = OPTIX_VERTEX_FORMAT_FLOAT3;
-    triangle_input.triangleArray.numVertices   = static_cast<uint32_t>(vertices.size());
-    triangle_input.triangleArray.vertexBuffers = &d_vertices;
-    triangle_input.triangleArray.flags         = triangle_input_flags;
-    triangle_input.triangleArray.numSbtRecords = 1;
-
     OptixAccelBufferSizes gas_buffer_sizes;
     LTB_SAFE_OPTIX_CHECK(optixAccelComputeMemoryUsage(context.get(),
                                                       &accel_build_options,
-                                                      &triangle_input,
+                                                      &build_input,
                                                       1, // Number of build inputs
                                                       &gas_buffer_sizes))
 
@@ -175,7 +127,7 @@ auto OptiX::make_geometry_acceleration_structure(std::shared_ptr<OptixDeviceCont
     LTB_SAFE_OPTIX_CHECK(optixAccelBuild(context.get(),
                                          nullptr, // CUDA stream
                                          &accel_build_options,
-                                         &triangle_input,
+                                         &build_input,
                                          1, // num build inputs
                                          temp_buffer_gas.value(),
                                          gas_buffer_sizes.tempSizeInBytes,

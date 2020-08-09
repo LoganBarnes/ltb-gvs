@@ -51,7 +51,8 @@ public:
     /// \param accel_build_options
     /// \return
     static auto make_geometry_acceleration_structure(std::shared_ptr<OptixDeviceContext_t> const& context,
-                                                     OptixAccelBuildOptions const&                accel_build_options)
+                                                     OptixAccelBuildOptions const&                accel_build_options,
+                                                     OptixBuildInput const&                       build_input)
         -> util::Result<std::shared_ptr<OptixTraversableHandle>>;
 
     /// \brief
