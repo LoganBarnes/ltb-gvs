@@ -20,40 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+// project
+#include "ltb/util/result.hpp"
 
-namespace ltb {
-namespace paths {
+// external
+#include <driver_types.h>
+#include <optix_types.h>
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
+// standard
+#include <memory>
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
+namespace ltb::cuda {
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
+auto to_cu_device_ptr(void* ptr) -> CUdeviceptr;
 
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
+struct ScopedDeviceMemory {
+    explicit ScopedDeviceMemory(std::shared_ptr<void> data);
 
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
+    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    operator CUdeviceptr() const;
 
-} // namespace paths
-} // namespace ltb
+    // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
+    operator void*() const;
+
+private:
+    std::shared_ptr<void> data_;
+};
+
+auto make_scoped_device_memory(std::size_t size_in_bytes) -> util::Result<ScopedDeviceMemory>;
+auto make_shared_device_memory(std::size_t size_in_bytes) -> util::Result<std::shared_ptr<void>>;
+
+} // namespace gpu

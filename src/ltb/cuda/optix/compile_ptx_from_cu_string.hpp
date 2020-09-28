@@ -20,40 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+// project
+#include "ltb/util/result.hpp"
 
-namespace ltb {
-namespace paths {
+// standard
+#include <string>
+#include <vector>
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
+namespace ltb::cuda {
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
+auto compile_ptx_from_cu_string(std::string const&       cu_source,
+                                std::string const&       name,
+                                std::vector<std::string> include_dirs,
+                                std::vector<std::string> compiler_flags
+                                = {"-std=c++17", "-use_fast_math", "-lineinfo", "-default-device"},
+                                const char** log_string = nullptr) -> ltb::util::Result<std::string>;
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
-} // namespace ltb
+} // namespace ltb::cuda

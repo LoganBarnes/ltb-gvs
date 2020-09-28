@@ -23,7 +23,7 @@
 #pragma once
 
 // project
-#include "../util11/result_11.hpp"
+#include "ltb/gvs/util11/result_11.hpp"
 #include "types.hpp"
 
 // standard

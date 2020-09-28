@@ -20,40 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+#include <string>
+#include <vector>
 
-namespace ltb {
-namespace paths {
+namespace ltb::cuda {
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
+struct ProgramsToCompile {
+    std::string              cu_filename;
+    std::string              program_name;
+    std::vector<std::string> include_dirs;
+    std::vector<std::string> compiler_flags;
+};
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
-
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
-} // namespace ltb
+} // namespace ltb::cuda

@@ -39,6 +39,12 @@
 #define CHECK_RESULT
 #endif
 
+#if __cplusplus < 201703L || defined(__CUDACC__)
+#define NO_DISCARD
+#else
+#define NO_DISCARD [[nodiscard]]
+#endif
+
 namespace ltb::util {
 
 /**
@@ -85,7 +91,7 @@ template <typename T, typename E>
 struct CHECK_RESULT Result;
 
 template <typename T, typename Error = ::ltb::util::Error>
-struct [[nodiscard]] Result : tl::expected<T, Error> {
+struct NO_DISCARD Result : tl::expected<T, Error> {
     using tl::expected<T, Error>::expected;
 
     template <typename F, typename... Args>

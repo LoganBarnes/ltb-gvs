@@ -45,4 +45,16 @@ auto ErrorAlertRecorder::record_warning(util::Error error) const -> bool {
     return false;
 }
 
+auto ErrorAlertRecorder::record_or_print(std::ostream& os, util::Error const& error) const -> void {
+    if (error.severity() == ltb::util::Error::Severity::Warning) {
+        if (!record_warning(error)) {
+            os << error.error_message() << std::endl;
+        }
+    } else {
+        if (!record_error(error)) {
+            os << error.error_message() << std::endl;
+        }
+    }
+}
+
 } // namespace ltb::gvs

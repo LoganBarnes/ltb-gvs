@@ -20,40 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+// project
+#include "ltb/gvs/core/types.hpp"
 
-namespace ltb {
-namespace paths {
+// external
+#include <Magnum/GL/AbstractShaderProgram.h>
+#include <Magnum/GL/Texture.h>
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
+namespace ltb::gvs {
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
+class TextureShader : public Magnum::GL::AbstractShaderProgram {
+public:
+    enum : Magnum::UnsignedInt { ColorOutput = 0 };
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
+    explicit TextureShader();
 
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
+    auto bind_tex(Magnum::GL::Texture2D& tex) -> TextureShader&;
+};
 
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
-} // namespace ltb
+} // namespace ltb::gvs

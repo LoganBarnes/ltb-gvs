@@ -20,40 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
+#include "device_memory.h"
 
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
+// project
+#include "ltb/cuda/cuda_check.hpp"
 
-#include "ltb/paths.hpp"
+// external
+#include <cuda_runtime.h>
 
-namespace ltb {
-namespace paths {
+namespace ltb::cuda {
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
+auto to_cu_device_ptr(void* ptr) -> CUdeviceptr {
+    return reinterpret_cast<CUdeviceptr>(ptr);
 }
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
+ScopedDeviceMemory::ScopedDeviceMemory(std::shared_ptr<void> data) : data_(std::move(data)) {}
+
+ScopedDeviceMemory::operator CUdeviceptr() const {
+    return to_cu_device_ptr(data_.get());
 }
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
+ScopedDeviceMemory::operator void*() const {
+    return data_.get();
 }
 
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
+auto make_scoped_device_memory(std::size_t size_in_bytes) -> util::Result<ScopedDeviceMemory> {
+    auto shared_device_memory = make_shared_device_memory(size_in_bytes);
+    if (shared_device_memory) {
+        return ScopedDeviceMemory(std::move(shared_device_memory.value()));
+    } else {
+        return tl::make_unexpected(std::move(shared_device_memory.error()));
+    }
 }
 
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
+auto make_shared_device_memory(std::size_t size_in_bytes) -> util::Result<std::shared_ptr<void>> {
+    void* ptr = nullptr;
+    LTB_SAFE_CUDA_CHECK(cudaMalloc(&ptr, size_in_bytes))
+    return std::shared_ptr<void>(ptr, [](auto* _ptr) { LTB_CUDA_CHECK(cudaFree(_ptr)); });
 }
 
-} // namespace paths
-} // namespace ltb
+} // namespace ltb::cuda

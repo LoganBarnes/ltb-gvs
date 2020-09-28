@@ -115,4 +115,16 @@ auto add_three_line_separator() -> void {
     ImGui::Spacing();
 }
 
+auto set_full_docking_window_settings_and_get_flags() -> int {
+    auto* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->GetWorkPos());
+    ImGui::SetNextWindowSize(viewport->GetWorkSize());
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    // NOLINTNEXTLINE(hicpp-signed-bitwise)
+    return ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBackground
+        | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+}
+
 } // namespace ltb::gvs

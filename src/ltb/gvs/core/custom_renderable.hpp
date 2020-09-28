@@ -20,40 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
-
 namespace ltb {
-namespace paths {
+namespace gvs {
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
+class CustomRenderable {
+public:
+    virtual ~CustomRenderable() = 0;
+};
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
+inline CustomRenderable::~CustomRenderable() = default;
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
+} // namespace gvs
 } // namespace ltb

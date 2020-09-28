@@ -21,39 +21,46 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
+// version will be inserted automagically
 
-#include "ltb/paths.hpp"
+in int gl_VertexID;
 
-namespace ltb {
-namespace paths {
+uniform float ndc_depth = 0.5f;
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
+layout(location = 0) out vec2 texture_coordinates;
+
+out gl_PerVertex
+{
+    vec4 gl_Position;
+};
+
+void main()
+{
+    switch (gl_VertexID)
+    {
+        case 0:
+        texture_coordinates = vec2(0.f, 0.f);
+        gl_Position         = vec4(-1.f, -1.f, ndc_depth, 1.f);
+        break;
+
+        case 1:
+        texture_coordinates = vec2(1.f, 0.f);
+        gl_Position         = vec4(1.f, -1.f, ndc_depth, 1.f);
+        break;
+
+        case 2:
+        texture_coordinates = vec2(0.f, 1.f);
+        gl_Position         = vec4(-1.f, 1.f, ndc_depth, 1.f);
+        break;
+
+        case 3:
+        texture_coordinates = vec2(1.f, 1.f);
+        gl_Position         = vec4(1.f, 1.f, ndc_depth, 1.f);
+        break;
+
+        default :
+        texture_coordinates = vec2(-1.f);
+        gl_Position         = vec4(0.f);
+        break;
+    }
 }
-
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
-
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
-} // namespace ltb

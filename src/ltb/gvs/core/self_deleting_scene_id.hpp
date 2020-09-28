@@ -20,40 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+// project
+#include "scene.hpp"
+
+// standard
+#include <memory>
 
 namespace ltb {
-namespace paths {
+namespace gvs {
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
+/// \todo Implement item removal from scenes before this can be used
+struct SelfDeletingSceneID {
+public:
+    /// \brief Creates a type that deletes the given id from the provided scene on destruction.
+    /// \param scene - the scene
+    /// \param id - the id in the scene
+    /// \warning {This scene pointer must remain valid for the lifetime of the SelfDeletingSceneID}
+    explicit SelfDeletingSceneID(Scene* scene = nullptr, SceneId scene_id = nil_id());
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
+    /// \brief Deletes the item from the scene if this is the last `SelfDeletingSceneID` for this item.
+    ~SelfDeletingSceneID();
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
+    auto raw_id() const -> const SceneId&;
 
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
+private:
+    std::shared_ptr<SceneId> scene_id_ = nullptr;
+};
 
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
+} // namespace gvs
 } // namespace ltb

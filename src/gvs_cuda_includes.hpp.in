@@ -26,32 +26,38 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+#include "ltb/config.hpp"
+#include "ltb/gvs_paths.hpp"
+
+#include <stdexcept>
+#include <vector>
+
+#cmakedefine LTB_OPTIX_ENABLED
 
 namespace ltb {
 namespace paths {
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
-}
-
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
-
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
+inline auto cuda_include_dir() -> std::string {
+#ifdef LTB_CUDA_ENABLED
+    return "@CUDAToolkit_INCLUDE_DIRS@";
 #else
-    return shaders() + "shader.frag";
+    throw std::runtime_error("CUDA is not enabled");
+#endif
+}
+
+inline auto optix_include_dir() -> std::string {
+#ifdef LTB_OPTIX_ENABLED
+    return "@OptiX_INCLUDE@";
+#else
+    throw std::runtime_error("OptiX is not enabled");
+#endif
+}
+
+inline auto cuda_architectures() -> std::vector<int> {
+#ifdef LTB_CUDA_ENABLED
+    return std::vector<int>{@CMAKE_CUDA_ARCHITECTURES@};
+#else
+    throw std::runtime_error("CUDA is not enabled");
 #endif
 }
 

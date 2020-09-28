@@ -20,26 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-FetchContent_Declare(glfw_dl
+FetchContent_Declare(ltb_glfw_dl
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG 3.3.2
         )
-FetchContent_Declare(imgui_dl
-        GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG v1.77
-        )
-FetchContent_Declare(corrade_dl
+FetchContent_Declare(ltb_corrade_dl
         GIT_REPOSITORY https://github.com/mosra/corrade.git
         GIT_TAG v2020.06
         )
-FetchContent_Declare(magnum_dl
+FetchContent_Declare(ltb_magnum_dl
         GIT_REPOSITORY https://github.com/mosra/magnum.git
         GIT_TAG v2020.06
         )
-FetchContent_Declare(magnum_integration_dl
-        GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
-        GIT_TAG v2020.06
+
+# All external graphics libraries put into a single target
+file(GLOB_RECURSE LTB_SOURCE_FILES
+        LIST_DIRECTORIES false
+        CONFIGURE_DEPENDS
+        ${LTB_GVS_ROOT}/external/*
         )
+
+add_library(ltb_external_graphics ${LTB_SOURCE_FILES})
+add_library(LtbExternal::Graphics ALIAS ltb_external_graphics)
 
 if (MSVC)
     set(LTB_GVS_TEST_GL_CONTEXT WglContext)
@@ -50,45 +52,39 @@ else ()
 endif ()
 
 ### GLFW ###
-FetchContent_GetProperties(glfw_dl)
-if (NOT glfw_dl_POPULATED)
-    FetchContent_Populate(glfw_dl)
+FetchContent_GetProperties(ltb_glfw_dl)
+if (NOT ltb_glfw_dl_POPULATED)
+    FetchContent_Populate(ltb_glfw_dl)
 
     set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-    add_subdirectory(${glfw_dl_SOURCE_DIR} ${glfw_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif ()
-
-### ImGui ###
-FetchContent_GetProperties(imgui_dl)
-if (NOT imgui_dl_POPULATED)
-    FetchContent_Populate(imgui_dl)
+    add_subdirectory(${ltb_glfw_dl_SOURCE_DIR} ${ltb_glfw_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif ()
 
 ### Corrade ###
-set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
+set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS OFF)
 
-FetchContent_GetProperties(corrade_dl)
-if (NOT corrade_dl_POPULATED)
-    FetchContent_Populate(corrade_dl)
+FetchContent_GetProperties(ltb_corrade_dl)
+if (NOT ltb_corrade_dl_POPULATED)
+    FetchContent_Populate(ltb_corrade_dl)
 
     if (MSVC_VERSION GREATER_EQUAL 1900)
         set(CORRADE_MSVC2019_COMPATIBILITY ON CACHE BOOL "" FORCE)
         set(MSVC2019_COMPATIBILITY ON CACHE BOOL "" FORCE)
     endif ()
 
-    add_subdirectory(${corrade_dl_SOURCE_DIR} ${corrade_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
+    add_subdirectory(${ltb_corrade_dl_SOURCE_DIR} ${ltb_corrade_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
 
     # Tell cmake where to find this library
-    set(Corrade_DIR ${corrade_dl_SOURCE_DIR}/modules)
+    set(Corrade_DIR ${ltb_corrade_dl_SOURCE_DIR}/modules)
 endif ()
 
 ### Magnum ###
-FetchContent_GetProperties(magnum_dl)
-if (NOT magnum_dl_POPULATED)
-    FetchContent_Populate(magnum_dl)
+FetchContent_GetProperties(ltb_magnum_dl)
+if (NOT ltb_magnum_dl_POPULATED)
+    FetchContent_Populate(ltb_magnum_dl)
 
     set(BUILD_DEPRECATED OFF CACHE BOOL "" FORCE)
     set(WITH_GLFWAPPLICATION ON CACHE BOOL "" FORCE)
@@ -101,43 +97,30 @@ if (NOT magnum_dl_POPULATED)
         set(WITH_WINDOWLESSEGLAPPLICATION ON CACHE BOOL "" FORCE)
     endif ()
 
-    add_subdirectory(${magnum_dl_SOURCE_DIR} ${magnum_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
+    add_subdirectory(${ltb_magnum_dl_SOURCE_DIR} ${ltb_magnum_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
 
     # Tell cmake where to find this library
-    set(Magnum_DIR ${magnum_dl_SOURCE_DIR}/modules)
+    set(Magnum_DIR ${ltb_magnum_dl_SOURCE_DIR}/modules)
+
+    find_package(Magnum REQUIRED
+            GL
+            GlfwApplication
+            ${LTB_GVS_TEST_GL_CONTEXT}
+            ${LTB_GVS_WINDOWLESS_APP}
+            )
 endif ()
-
-### Magnum Integration ###
-FetchContent_GetProperties(magnum_integration_dl)
-if (NOT magnum_integration_dl_POPULATED)
-    FetchContent_Populate(magnum_integration_dl)
-
-    set(WITH_IMGUI ON CACHE BOOL "" FORCE)
-    set(IMGUI_DIR "${imgui_dl_SOURCE_DIR}" CACHE STRING "" FORCE)
-
-    add_subdirectory(${magnum_integration_dl_SOURCE_DIR} ${magnum_integration_dl_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-    # Tell cmake where to find this library
-    set(MagnumIntegration_DIR ${magnum_integration_dl_SOURCE_DIR}/modules)
-endif ()
-
-find_package(Magnum REQUIRED
-        GL
-        GlfwApplication
-        ${LTB_GVS_TEST_GL_CONTEXT}
-        ${LTB_GVS_WINDOWLESS_APP}
-        )
-find_package(MagnumIntegration REQUIRED ImGui)
 
 # Set the include directory as system headers to avoid compiler warnings
-target_include_directories(ltb_gvs_display_deps
+target_include_directories(ltb_external_graphics
         SYSTEM PUBLIC
-        ${corrade_dl_SOURCE_DIR}/src
-        ${magnum_dl_SOURCE_DIR}/src
+        $<BUILD_INTERFACE:${LTB_GVS_ROOT}/external>
+        $<BUILD_INTERFACE:${ltb_corrade_dl_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${ltb_magnum_dl_SOURCE_DIR}/src>
         )
 
 # Add the necessary libraries
-target_link_libraries(ltb_gvs_display_deps PUBLIC
+target_link_libraries(ltb_external_graphics
+        PUBLIC
         Corrade::Utility
         Magnum::Application
         Magnum::Magnum
@@ -146,7 +129,6 @@ target_link_libraries(ltb_gvs_display_deps PUBLIC
         Magnum::SceneGraph
         Magnum::Shaders
         Magnum::Trade
-        MagnumIntegration::ImGui
         Magnum::${LTB_GVS_TEST_GL_CONTEXT}
         Magnum::${LTB_GVS_WINDOWLESS_APP}
         )

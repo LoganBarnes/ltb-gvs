@@ -21,39 +21,15 @@
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
 
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
+// version will be inserted automagically
 
-#include "ltb/paths.hpp"
+layout(location = 0) in vec2 texture_coordinates;
 
-namespace ltb {
-namespace paths {
+layout(binding = 0) uniform sampler2D tex;
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
+layout(location = 0) out vec4 out_color;
+
+void main()
+{
+    out_color = texture(tex, texture_coordinates);
 }
-
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
-}
-
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
-} // namespace ltb

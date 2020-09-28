@@ -1,5 +1,5 @@
 ##########################################################################################
-# LTB Utilities
+# LTB Geometry Visualization Server
 # Copyright (c) 2020 Logan Barnes - All Rights Reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,43 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-cmake_minimum_required(VERSION 3.15)
-project(LtbUtilities LANGUAGES CXX)
+include(FetchContent)
 
-include(cmake/LtbConfig.cmake) # <-- Additional project options are in here.
-include(cmake/ThirdParty.cmake)
-
-############
-### Util ###
-############
-file(GLOB_RECURSE LTB_SOURCE_FILES
-        LIST_DIRECTORIES false
-        CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_LIST_DIR}/src/ltb/util/*
+FetchContent_Declare(ltb_mapbox_dl
+        GIT_REPOSITORY https://github.com/mapbox/variant.git
+        GIT_TAG v1.1.6
         )
 
-### Optional CUDA ###
-if (CMAKE_CUDA_COMPILER)
-    file(GLOB_RECURSE LTB_CUDA_SOURCE_FILES
-            LIST_DIRECTORIES false
-            CONFIGURE_DEPENDS
-            ${CMAKE_CURRENT_LIST_DIR}/src/ltb/cuda/*
+### Boost UUID ###
+include(cmake/BoostUuidLibs.cmake)
+
+### mapbox variant ###
+FetchContent_GetProperties(ltb_mapbox_dl)
+if (NOT ltb_mapbox_dl_POPULATED)
+    FetchContent_Populate(ltb_mapbox_dl)
+
+    ltb_add_external(mapbox Mapbox)
+    target_include_directories(ltb_external_mapbox
+            SYSTEM INTERFACE
+            $<BUILD_INTERFACE:${ltb_mapbox_dl_SOURCE_DIR}/include>
             )
-    list(APPEND LTB_SOURCE_FILES ${LTB_CUDA_SOURCE_FILES})
-endif ()
-
-ltb_add_library(ltb_util 17 ${LTB_SOURCE_FILES})
-ltb_link_libraries(ltb_util
-        PUBLIC
-        LtbExternal::Expected
-        LtbExternal::RangeV3
-        Threads::Threads
-        LtbExternal::Doctest
-        )
-ltb_include_directories(ltb_util
-        PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>"
-        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated>"
-        )
-add_library(Ltb::Util ALIAS ltb_util)
-
+endif (NOT ltb_mapbox_dl_POPULATED)

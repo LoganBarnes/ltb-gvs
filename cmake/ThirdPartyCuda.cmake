@@ -20,21 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ##########################################################################################
-include(FetchContent)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
-FetchContent_Declare(mapbox_dl
-        GIT_REPOSITORY https://github.com/mapbox/variant.git
-        GIT_TAG v1.1.6
-        )
+ltb_add_external(cuda Cuda)
 
-### Boost UUID ###
-include(cmake/BoostUuidLibs.cmake)
+if (CMAKE_CUDA_COMPILER)
+    find_package(CUDAToolkit 11)
 
-### mapbox variant ###
-FetchContent_GetProperties(mapbox_dl)
-if (NOT mapbox_dl_POPULATED)
-    FetchContent_Populate(mapbox_dl)
+    if (CUDAToolkit_FOUND)
+        set(LTB_CUDA_ENABLED TRUE)
 
-    add_library(mapbox INTERFACE)
-    target_include_directories(mapbox SYSTEM INTERFACE "$<BUILD_INTERFACE:${mapbox_dl_SOURCE_DIR}/include>")
-endif (NOT mapbox_dl_POPULATED)
+        target_link_libraries(ltb_external_cuda
+                INTERFACE
+                CUDA::toolkit
+                CUDA::nvrtc
+                )
+
+        find_package(OptiX)
+
+        if (OptiX_INCLUDE)
+            message(STATUS "OptiX FOUND: ${OptiX_INCLUDE}")
+            set(LTB_OPTIX_ENABLED TRUE)
+
+            target_include_directories(ltb_external_cuda
+                    SYSTEM INTERFACE
+                    $<BUILD_INTERFACE:${OptiX_INCLUDE}>
+                    )
+        endif ()
+    endif ()
+endif ()

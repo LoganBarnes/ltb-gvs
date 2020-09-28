@@ -20,40 +20,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "ltb/paths.hpp"
+#include "gl_buffer.hpp"
+#include "gl_buffer_image.hpp"
 
 namespace ltb {
-namespace paths {
+namespace cuda {
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
+template <typename T>
+class GLBufferMapGuard {
+public:
+    explicit GLBufferMapGuard(GLBuffer<T>& interop_buffer) : interop_buffer_(interop_buffer) {
+        interop_buffer.map_for_cuda();
+    }
+    ~GLBufferMapGuard() { interop_buffer_.unmap_from_cuda(); }
+
+private:
+    GLBuffer<T>& interop_buffer_;
+};
+
+// Allows the guard to be created without having to specify the template type
+template <typename T>
+GLBufferMapGuard<T> make_gl_buffer_map_guard(GLBuffer<T>& interop_buffer) {
+    return GLBufferMapGuard<T>(interop_buffer);
 }
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
+template <typename T>
+class GLBufferImageMapGuard {
+public:
+    explicit GLBufferImageMapGuard(GLBufferImage<T>& interop_buffer) : interop_buffer_(interop_buffer) {
+        interop_buffer.map_for_cuda();
+    }
+    ~GLBufferImageMapGuard() { interop_buffer_.unmap_from_cuda(); }
+
+private:
+    GLBufferImage<T>& interop_buffer_;
+};
+
+// Allows the guard to be created without having to specify the template type
+template <typename T>
+GLBufferImageMapGuard<T> make_gl_buffer_map_guard(GLBufferImage<T>& interop_buffer) {
+    return GLBufferImageMapGuard<T>(interop_buffer);
 }
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
+} // namespace cuda
 } // namespace ltb

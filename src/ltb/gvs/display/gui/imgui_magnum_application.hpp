@@ -23,9 +23,9 @@
 #pragma once
 
 // project
-#include "../camera_package.hpp"
 #include "error_alert.hpp"
 #include "imgui_theme.hpp"
+#include "ltb/gvs/display/camera_package.hpp"
 #include "ltb/gvs/forward_declarations.hpp"
 #include "settings.hpp"
 

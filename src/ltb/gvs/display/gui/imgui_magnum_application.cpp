@@ -124,7 +124,8 @@ auto ImGuiMagnumApplication::drawEvent() -> void {
 
     GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
 
-    auto cam_changed = arcball_camera_->update();
+    auto cam_changed               = arcball_camera_->update();
+    camera_package_.focal_distance = arcball_camera_->viewDistance();
 
     render(camera_package_);
 

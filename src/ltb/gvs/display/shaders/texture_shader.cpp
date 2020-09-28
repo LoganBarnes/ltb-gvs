@@ -20,40 +20,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
+#include "texture_shader.hpp"
 
-// ///////////////////////////////////////////////////////////////////////////////////////
-// @AUTO_GENERATION_MESSAGE@
-// ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
+// external
+#include <Corrade/Containers/Reference.h>
+#include <Corrade/Utility/Resource.h>
+#include <Magnum/GL/Context.h>
+#include <Magnum/GL/Shader.h>
+#include <Magnum/GL/Version.h>
+#include <Magnum/Math/Matrix3.h>
+#include <Magnum/Math/Matrix4.h>
 
-#include "ltb/paths.hpp"
+namespace ltb::gvs {
 
-namespace ltb {
-namespace paths {
+TextureShader::TextureShader() {
+    MAGNUM_ASSERT_GL_VERSION_SUPPORTED(Magnum::GL::Version::GL450);
 
-inline auto gvs_root() -> std::string {
-    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
+    const Corrade::Utility::Resource rs{"gvs-resource-data"};
+
+    Magnum::GL::Shader vert{Magnum::GL::Version::GL450, Magnum::GL::Shader::Type::Vertex};
+    Magnum::GL::Shader frag{Magnum::GL::Version::GL450, Magnum::GL::Shader::Type::Fragment};
+
+    vert.addSource(rs.get("texture_shader.vert"));
+    frag.addSource(rs.get("texture_shader.frag"));
+
+    auto vert_ref = Corrade::Containers::Reference<Magnum::GL::Shader>(vert);
+    auto frag_ref = Corrade::Containers::Reference<Magnum::GL::Shader>(frag);
+
+    CORRADE_INTERNAL_ASSERT_OUTPUT(Magnum::GL::Shader::compile({vert_ref, frag_ref}));
+
+    attachShaders({vert, frag});
+
+    CORRADE_INTERNAL_ASSERT_OUTPUT(link());
 }
 
-inline auto resources() -> std::string {
-    return gvs_root() + "res" + slash();
+auto TextureShader::bind_tex(Magnum::GL::Texture2D& tex) -> TextureShader& {
+    tex.bind(0);
+    return *this;
 }
 
-inline auto gvs_src() -> std::string {
-    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline auto shaders() -> std::string {
-    return gvs_src() + "display" + slash() + "shaders" + slash();
-}
-
-inline auto frag_shader_file() -> std::string {
-#ifdef __APPLE__
-    return shaders() + "shader_mac.frag";
-#else
-    return shaders() + "shader.frag";
-#endif
-}
-
-} // namespace paths
-} // namespace ltb
+} // namespace ltb::gvs
