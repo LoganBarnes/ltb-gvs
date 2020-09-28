@@ -34,7 +34,7 @@ include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in 
 include(cmake/ThirdParty.cmake)
 
 if (LTB_ENABLE_GVS_DISPLAY)
-    # All GUI thirdparty libraries put into a single target
+    # All GUI third party libraries put into a single target
     file(GLOB_RECURSE LTB_SOURCE_FILES
             LIST_DIRECTORIES false
             CONFIGURE_DEPENDS
