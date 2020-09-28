@@ -26,7 +26,7 @@ install:
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
-  - . ./ci/build_and_run.sh
+  - . ${TRAVIS_BUILD_DIR}/ltb-util/ci/build_and_run.sh
 
 after_success:
   # Upload report to CodeCov
