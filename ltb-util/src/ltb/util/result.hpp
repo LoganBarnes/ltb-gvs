@@ -95,22 +95,22 @@ struct NO_DISCARD Result : tl::expected<T, Error> {
     using tl::expected<T, Error>::expected;
 
     template <typename F, typename... Args>
-    constexpr auto and_then(F && f, Args && ... args)& {
+    constexpr auto and_then(F&& f, Args&&... args) & {
         return and_then_impl(*this, std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     template <typename F, typename... Args>
-    constexpr auto and_then(F && f, Args && ... args)&& {
+    constexpr auto and_then(F&& f, Args&&... args) && {
         return and_then_impl(std::move(*this), std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     template <typename F, typename... Args>
-    constexpr auto and_then(F && f, Args && ... args) const& {
+    constexpr auto and_then(F&& f, Args&&... args) const& {
         return and_then_impl(*this, std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     template <typename F, typename... Args>
-    constexpr auto and_then(F && f, Args && ... args) const&& {
+    constexpr auto and_then(F&& f, Args&&... args) const&& {
         return and_then_impl(std::move(*this), std::forward<F>(f), std::forward<Args>(args)...);
     }
 

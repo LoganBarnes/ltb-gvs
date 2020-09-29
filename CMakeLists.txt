@@ -24,6 +24,7 @@ cmake_minimum_required(VERSION 3.15)
 project(LtbGeometryVisualizationServer LANGUAGES CXX)
 
 option(LTB_ENABLE_GVS_DISPLAY "Build the GUI targets that display scenes" ON)
+option(LTB_ENABLE_GVS_NETWORKING "Build the networking targets that enable remote scene manipulation" ON)
 option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
 
 include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
@@ -55,6 +56,10 @@ if (LTB_ENABLE_GVS_DISPLAY)
             )
 endif (LTB_ENABLE_GVS_DISPLAY)
 
+if (LTB_ENABLE_GVS_NETWORKING)
+    include(cmake/ThirdPartyNetworking.cmake)
+endif (LTB_ENABLE_GVS_NETWORKING)
+
 #####################
 ### Configuration ###
 #####################
@@ -83,6 +88,12 @@ file(GLOB_RECURSE LTB_TEST_SOURCE_FILES
         ${CMAKE_CURRENT_LIST_DIR}/src/ltb/testing/*
         )
 
+file(GLOB_RECURSE LTB_GRPCW_SOURCE_FILES
+        LIST_DIRECTORIES false
+        CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_LIST_DIR}/src/ltb/grpcw/*
+        )
+
 file(GLOB_RECURSE LTB_DISPLAY_SOURCE_FILES
         LIST_DIRECTORIES false
         CONFIGURE_DEPENDS
@@ -108,6 +119,7 @@ list(REMOVE_ITEM LTB_CUDA_SOURCE_FILES ${LTB_OPTIX_SOURCE_FILES})
 ltb_add_library(ltb_gvs
         17
         ${LTB_CORE_SOURCE_FILES}
+        $<$<BOOL:${LTB_ENABLE_GVS_NETWORKING}>:${LTB_GRPCW_SOURCE_FILES}>
         $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:${LTB_DISPLAY_SOURCE_FILES}>
         $<$<BOOL:${CUDAToolkit_FOUND}>:${LTB_CUDA_SOURCE_FILES}>
         $<$<BOOL:${OptiX_INCLUDE}>:${LTB_OPTIX_SOURCE_FILES}>
@@ -124,7 +136,7 @@ ltb_link_libraries(ltb_gvs
         LtbExternal::Doctest
         LtbExternal::BoostUuid
         LtbExternal::Mapbox
-        $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_util>
+        $<$<OR:$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>,$<BOOL:${LTB_ENABLE_GVS_NETWORKING}>>:ltb_util>
         $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_gvs_display_resources>
         $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_external_gui>
         $<$<BOOL:${CUDAToolkit_FOUND}>:ltb_external_cuda>

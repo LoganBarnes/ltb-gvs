@@ -1,6 +1,6 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Geometry Visualization Server
-// Copyright (c) 2020 Logan Barnes - All Rights Reserved
+// gRPC Wrapper
+// Copyright (c) 2019 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,34 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// project
-#include "ltb/gvs/core/scene_update_handler.hpp"
-#include "ltb/gvs/display/scene_display.hpp"
+// standard
+#include <stdexcept>
+#include <string>
 
-namespace ltb::gvs {
+namespace grpcw {
+namespace client {
 
-class DisplayBackend : public SceneUpdateHandler, public SceneDisplay {
-public:
-    ~DisplayBackend() override = 0;
+enum class GrpcClientState {
+    not_connected,
+    attempting_to_connect,
+    connected,
 };
 
-inline DisplayBackend::~DisplayBackend() = default;
+inline std::string to_string(const GrpcClientState& state) {
+    switch (state) {
+    case GrpcClientState::not_connected:
+        return "not_connected";
+    case GrpcClientState::attempting_to_connect:
+        return "attempting_to_connect";
+    case GrpcClientState::connected:
+        return "connected";
+    }
+    throw std::invalid_argument("Invalid GrpcClientState");
+}
 
-} // namespace ltb::gvs
+inline ::std::ostream& operator<<(::std::ostream& os, const GrpcClientState& state) {
+    return os << to_string(state);
+}
+
+} // namespace client
+} // namespace grpcw

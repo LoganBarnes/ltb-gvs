@@ -1,6 +1,6 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Geometry Visualization Server
-// Copyright (c) 2020 Logan Barnes - All Rights Reserved
+// gRPC Wrapper
+// Copyright (c) 2019 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,33 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// project
-#include "ltb/gvs/core/scene_update_handler.hpp"
-#include "ltb/gvs/display/scene_display.hpp"
+namespace grpcw {
+namespace server {
 
-namespace ltb::gvs {
+using ClientID = void*;
 
-class DisplayBackend : public SceneUpdateHandler, public SceneDisplay {
-public:
-    ~DisplayBackend() override = 0;
-};
+class GrpcServer;
 
-inline DisplayBackend::~DisplayBackend() = default;
+template <typename Service>
+class GrpcAsyncServer;
 
-} // namespace ltb::gvs
+template <typename Response>
+class StreamInterface;
+
+} // namespace server
+
+namespace client {
+
+template <typename Service>
+class GrpcClient;
+
+template <typename Service>
+class GrpcClientStreamInterface;
+
+template <typename Service, typename Return>
+class GrpcClientStream;
+
+enum class GrpcClientState;
+
+} // namespace client
+} // namespace grpcw
