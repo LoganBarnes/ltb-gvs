@@ -24,6 +24,7 @@ cmake_minimum_required(VERSION 3.15)
 project(LtbGeometryVisualizationServer LANGUAGES CXX)
 
 option(LTB_ENABLE_GVS_DISPLAY "Build the GUI targets that display scenes" ON)
+option(LTB_ENABLE_GVS_NETWORKING "Build the networking targets that enable remote scene manipulation" ON)
 option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
 
 include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
@@ -54,6 +55,10 @@ if (LTB_ENABLE_GVS_DISPLAY)
             LtbExternal::Graphics
             )
 endif (LTB_ENABLE_GVS_DISPLAY)
+
+if (LTB_ENABLE_GVS_NETWORKING)
+    include(cmake/ThirdPartyNetworking.cmake)
+endif (LTB_ENABLE_GVS_NETWORKING)
 
 #####################
 ### Configuration ###

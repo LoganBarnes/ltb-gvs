@@ -22,8 +22,7 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "nil_scene.hpp"
 
-namespace ltb {
-namespace gvs {
+namespace ltb::gvs {
 
 NilScene::NilScene()  = default;
 NilScene::~NilScene() = default;
@@ -57,5 +56,4 @@ auto NilScene::actually_get_item_info(SceneId const& /*item_id*/, InfoGetterFunc
     return util11::success();
 }
 
-} // namespace gvs
-} // namespace ltb
+} // namespace ltb::gvs

@@ -20,19 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
-
 // project
-#include "ltb/gvs/core/scene_update_handler.hpp"
-#include "ltb/gvs/display/scene_display.hpp"
+#include "ltb/gvs/core/nil_scene.hpp"
+//#include "ltb/gvs/net/client_scene.hpp"
 
-namespace ltb::gvs {
+// examples
+#include "../common/test_scene.hpp"
 
-class DisplayBackend : public SceneUpdateHandler, public SceneDisplay {
-public:
-    ~DisplayBackend() override = 0;
-};
+int main(int argc, char* argv[]) {
+    std::string server_address = "0.0.0.0:50055";
 
-inline DisplayBackend::~DisplayBackend() = default;
+    if (argc > 1) {
+        server_address = argv[1];
+    }
 
-} // namespace ltb::gvs
+    std::unique_ptr<ltb::gvs::Scene> scene;
+
+    {
+        //        auto client_scene = std::make_unique<ltb::gvs::ClientScene>(server_address);
+        //        if (client_scene->connected()) {
+        //            scene = std::move(client_scene);
+        //        } else {
+        scene = std::make_unique<ltb::gvs::NilScene>();
+        //        }
+    }
+
+    scene->clear();
+    ltb::example::build_test_scene(scene.get());
+
+    return 0;
+}
