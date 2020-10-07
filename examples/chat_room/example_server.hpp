@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Networking
+// LTB Geometry Visualization Server
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,25 +22,45 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-// project
-#include "ltb/net/client/async_client.hpp"
-
 // generated
 #include <protos/chat/chat_room.grpc.pb.h>
 
+// external
+#include <grpc++/server.h>
+
 namespace ltb::example {
 
-class ExampleClient {
+class ExampleService : public ChatRoom::Service {
 public:
-    explicit ExampleClient(std::string const& host_address);
-    explicit ExampleClient(grpc::Server& interprocess_server);
+    ~ExampleService() override;
 
-    auto run() -> void;
+    grpc::Status DispatchAction(grpc::ServerContext* context, Action const* request, util::Result* response) override;
 
-    auto dispatch_action(Action const& action) -> ExampleClient&;
+    grpc::Status
+    PokeUser(grpc::ServerContext* context, grpc::ServerReader<User::Id>* reader, util::Result* response) override;
+
+    grpc::Status SearchMessages(grpc::ServerContext*                 context,
+                                google::protobuf::StringValue const* request,
+                                grpc::ServerWriter<UserMessage>*     writer) override;
+
+    grpc::Status GetMessages(grpc::ServerContext*                                         context,
+                             grpc::ServerReaderWriter<ChatMessageResult, ChatMessage_Id>* stream) override;
+
+    grpc::Status GetUpdates(grpc::ServerContext*           context,
+                            google::protobuf::Empty const* request,
+                            grpc::ServerWriter<Update>*    writer) override;
+};
+
+class ExampleServer {
+public:
+    explicit ExampleServer(std::string const& host_address = "");
+
+    auto grpc_server() -> grpc::Server&;
+    auto shutdown() -> void;
 
 private:
-    ltb::net::AsyncClient<ChatRoom> async_client_;
+    ExampleService                service_;
+    std::unique_ptr<grpc::Server> server_;
 };
 
 } // namespace ltb::example

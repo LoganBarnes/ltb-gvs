@@ -23,6 +23,8 @@
 function(add_example _directory _cpp17_enabled)
     set(target run_${_directory}_example)
 
+    message(STATUS "Building ${_directory} example")
+
     file(GLOB_RECURSE LTB_SOURCE_FILES
             LIST_DIRECTORIES false
             CONFIGURE_DEPENDS
@@ -40,6 +42,7 @@ function(add_example _directory _cpp17_enabled)
     endif ()
 
     target_compile_options(${target} PRIVATE ${LTB_COMPILE_FLAGS})
+    target_link_options(${target} PRIVATE ${LTB_LINK_FLAGS})
     set_target_properties(
             ${target}
             PROPERTIES
@@ -56,17 +59,22 @@ function(add_example _directory _cpp17_enabled)
 
 endfunction()
 
-if (LTB_ENABLE_GVS_DISPLAY)
+if (${LTB_ENABLE_GVS_DISPLAY})
     add_example(display_window TRUE)
     add_example(intersection TRUE)
     add_example(primitives TRUE)
     add_example(scene TRUE)
 else ()
-    message("-- (LTB_ENABLE_GVS_DISPLAY=OFF) Some examples will not be built: display_window intersection primitives scene")
+    message(STATUS "(LTB_ENABLE_GVS_DISPLAY=OFF) Some examples will not be built: display_window intersection primitives scene")
 endif ()
 
-if (LTB_ENABLE_GVS_NETWORKING)
+if (${LTB_ENABLE_GVS_NETWORKING})
     add_example(scene_client FALSE)
+
+    if (${LTB_NET_BUILD_EXAMPLES})
+        add_example(chat_room TRUE)
+        target_link_libraries(run_chat_room_example PUBLIC ltb_net_example_protos)
+    endif ()
 else ()
-    message("-- (LTB_ENABLE_GVS_NETWORKING=OFF) Some examples will not be built: scene_client")
+    message(STATUS "(LTB_ENABLE_GVS_NETWORKING=OFF) Some examples will not be built: scene_client")
 endif ()

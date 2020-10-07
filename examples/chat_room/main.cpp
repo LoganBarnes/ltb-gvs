@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Networking
+// LTB Geometry Visualization Server
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,7 @@
 #include "example_client.hpp"
 #include "example_server.hpp"
 
-auto main(int argc, const char* argv[]) -> int {
+auto main(int argc, char* argv[]) -> int {
     std::string host_address = "0.0.0.0:50051";
     auto        client_only  = false;
     auto        server_only  = false;
@@ -61,9 +61,8 @@ auto main(int argc, const char* argv[]) -> int {
     }
 
     if (client_only) {
-        ltb::example::ExampleClient client(host_address);
-        client.run();
-        return EXIT_SUCCESS;
+        ltb::example::ExampleClient client({argc, argv}, host_address);
+        return client.exec();
     }
 
     if (server_only) {
@@ -75,9 +74,9 @@ auto main(int argc, const char* argv[]) -> int {
     }
 
     ltb::example::ExampleServer server;
-    ltb::example::ExampleClient client(server.grpc_server());
-    client.run();
+    ltb::example::ExampleClient client({argc, argv}, server.grpc_server());
+    auto                        return_code = client.exec();
     server.shutdown();
 
-    return EXIT_SUCCESS;
+    return return_code;
 }

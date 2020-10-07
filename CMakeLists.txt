@@ -133,6 +133,7 @@ ltb_link_libraries(ltb_gvs
         LtbExternal::Doctest
         LtbExternal::BoostUuid
         LtbExternal::Mapbox
+        $<$<BOOL:${LTB_ENABLE_GVS_NETWORKING}>:ltb_net>
         $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_util>
         $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_gvs_display_resources>
         $<$<BOOL:${LTB_ENABLE_GVS_DISPLAY}>:ltb_external_gui>
