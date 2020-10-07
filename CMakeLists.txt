@@ -27,12 +27,16 @@ option(LTB_ENABLE_GVS_DISPLAY "Build the GUI targets that display scenes" ON)
 option(LTB_ENABLE_GVS_NETWORKING "Build the networking targets that enable remote scene manipulation" ON)
 option(LTB_BUILD_GVS_EXAMPLES "Build example programs" OFF)
 
-include(ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
+include(${CMAKE_CURRENT_LIST_DIR}/ltb-net/ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
 
 ############
 ### Util ###
 ############
-add_subdirectory(ltb-util)
+if (${LTB_ENABLE_GVS_NETWORKING})
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ltb-net)
+elseif (${LTB_ENABLE_GVS_DISPLAY})
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ltb-net/ltb-util)
+endif ()
 
 ########################
 ### External Targets ###
