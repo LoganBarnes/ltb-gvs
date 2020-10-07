@@ -28,14 +28,16 @@ if (NOT LTB_CONFIGURED)
 
     option(LTB_BUILD_TESTS "Build unit tests" OFF)
     option(LTB_USE_DEV_FLAGS "Compile with all the flags" OFF)
+    option(LTB_USE_CUDA "Enable CUDA features if available" ON)
+    option(LTB_THREAD_SANITIZATION "Add thread sanitizer flags (clang debug only)" OFF)
 
     # Disabling CUDA support for lower versions because there is a cmake bug
     # which causes an undefined reference to '__cudaUnregisterFatBinary'.
-    if (${CMAKE_VERSION} VERSION_GREATER "3.16.2")
+    if (LTB_USE_CUDA AND ${CMAKE_VERSION} VERSION_GREATER "3.16.2")
         include(CheckLanguage)
 
         check_language(CUDA)
-        if (CMAKE_CUDA_COMPILER)
+        if (${CMAKE_CUDA_COMPILER})
             enable_language(CUDA)
             set(LTB_CUDA_ENABLED ON)
         endif ()
@@ -45,32 +47,45 @@ if (NOT LTB_CONFIGURED)
         add_definitions(-DNOMINMAX -D_CRT_SECURE_NO_WARNINGS) # silly microsoft
     endif ()
 
-    if (LTB_USE_DEV_FLAGS)
-        if (NOT MSVC)
-            set(LTB_COMPILE_FLAGS
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wunused>
-                    $<$<COMPILE_LANGUAGE:CXX>:-pedantic-errors>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Winit-self>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wsign-conversion>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wmissing-declarations>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wmissing-include-dirs>
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>
-                    )
-        else ()
-            set(LTB_COMPILE_FLAGS
-                    $<$<COMPILE_LANGUAGE:CXX>:/WX>
-                    $<$<COMPILE_LANGUAGE:CXX>:/experimental:external>
-                    $<$<COMPILE_LANGUAGE:CXX>:/external:anglebrackets>
-                    $<$<COMPILE_LANGUAGE:CXX>:/external:W0>
-                    )
-        endif ()
+    string(CONCAT LTB_SANITIZE_THREAD_FLAG
+            "$<"
+            "$<AND:"
+            "$<BOOL:${LTB_THREAD_SANITIZATION}>,"
+            "$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>,"
+            "$<CONFIG:DEBUG>"
+            ">:"
+            "-fsanitize=thread"
+            ">")
+
+    set(LTB_COMPILE_FLAGS
+            # Ignore any headers using angle brackets on windows
+            $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/experimental:external>
+            $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/external:anglebrackets>
+            $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/external:W0>
+            ${LTB_SANITIZE_THREAD_FLAG}
+            )
+
+    set(LTB_LINK_FLAGS ${LTB_SANITIZE_THREAD_FLAG})
+
+    if (${LTB_USE_DEV_FLAGS})
+        list(APPEND
+                LTB_COMPILE_FLAGS
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wall>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wextra>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Werror>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wpedantic>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wunused>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-pedantic-errors>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Winit-self>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wold-style-cast>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Woverloaded-virtual>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wsign-conversion>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wshadow>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wmissing-declarations>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wmissing-include-dirs>
+                $<$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>:-Wno-unknown-pragmas>
+                $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/external:W0>
+                )
     endif ()
 
     add_library(ltb_testing INTERFACE)
@@ -80,8 +95,9 @@ if (NOT LTB_CONFIGURED)
     include(${CMAKE_CURRENT_LIST_DIR}/LtbSetProperties.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/LtbAddLibrary.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/LtbAddExecutable.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/LtbAddExternal.cmake)
 
-    if (LTB_BUILD_TESTS)
+    if (${LTB_BUILD_TESTS})
         enable_testing()
     endif ()
 
