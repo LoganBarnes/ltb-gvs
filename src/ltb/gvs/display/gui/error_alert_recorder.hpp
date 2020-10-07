@@ -27,6 +27,7 @@
 
 // standard
 #include <memory>
+#include <ostream>
 
 namespace ltb::gvs {
 
@@ -49,6 +50,11 @@ public:
     /// \return true if the warning was successfully recorded, false otherwise
     ///
     [[nodiscard]] auto record_warning(util::Error error) const -> bool;
+
+    ///
+    /// \brief Records the error or warning and prints to `os` if the weakly stored ErrorAlert does not exist.
+    ///
+    auto record_or_print(std::ostream& os, util::Error const& error) const -> void;
 
 private:
     std::weak_ptr<ErrorAlert> const error_alert_;

@@ -42,7 +42,7 @@ auto to_string(SceneId const& id) -> std::string;
 
 auto from_string(std::string const& id) -> SceneId;
 
-std::ostream& operator<<(std::ostream& os, SceneId const& id);
+auto operator<<(std::ostream& os, SceneId const& id) -> std::ostream&;
 
 } // namespace gvs
 } // namespace ltb
@@ -51,7 +51,7 @@ namespace std {
 
 template <>
 struct hash<ltb::gvs::SceneId> {
-    size_t operator()(ltb::gvs::SceneId const& id) const { return boost::uuids::hash_value(id); }
+    auto operator()(ltb::gvs::SceneId const& id) const -> size_t { return boost::uuids::hash_value(id); }
 };
 
 } // namespace std

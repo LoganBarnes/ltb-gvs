@@ -22,6 +22,8 @@
 ##########################################################################################
 find_package(Boost 1.62.0)
 
+ltb_add_external(boost_uuid BoostUuid)
+
 if (NOT Boost_FOUND)
     # Could not find a system boost so we need to download the appropriate headers
 
@@ -83,7 +85,8 @@ if (NOT Boost_FOUND)
 
     add_boost_library(uuid)
 
-    target_link_libraries(boost_uuid INTERFACE
+    target_link_libraries(ltb_external_boost_uuid INTERFACE
+            boost_uuid
             boost_config
             boost_type_traits
             boost_lexical_cast
@@ -124,7 +127,9 @@ if (NOT Boost_FOUND)
 else (NOT Boost_FOUND)
 
     # Found system Boost library
-    add_library(boost_uuid INTERFACE)
-    target_include_directories(boost_uuid INTERFACE "$<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>")
+    target_include_directories(ltb_external_boost_uuid
+            INTERFACE
+            $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
+            )
 
 endif (NOT Boost_FOUND)

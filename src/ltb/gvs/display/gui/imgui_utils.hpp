@@ -74,4 +74,6 @@ auto display_device_info() -> void;
 
 auto add_three_line_separator() -> void;
 
+auto set_full_docking_window_settings_and_get_flags() -> int;
+
 } // namespace ltb::gvs

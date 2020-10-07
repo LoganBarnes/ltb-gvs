@@ -22,11 +22,11 @@ before_install:
   - sudo apt-get install -y xorg-dev libgl1-mesa-dev libgles2-mesa-dev lcov
 
 install:
-  - . ${TRAVIS_BUILD_DIR}/ltb-util/ci/download_cmake.sh
+  - . ${TRAVIS_BUILD_DIR}/ltb-util/ci/download_cmake.sh 3.18
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
-  - . ./ci/build_and_run.sh
+  - . ${TRAVIS_BUILD_DIR}/ltb-util/ci/build_and_run.sh
 
 after_success:
   # Upload report to CodeCov

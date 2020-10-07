@@ -30,7 +30,8 @@
 #include <cmath>
 #include <random>
 
-namespace ltb::example {
+namespace ltb {
+namespace example {
 namespace {
 
 constexpr gvs::vec3 blueish  = {0.3f, 0.3f, 1.f};
@@ -196,4 +197,5 @@ auto build_primitive_scene(gvs::Scene* scene, gvs::SceneId const& root_id) -> vo
     }
 }
 
-} // namespace ltb::example
+} // namespace example
+} // namespace ltb

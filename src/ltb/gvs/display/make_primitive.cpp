@@ -29,7 +29,6 @@
 #include <Corrade/Containers/ArrayViewStl.h>
 #include <Corrade/Containers/StridedArrayView.h>
 #include <Magnum/Math/Color.h>
-#include <Magnum/Math/Vector3.h>
 #include <Magnum/Primitives/Axis.h>
 #include <Magnum/Primitives/Cone.h>
 #include <Magnum/Primitives/Cube.h>
@@ -37,7 +36,6 @@
 #include <Magnum/Primitives/Plane.h>
 #include <Magnum/Primitives/UVSphere.h>
 #include <Magnum/Trade/MeshData.h>
-#include <range/v3/view/transform.hpp>
 
 namespace ltb::gvs {
 namespace {
@@ -71,10 +69,10 @@ struct PrimitiveVisitor {
         auto mesh = Magnum::Primitives::axis3D();
 
         auto colors4 = mesh.colorsAsArray();
-        auto colors  = colors4 | ranges::views::transform([](const auto& color) {
-                          return Magnum::Color3{color.r(), color.g(), color.b()};
-                      })
-            | ranges::to<std::vector>;
+        auto colors  = std::vector<Magnum::Color3>{colors4.size()};
+        std::transform(colors4.begin(), colors4.end(), colors.begin(), [](const auto& color) {
+            return Magnum::Color3{color.r(), color.g(), color.b()};
+        });
 
         info->geometry_info = {};
         extract_positions_normal_indices(mesh, &info->geometry_info.positions, nullptr, &info->geometry_info.indices);

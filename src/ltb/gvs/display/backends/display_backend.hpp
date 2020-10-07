@@ -23,8 +23,8 @@
 #pragma once
 
 // project
-#include "../scene_display.hpp"
 #include "ltb/gvs/core/scene_update_handler.hpp"
+#include "ltb/gvs/display/scene_display.hpp"
 
 namespace ltb::gvs {
 
