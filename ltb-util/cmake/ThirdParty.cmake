@@ -67,6 +67,7 @@ if (NOT range_v3_dl_POPULATED)
     target_compile_options(range-v3
             INTERFACE
             $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->
+            $<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/std:c++latest>
             )
     add_library(LtbExternal::RangeV3 ALIAS range-v3)
 endif (NOT range_v3_dl_POPULATED)
