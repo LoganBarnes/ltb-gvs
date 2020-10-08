@@ -26,7 +26,7 @@
 
 namespace ltb::example {
 
-ExampleService::~ExampleService() {}
+ExampleService::~ExampleService() = default;
 
 grpc::Status
 ExampleService::DispatchAction(grpc::ServerContext* /*context*/, Action const* request, util::Result* response) {

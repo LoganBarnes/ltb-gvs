@@ -151,7 +151,8 @@ void ExampleClient::configure_gui() {
         }
         ImGui::Text(">");
         ImGui::SameLine();
-        if (ltb::gvs::configure_gui("###current_message", &current_message_, ImGuiInputTextFlags_EnterReturnsTrue)) {
+        if (ltb::gvs::configure_gui("###current_message", &current_message_, ImGuiInputTextFlags_EnterReturnsTrue)
+            && !current_message_.empty()) {
             Action action;
             action.set_send_message(current_message_);
             dispatch_action(action);
@@ -177,7 +178,7 @@ void ExampleClient::configure_gui() {
     ImGui::End();
 }
 
-auto ExampleClient::resize(Magnum::Vector2i const& /*viewport*/) -> void {}
+auto ExampleClient::resize(Magnum::Vector2i const & /*viewport*/) -> void {}
 
 auto ExampleClient::dispatch_action(Action const& action) -> ExampleClient& {
     async_client_.unary_rpc<util::Result>(
@@ -198,8 +199,14 @@ auto ExampleClient::dispatch_action(Action const& action) -> ExampleClient& {
 }
 
 auto ExampleClient::set_callbacks_and_start_client_thread() -> void {
-    async_client_.on_state_change([this](auto const& state) { queue_update(ConnectionState{state}); },
-                                  ltb::net::CallImmediately::Yes);
+    async_client_.on_state_change(
+        [this](auto const& state) {
+            std::stringstream stream;
+            stream << "State: " << state;
+            queue_update(DebugLog{stream.str()});
+            queue_update(ConnectionState{state});
+        },
+        ltb::net::CallImmediately::Yes);
     client_thread_ = std::thread([this] { async_client_.run(); });
 }
 auto ExampleClient::queue_update(ExampleUpdate update) -> void {

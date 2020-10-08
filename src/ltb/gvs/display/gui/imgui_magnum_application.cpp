@@ -117,6 +117,7 @@ ImGuiMagnumApplication::~ImGuiMagnumApplication() = default;
 auto ImGuiMagnumApplication::reset_draw_counter() -> void {
     draw_counter_ = 5;
     redraw();
+    glfwPostEmptyEvent();
 }
 
 auto ImGuiMagnumApplication::drawEvent() -> void {
