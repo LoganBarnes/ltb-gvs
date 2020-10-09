@@ -26,37 +26,6 @@
 
 namespace ltb::example {
 
-ExampleService::~ExampleService() = default;
-
-grpc::Status
-ExampleService::DispatchAction(grpc::ServerContext* /*context*/, Action const* request, util::Result* response) {
-    std::cout << "S: Action: " << request->ShortDebugString() << std::endl;
-    response->mutable_success();
-    return grpc::Status::OK;
-}
-
-grpc::Status
-ExampleService::PokeUser(grpc::ServerContext* context, grpc::ServerReader<User::Id>* reader, util::Result* response) {
-    return Service::PokeUser(context, reader, response);
-}
-
-grpc::Status ExampleService::SearchMessages(grpc::ServerContext*                 context,
-                                            google::protobuf::StringValue const* request,
-                                            grpc::ServerWriter<UserMessage>*     writer) {
-    return Service::SearchMessages(context, request, writer);
-}
-
-grpc::Status ExampleService::GetMessages(grpc::ServerContext*                                         context,
-                                         grpc::ServerReaderWriter<ChatMessageResult, ChatMessage_Id>* stream) {
-    return Service::GetMessages(context, stream);
-}
-
-grpc::Status ExampleService::GetUpdates(grpc::ServerContext*           context,
-                                        google::protobuf::Empty const* request,
-                                        grpc::ServerWriter<Update>*    writer) {
-    return Service::GetUpdates(context, request, writer);
-}
-
 ExampleServer::ExampleServer(std::string const& host_address) {
     grpc::ServerBuilder builder;
     if (!host_address.empty()) {
@@ -64,15 +33,44 @@ ExampleServer::ExampleServer(std::string const& host_address) {
         builder.AddListeningPort(host_address, grpc::InsecureServerCredentials());
     }
     builder.RegisterService(&service_);
-    server_ = builder.BuildAndStart();
+    completion_queue_ = builder.AddCompletionQueue();
+    server_           = builder.BuildAndStart();
 }
 
 auto ExampleServer::grpc_server() -> grpc::Server& {
     return *server_;
 }
 
+auto ExampleServer::run() -> void {
+
+    void* raw_tag                = {};
+    bool  completed_successfully = {};
+
+    while (completion_queue_->Next(&raw_tag, &completed_successfully)) {
+        if (completed_successfully) {
+
+        } else {
+
+        }
+    }
+}
+
 auto ExampleServer::shutdown() -> void {
     server_->Shutdown();
+}
+
+auto ExampleServer::set_callbacks() -> void {
+
+    grpc::ServerContext                                         context;
+    Action                                                      request;
+    grpc::ServerAsyncResponseWriter<ltb::example::util::Result> response(&context);
+
+    service_.RequestDispatchAction(&context,
+                                   &request,
+                                   &response,
+                                   completion_queue_.get(),
+                                   completion_queue_.get(),
+                                   nullptr);
 }
 
 } // namespace ltb::example
