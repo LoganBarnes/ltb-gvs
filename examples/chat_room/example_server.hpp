@@ -28,6 +28,9 @@
 // external
 #include <grpc++/server.h>
 
+// standard
+#include <thread>
+
 namespace ltb::example {
 
 class ExampleServer {
@@ -41,9 +44,11 @@ public:
     auto shutdown() -> void;
 
 private:
+    std::mutex                                   mutex_;
     ChatRoom::AsyncService                       service_;
     std::unique_ptr<grpc::ServerCompletionQueue> completion_queue_;
     std::unique_ptr<grpc::Server>                server_;
+    std::thread                                  run_thread_;
 
     auto set_callbacks() -> void;
 };

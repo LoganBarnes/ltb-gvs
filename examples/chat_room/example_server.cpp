@@ -22,11 +22,17 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "example_server.hpp"
 
+// project
+#include "ltb/net/server/async_server_data.hpp"
+
+// external
 #include <grpc++/server_builder.h>
 
 namespace ltb::example {
 
 ExampleServer::ExampleServer(std::string const& host_address) {
+    std::lock_guard lock(mutex_);
+
     grpc::ServerBuilder builder;
     if (!host_address.empty()) {
         // std::cout << "S: " << host_address << std::endl;
@@ -35,6 +41,8 @@ ExampleServer::ExampleServer(std::string const& host_address) {
     builder.RegisterService(&service_);
     completion_queue_ = builder.AddCompletionQueue();
     server_           = builder.BuildAndStart();
+
+    run_thread_ = std::thread([this] { run(); });
 }
 
 auto ExampleServer::grpc_server() -> grpc::Server& {
@@ -47,19 +55,26 @@ auto ExampleServer::run() -> void {
     bool  completed_successfully = {};
 
     while (completion_queue_->Next(&raw_tag, &completed_successfully)) {
+        std::lock_guard lock(mutex_);
         if (completed_successfully) {
-
+            // auto* call_data = static_cast<ltb::net::AsyncServerRpcCallData*>(raw_tag);
+            // call_data->process_callbacks();
         } else {
-
         }
     }
 }
 
 auto ExampleServer::shutdown() -> void {
-    server_->Shutdown();
+    {
+        std::lock_guard lock(mutex_);
+        server_->Shutdown();
+        completion_queue_->Shutdown();
+    }
+    run_thread_.join();
 }
 
 auto ExampleServer::set_callbacks() -> void {
+    std::lock_guard lock(mutex_);
 
     grpc::ServerContext                                         context;
     Action                                                      request;
