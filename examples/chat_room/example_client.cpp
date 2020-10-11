@@ -153,9 +153,14 @@ void ExampleClient::configure_gui() {
         ImGui::SameLine();
         if (ltb::gvs::configure_gui("###current_message", &current_message_, ImGuiInputTextFlags_EnterReturnsTrue)
             && !current_message_.empty()) {
+
             Action action;
-            action.set_send_message(current_message_);
+
+            auto* send_message = action.mutable_send_message();
+            send_message->mutable_client_id()->set_value("tmp client id");
+            send_message->set_message(current_message_);
             dispatch_action(action);
+
             current_message_ = "";
         }
     }
@@ -178,7 +183,7 @@ void ExampleClient::configure_gui() {
     ImGui::End();
 }
 
-auto ExampleClient::resize(Magnum::Vector2i const & /*viewport*/) -> void {}
+auto ExampleClient::resize(Magnum::Vector2i const& /*viewport*/) -> void {}
 
 auto ExampleClient::dispatch_action(Action const& action) -> ExampleClient& {
     async_client_.unary_rpc<util::Result>(

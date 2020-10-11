@@ -23,28 +23,24 @@
 #pragma once
 
 // project
-#include "ltb/net/server/async_server.hpp"
+#include "ltb/net/server/async_server_writers.hpp"
 
 // generated
 #include <protos/chat/chat_room.grpc.pb.h>
 
-// standard
-#include <thread>
-
 namespace ltb::example {
 
-class ExampleServer {
+class ExampleService {
 public:
-    explicit ExampleServer(std::string const& host_address = "");
-    virtual ~ExampleServer();
+    explicit ExampleService();
 
-    auto grpc_server() -> grpc::Server&;
-
-    auto shutdown() -> void;
+    auto handle_action_raw(Action const& action, ltb::net::AsyncUnaryWriter<util::Result> writer) -> void;
+    auto handle_action(Action const& action, util::Result* result) -> grpc::Status;
 
 private:
-    ltb::net::AsyncServer<ChatRoom::AsyncService> async_server_;
-    std::thread                                   run_thread_;
+    std::vector<std::string>                     chat_message_ids_;
+    std::unordered_map<std::string, ChatMessage> chat_message_data_;
+    std::unordered_map<std::string, UserMessage> user_message_data_;
 };
 
 } // namespace ltb::example

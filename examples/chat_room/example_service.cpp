@@ -20,31 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
-
-// project
-#include "ltb/net/server/async_server.hpp"
-
-// generated
-#include <protos/chat/chat_room.grpc.pb.h>
-
-// standard
-#include <thread>
+#include "example_service.hpp"
 
 namespace ltb::example {
 
-class ExampleServer {
-public:
-    explicit ExampleServer(std::string const& host_address = "");
-    virtual ~ExampleServer();
+ExampleService::ExampleService() = default;
 
-    auto grpc_server() -> grpc::Server&;
+auto ExampleService::handle_action(Action const& action, util::Result* result) -> grpc::Status {
+    result->mutable_success(); // success by default
 
-    auto shutdown() -> void;
+    switch (action.action_case()) {
 
-private:
-    ltb::net::AsyncServer<ChatRoom::AsyncService> async_server_;
-    std::thread                                   run_thread_;
-};
+    case Action::kSendMessage: {
+        auto const& new_message = action.send_message();
+
+        ChatMessage chat_message = {};
+        chat_message.mutable_id()->set_value(std::to_string(chat_message_ids_.size()));
+        chat_message.set_value(new_message.message());
+
+        UserMessage user_message           = {};
+        *user_message.mutable_client_id()  = new_message.client_id();
+        *user_message.mutable_message_id() = chat_message.id();
+
+        chat_message_ids_.emplace_back(chat_message.id().value());
+        chat_message_data_.emplace(chat_message.id().value(), chat_message);
+        user_message_data_.emplace(user_message.message_id().value(), user_message);
+    } break;
+
+    case Action::kChangeClientInfo: {
+        result->mutable_error()->set_error_message("Action not yet supported");
+    } break;
+
+    case Action::ACTION_NOT_SET: {
+        result->mutable_error()->set_error_message("Action value not set properly by client");
+    } break;
+
+    } // switch end
+
+    return grpc::Status::OK;
+}
 
 } // namespace ltb::example

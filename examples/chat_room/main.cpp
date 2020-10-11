@@ -69,14 +69,10 @@ auto main(int argc, char* argv[]) -> int {
         ltb::example::ExampleServer server(host_address);
         std::cout << "Press enter to exit" << std::endl;
         std::cin.ignore();
-        server.shutdown();
         return EXIT_SUCCESS;
     }
 
     ltb::example::ExampleServer server;
     ltb::example::ExampleClient client({argc, argv}, server.grpc_server());
-    auto                        return_code = client.exec();
-    server.shutdown();
-
-    return return_code;
+    return client.exec();
 }
