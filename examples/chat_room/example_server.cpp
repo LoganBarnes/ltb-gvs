@@ -33,17 +33,30 @@ namespace ltb::example {
 namespace {
 
 auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, ExampleService* service) -> void {
-    async_server->unary_rpc(&ChatRoom::AsyncService::RequestDispatchAction,
-                            [service](Action const& action, ltb::net::AsyncUnaryWriter<util::Result> writer) {
-                                std::cout << "S: " << action.ShortDebugString() << std::endl;
-                                util::Result response;
-                                auto         status = service->handle_action(action, &response);
-                                writer.finish(response, status);
-                            });
+    async_server->register_rpc(&ChatRoom::AsyncService::RequestDispatchAction,
+                               [service](Action const& action, net::AsyncServerUnaryWriter<util::Result> writer) {
+                                   std::cout << "S: " << action.ShortDebugString() << std::endl;
+                                   util::Result response;
+                                   auto         status = service->handle_action(action, &response);
+                                   writer.finish(response, status);
+                               });
+
+    async_server->register_rpc(&ChatRoom::AsyncService::RequestPokeUser/*,
+                               [service](Action const& action, net::AsyncServerUnaryWriter<util::Result> writer) {
+                                   std::cout << "S: " << action.ShortDebugString() << std::endl;
+                                   util::Result response;
+                                   auto         status = service->handle_action(action, &response);
+                                   writer.finish(response, status);
+                               }*/);
+
+    async_server->register_rpc(&ChatRoom::AsyncService::RequestSearchMessages);
+    async_server->register_rpc(&ChatRoom::AsyncService::RequestGetMessages);
+    async_server->register_rpc(&ChatRoom::AsyncService::RequestGetUpdates);
 
 #if 0
     ChatRoom::AsyncService async_service;
 
+    // Unary
     {
         grpc::ServerContext*                           context = nullptr;
         Action*                                        request = nullptr;
@@ -56,6 +69,7 @@ auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, 
         writer->Finish(response, grpc::Status::OK, tag);
     }
 
+    // Client stream
     {
         grpc::ServerContext*                             context = nullptr;
         grpc::ServerAsyncReader<util::Result, User::Id>* reader  = nullptr;
@@ -69,6 +83,7 @@ auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, 
         reader->Finish(response, grpc::Status::OK, tag);
     }
 
+    // Server stream
     {
         grpc::ServerContext*                  context = nullptr;
         google::protobuf::StringValue*        request = nullptr;
@@ -82,6 +97,7 @@ auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, 
         writer->Finish(grpc::Status::OK, tag);
     }
 
+    // Bi-directional stream
     {
         grpc::ServerContext*                                               context = nullptr;
         grpc::ServerAsyncReaderWriter<ChatMessageResult, ChatMessage::Id>* stream  = nullptr;
@@ -96,6 +112,7 @@ auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, 
         stream->Finish(grpc::Status::OK, tag);
     }
 
+    // Server stream
     {
         grpc::ServerContext*             context = nullptr;
         User::Id*                        request = nullptr;
