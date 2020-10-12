@@ -24,7 +24,7 @@
 
 // project
 #include "example_service.hpp"
-#include "ltb/net/server/async_server_data.hpp"
+#include "ltb/net/server/rpc_function_types.hpp"
 
 // external
 #include <grpc++/server_builder.h>
