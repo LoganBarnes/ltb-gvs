@@ -35,6 +35,7 @@ namespace {
 auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, ExampleService* service) -> void {
     async_server->unary_rpc(&ChatRoom::AsyncService::RequestDispatchAction,
                             [service](Action const& action, ltb::net::AsyncUnaryWriter<util::Result> writer) {
+                                std::cout << "S: " << action.ShortDebugString() << std::endl;
                                 util::Result response;
                                 auto         status = service->handle_action(action, &response);
                                 writer.finish(response, status);

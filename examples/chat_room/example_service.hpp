@@ -34,7 +34,6 @@ class ExampleService {
 public:
     explicit ExampleService();
 
-    auto handle_action_raw(Action const& action, ltb::net::AsyncUnaryWriter<util::Result> writer) -> void;
     auto handle_action(Action const& action, util::Result* result) -> grpc::Status;
 
 private:

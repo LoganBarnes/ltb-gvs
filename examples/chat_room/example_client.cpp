@@ -183,7 +183,7 @@ void ExampleClient::configure_gui() {
     ImGui::End();
 }
 
-auto ExampleClient::resize(Magnum::Vector2i const& /*viewport*/) -> void {}
+auto ExampleClient::resize(Magnum::Vector2i const & /*viewport*/) -> void {}
 
 auto ExampleClient::dispatch_action(Action const& action) -> ExampleClient& {
     async_client_.unary_rpc<util::Result>(
