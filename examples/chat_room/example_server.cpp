@@ -40,6 +40,75 @@ auto set_callbacks(ltb::net::AsyncServer<ChatRoom::AsyncService>* async_server, 
                                 auto         status = service->handle_action(action, &response);
                                 writer.finish(response, status);
                             });
+
+#if 0
+    ChatRoom::AsyncService async_service;
+
+    {
+        grpc::ServerContext*                           context = nullptr;
+        Action*                                        request = nullptr;
+        grpc::ServerAsyncResponseWriter<util::Result>* writer  = nullptr;
+        grpc::ServerCompletionQueue*                   cq      = nullptr;
+        void*                                          tag     = nullptr;
+        (async_service.*(&ChatRoom::AsyncService::RequestDispatchAction))(context, request, writer, cq, cq, tag);
+
+        util::Result response;
+        writer->Finish(response, grpc::Status::OK, tag);
+    }
+
+    {
+        grpc::ServerContext*                             context = nullptr;
+        grpc::ServerAsyncReader<util::Result, User::Id>* reader  = nullptr;
+        grpc::ServerCompletionQueue*                     cq      = nullptr;
+        void*                                            tag     = nullptr;
+        (async_service.*(&ChatRoom::AsyncService::RequestPokeUser))(context, reader, cq, cq, tag);
+
+        User::Id     request;
+        util::Result response;
+        reader->Read(&request, tag);
+        reader->Finish(response, grpc::Status::OK, tag);
+    }
+
+    {
+        grpc::ServerContext*                  context = nullptr;
+        google::protobuf::StringValue*        request = nullptr;
+        grpc::ServerAsyncWriter<UserMessage>* writer  = nullptr;
+        grpc::ServerCompletionQueue*          cq      = nullptr;
+        void*                                 tag     = nullptr;
+        (async_service.*(&ChatRoom::AsyncService::RequestSearchMessages))(context, request, writer, cq, cq, tag);
+
+        UserMessage response;
+        writer->Write(response, tag);
+        writer->Finish(grpc::Status::OK, tag);
+    }
+
+    {
+        grpc::ServerContext*                                               context = nullptr;
+        grpc::ServerAsyncReaderWriter<ChatMessageResult, ChatMessage::Id>* stream  = nullptr;
+        grpc::ServerCompletionQueue*                                       cq      = nullptr;
+        void*                                                              tag     = nullptr;
+        (async_service.*(&ChatRoom::AsyncService::RequestGetMessages))(context, stream, cq, cq, tag);
+
+        ChatMessage::Id   request;
+        ChatMessageResult response;
+        stream->Read(&request, tag);
+        stream->Write(response, tag);
+        stream->Finish(grpc::Status::OK, tag);
+    }
+
+    {
+        grpc::ServerContext*             context = nullptr;
+        User::Id*                        request = nullptr;
+        grpc::ServerAsyncWriter<Update>* writer  = nullptr;
+        grpc::ServerCompletionQueue*     cq      = nullptr;
+        void*                            tag     = nullptr;
+        (async_service.*(&ChatRoom::AsyncService::RequestGetUpdates))(context, request, writer, cq, cq, tag);
+
+        Update response;
+        writer->Write(response, tag);
+        writer->Finish(grpc::Status::OK, tag);
+    }
+#endif
 }
 
 } // namespace
