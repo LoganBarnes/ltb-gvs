@@ -29,15 +29,6 @@ option(LTB_GVS_BUILD_EXAMPLES "Build example programs" OFF)
 
 include(${CMAKE_CURRENT_LIST_DIR}/ltb-net/ltb-util/cmake/LtbConfig.cmake) # <-- Additional project options are in here.
 
-############
-### Util ###
-############
-if (${LTB_GVS_ENABLE_NETWORKING})
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ltb-net)
-elseif (${LTB_GVS_ENABLE_DISPLAY})
-    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ltb-net/ltb-util)
-endif ()
-
 ########################
 ### External Targets ###
 ########################
@@ -59,6 +50,15 @@ if (LTB_GVS_ENABLE_DISPLAY)
             LtbExternal::Graphics
             )
 endif (LTB_GVS_ENABLE_DISPLAY)
+
+############
+### Util ###
+############
+if (${LTB_GVS_ENABLE_NETWORKING})
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ltb-net)
+elseif (${LTB_GVS_ENABLE_DISPLAY})
+    add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/ltb-net/ltb-util)
+endif ()
 
 #####################
 ### Configuration ###

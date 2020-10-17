@@ -27,6 +27,9 @@ FetchContent_Declare(ltb_mapbox_dl
         GIT_TAG v1.1.6
         )
 
+### Threads ###
+find_package(Threads REQUIRED)
+
 ### Boost UUID ###
 include(cmake/BoostUuidLibs.cmake)
 
