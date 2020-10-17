@@ -135,7 +135,7 @@ void MainWindow::configure_gui() {
     ImGui::SetNextWindowSize({350.f, height}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Settings", nullptr);
 
-    display_device_info();
+    gvs::display_device_info();
 
     gvs::add_three_line_separator();
 

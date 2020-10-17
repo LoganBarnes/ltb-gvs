@@ -23,6 +23,7 @@
 #pragma once
 
 // project
+#include "custom_renderable.hpp"
 #include "ltb/gvs/util11/make_unique_11.hpp"
 #include "primitive_types.hpp"
 #include "scene_id.hpp"
@@ -144,7 +145,7 @@ struct SparseGeometryInfo {
 };
 
 namespace detail {
-using GeometryBase = mapbox::util::variant<SparseGeometryInfo, Primitive>;
+using GeometryBase = mapbox::util::variant<SparseGeometryInfo, Primitive, std::shared_ptr<CustomRenderable>>;
 }
 
 struct Geometry : detail::GeometryBase {
@@ -152,6 +153,8 @@ struct Geometry : detail::GeometryBase {
     Geometry(SparseGeometryInfo setter) : detail::GeometryBase(std::move(setter)) {}
     // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
     Geometry(Primitive primitive) : detail::GeometryBase(std::move(primitive)) {}
+    // NOLINTNEXTLINE(google-explicit-constructor,hicpp-explicit-conversions)
+    Geometry(std::shared_ptr<CustomRenderable> renderable) : detail::GeometryBase(std::move(renderable)) {}
 };
 
 struct SparseSceneItemInfo {
@@ -192,10 +195,11 @@ struct GeometryInfo {
 };
 
 struct SceneItemInfo {
-    GeometryInfo         geometry_info = {};
-    DisplayInfo          display_info  = {};
-    SceneId              parent        = nil_id();
-    std::vector<SceneId> children      = {};
+    std::shared_ptr<CustomRenderable> renderable    = nullptr;
+    GeometryInfo                      geometry_info = {};
+    DisplayInfo                       display_info  = {};
+    SceneId                           parent        = nil_id();
+    std::vector<SceneId>              children      = {};
 };
 
 using SceneItems = std::unordered_map<SceneId, SceneItemInfo>;

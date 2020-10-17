@@ -26,32 +26,28 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <string>
+#include "ltb/paths.hpp"
 
 namespace ltb {
 namespace paths {
 
-inline std::string slash() {
-    return "@SLASH@";
+inline auto gvs_root() -> std::string {
+    return "@CMAKE_CURRENT_LIST_DIR@" + slash();
 }
 
-inline std::string project_root() {
-    return "@NATIVE_PROJECT_SOURCE_DIR@" + slash();
+inline auto resources() -> std::string {
+    return gvs_root() + "res" + slash();
 }
 
-inline std::string resources() {
-    return project_root() + "res" + slash();
+inline auto gvs_src() -> std::string {
+    return gvs_root() + "src" + slash() + "ltb" + slash() + "gvs";
 }
 
-inline std::string gvs_src() {
-    return project_root() + "src" + slash() + "ltb" + slash() + "gvs";
-}
-
-inline std::string shaders() {
+inline auto shaders() -> std::string {
     return gvs_src() + "display" + slash() + "shaders" + slash();
 }
 
-inline std::string frag_shader_file() {
+inline auto frag_shader_file() -> std::string {
 #ifdef __APPLE__
     return shaders() + "shader_mac.frag";
 #else

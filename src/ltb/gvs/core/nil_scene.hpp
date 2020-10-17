@@ -33,7 +33,7 @@ namespace gvs {
 ///        Calls to add_item will return a nil SceneId and no items will ever be added or updated.
 ///
 ///        This is useful as a placeholder class when you cannot connect to a server. Replacing a
-///        net::ClientScene instance will a NilScene instance will allow your code to remain the same
+///        net::ClientScene instance with a NilScene instance will allow your code to remain the same
 ///        but it will prevent errors from being thrown when the client cannot connect.
 class NilScene : public Scene {
 public:

@@ -137,6 +137,10 @@ auto OpenglBackend::render(CameraPackage const& camera_package) const -> void {
     camera_object_.setTransformation(camera_package.camera->cameraMatrix().inverted());
     camera_->setProjectionMatrix(camera_package.camera->projectionMatrix());
 
+    if (!custom_renderable_drawables_.isEmpty()) {
+        camera_->draw(custom_renderable_drawables_);
+    }
+
     if (!opaque_drawables_.isEmpty()) {
         camera_->draw(opaque_drawables_);
     }
@@ -218,7 +222,10 @@ auto OpenglBackend::updated(SceneId const& item_id, UpdatedInfo const& updated, 
         mesh_package.drawable->update_display_info(item.display_info);
         mesh_package.visible = item.display_info.visible;
 
-        if (item.display_info.wireframe_only) {
+        if (item.renderable) {
+            mesh_package.drawable_group_when_visible = &custom_renderable_drawables_;
+
+        } else if (item.display_info.wireframe_only) {
             mesh_package.drawable_group_when_visible = &wireframe_drawables_;
 
         } else if (item.display_info.opacity < 1.f) {
