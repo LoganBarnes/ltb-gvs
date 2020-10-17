@@ -43,12 +43,12 @@ endif ()
 ########################
 set(LTB_GVS_ROOT ${CMAKE_CURRENT_LIST_DIR})
 
-include(cmake/ThirdPartyCore.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/ThirdPartyCore.cmake)
 
-if (LTB_GVS_ENABLE_DISPLAY)
-    include(cmake/ThirdPartyGraphics.cmake)
-    include(cmake/ThirdPartyGui.cmake)
-    include(cmake/ThirdPartyCuda.cmake)
+if (${LTB_GVS_ENABLE_DISPLAY})
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/ThirdPartyGraphics.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/ThirdPartyGui.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/ThirdPartyCuda.cmake)
 
     ### GVS Display Resources ###
     # Compile resources separately to avoid linting issues on generated code
@@ -58,7 +58,7 @@ if (LTB_GVS_ENABLE_DISPLAY)
             PUBLIC
             LtbExternal::Graphics
             )
-endif (LTB_GVS_ENABLE_DISPLAY)
+endif (${LTB_GVS_ENABLE_DISPLAY})
 
 #####################
 ### Configuration ###

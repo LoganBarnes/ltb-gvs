@@ -28,7 +28,7 @@ FetchContent_Declare(ltb_mapbox_dl
         )
 
 ### Boost UUID ###
-include(cmake/BoostUuidLibs.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/BoostUuidLibs.cmake)
 
 ### mapbox variant ###
 FetchContent_GetProperties(ltb_mapbox_dl)
