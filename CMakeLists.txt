@@ -60,10 +60,6 @@ if (LTB_GVS_ENABLE_DISPLAY)
             )
 endif (LTB_GVS_ENABLE_DISPLAY)
 
-if (LTB_GVS_ENABLE_NETWORKING)
-    include(cmake/ThirdPartyNetworking.cmake)
-endif (LTB_GVS_ENABLE_NETWORKING)
-
 #####################
 ### Configuration ###
 #####################
