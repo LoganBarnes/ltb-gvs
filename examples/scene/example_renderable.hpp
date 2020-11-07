@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Utilities
+// LTB Geometry Visualization Server
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,30 +20,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "string.hpp"
+#pragma once
+
+// project
+#include "general_shader.hpp"
+#include "ltb/gvs/display/backends/opengl_renderable.hpp"
+#include "ltb/util/duration.hpp"
 
 // external
-#include <doctest/doctest.h>
+#include <Magnum/GL/Mesh.h>
 
-namespace ltb::util {
+// standard
+#include <memory>
 
-auto starts_with(const std::string& str, const std::string& prefix) -> bool {
-    return str.compare(0, prefix.length(), prefix) == 0;
-}
+namespace ltb::example {
 
-TEST_CASE("[ltb][util] string_starts_with") {
-    CHECK(starts_with("", ""));
-    CHECK(starts_with("check for prefix", ""));
-    CHECK(starts_with("check for prefix", "c"));
-    CHECK(starts_with("check for prefix", "check"));
-    CHECK(starts_with("check for prefix", "check "));
-    CHECK(starts_with("check for prefix", "check for prefix"));
+class ExampleRenderable : public gvs::OpenglRenderable {
+public:
+    ExampleRenderable();
 
-    CHECK_FALSE(starts_with("", "?"));
-    CHECK_FALSE(starts_with("check for prefix", "z"));
-    CHECK_FALSE(starts_with("check for prefix", "checkk"));
-    CHECK_FALSE(starts_with("check for prefix", "check  "));
-    CHECK_FALSE(starts_with("check for prefix", "check for prefix?"));
-}
+    // gvs::OpenGLRenderable start
+    ~ExampleRenderable() override;
 
-} // namespace ltb::util
+    auto init(Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>& object,
+              Magnum::SceneGraph::DrawableGroup3D*                                    group,
+              unsigned                                                                intersect_id) -> void override;
+
+    [[nodiscard]] auto drawable() const -> Magnum::SceneGraph::Drawable3D* override;
+
+    auto set_display_info(gvs::DisplayInfo const& display_info) -> void override;
+
+    auto resize(Magnum::Vector2i const& viewport) -> void override;
+    // gvs::OpenGLRenderable end
+
+    auto update(util::Duration const& sim_time) -> void;
+
+private:
+    class ExampleDrawable;
+
+    GridShader                       shader_;
+    Magnum::GL::Mesh                 mesh_;
+    std::shared_ptr<ExampleDrawable> drawable_;
+};
+
+} // namespace ltb::example

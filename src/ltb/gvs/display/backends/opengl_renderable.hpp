@@ -1,5 +1,5 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
-// LTB Utilities
+// LTB Geometry Visualization Server
 // Copyright (c) 2020 Logan Barnes - All Rights Reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,30 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "string.hpp"
+#pragma once
+
+// project
+#include "ltb/gvs/core/custom_renderable.hpp"
+#include "ltb/gvs/core/types.hpp"
 
 // external
-#include <doctest/doctest.h>
+#include <Magnum/SceneGraph/Drawable.h>
 
-namespace ltb::util {
+namespace ltb::gvs {
 
-auto starts_with(const std::string& str, const std::string& prefix) -> bool {
-    return str.compare(0, prefix.length(), prefix) == 0;
-}
+class OpenglRenderable : public CustomRenderable {
+public:
+    ~OpenglRenderable() override = 0;
 
-TEST_CASE("[ltb][util] string_starts_with") {
-    CHECK(starts_with("", ""));
-    CHECK(starts_with("check for prefix", ""));
-    CHECK(starts_with("check for prefix", "c"));
-    CHECK(starts_with("check for prefix", "check"));
-    CHECK(starts_with("check for prefix", "check "));
-    CHECK(starts_with("check for prefix", "check for prefix"));
+    virtual auto init(Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>& object,
+                      Magnum::SceneGraph::DrawableGroup3D*                                    group,
+                      unsigned                                                                intersect_id) -> void
+        = 0;
 
-    CHECK_FALSE(starts_with("", "?"));
-    CHECK_FALSE(starts_with("check for prefix", "z"));
-    CHECK_FALSE(starts_with("check for prefix", "checkk"));
-    CHECK_FALSE(starts_with("check for prefix", "check  "));
-    CHECK_FALSE(starts_with("check for prefix", "check for prefix?"));
-}
+    [[nodiscard]] virtual auto drawable() const -> Magnum::SceneGraph::Drawable3D* = 0;
 
-} // namespace ltb::util
+    virtual auto set_display_info(DisplayInfo const& display_info) -> void = 0;
+
+    virtual auto resize(Magnum::Vector2i const& viewport) -> void = 0;
+};
+
+inline OpenglRenderable::~OpenglRenderable() = default;
+
+} // namespace ltb::gvs

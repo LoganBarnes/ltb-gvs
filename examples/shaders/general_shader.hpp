@@ -23,33 +23,47 @@
 #pragma once
 
 // project
-#include "example_renderable.hpp"
-#include "ltb/gvs/display/gui/imgui_magnum_application.hpp"
-#include "ltb/gvs/display/local_scene.hpp"
+#include "ltb/gvs/core/types.hpp"
+
+// external
+#include <Magnum/GL/AbstractShaderProgram.h>
+#include <Magnum/Math/Color.h>
 
 namespace ltb::example {
 
-class MainWindow : public gvs::ImGuiMagnumApplication {
+class GridShader : public Magnum::GL::AbstractShaderProgram {
 public:
-    explicit MainWindow(const Arguments& arguments);
-    ~MainWindow() override;
+    typedef Magnum::GL::Attribute<0, Magnum::Vector3> Position;
+    typedef Magnum::GL::Attribute<1, Magnum::Vector3> Normal;
+    typedef Magnum::GL::Attribute<2, Magnum::Vector2> TextureCoordinate;
+    typedef Magnum::GL::Attribute<3, Magnum::Vector3> VertexColor;
+
+    enum : Magnum::UnsignedInt { ColorOutput = 0, IdOutput = 1 };
+
+    explicit GridShader();
+
+    auto set_projection_from_world_matrix(Magnum::Matrix4 const& projection_from_world) -> GridShader&;
+
+    auto set_coloring(gvs::Coloring const& coloring) -> GridShader&;
+    auto set_uniform_color(Magnum::Color3 const& color) -> GridShader&;
+
+    auto set_shading(gvs::Shading const& shading) -> GridShader&;
+    auto set_id(unsigned const& id) -> GridShader&;
+    auto set_time(float time_secs) -> GridShader&;
 
 private:
-    void update() override;
-    void render(const gvs::CameraPackage& camera_package) const override;
-    void configure_gui() override;
+    int projection_from_world_uniform_location_ = -1;
 
-    void resize(const Magnum::Vector2i& viewport) override;
+    int coloring_uniform_location_      = -1;
+    int uniform_color_uniform_location_ = -1;
 
-    // Scene
-    gvs::LocalScene scene_;
+    int shading_uniform_location_         = -1;
+    int light_direction_uniform_location_ = -1;
+    int light_color_uniform_location_     = -1;
+    int ambient_scale_uniform_location_   = -1;
 
-    // Renderable
-    std::shared_ptr<ExampleRenderable> renderable_ = nullptr;
-
-    // Timing
-    std::chrono::steady_clock::time_point start_time_;
-    std::chrono::steady_clock::time_point current_time_;
+    int id_uniform_location_        = -1;
+    int time_secs_uniform_location_ = -1;
 };
 
 } // namespace ltb::example
