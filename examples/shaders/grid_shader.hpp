@@ -33,34 +33,25 @@ namespace ltb::example {
 
 class GridShader : public Magnum::GL::AbstractShaderProgram {
 public:
-    typedef Magnum::GL::Attribute<0, Magnum::Vector3> Position;
-    typedef Magnum::GL::Attribute<1, Magnum::Vector3> Normal;
-    typedef Magnum::GL::Attribute<2, Magnum::Vector2> TextureCoordinate;
-    typedef Magnum::GL::Attribute<3, Magnum::Vector3> VertexColor;
-
     enum : Magnum::UnsignedInt { ColorOutput = 0, IdOutput = 1 };
 
     explicit GridShader();
 
     auto set_projection_from_world_matrix(Magnum::Matrix4 const& projection_from_world) -> GridShader&;
 
-    auto set_coloring(gvs::Coloring const& coloring) -> GridShader&;
-    auto set_uniform_color(Magnum::Color3 const& color) -> GridShader&;
+    auto set_color(Magnum::Color3 const& color) -> GridShader&;
+    auto set_grid_width(float grid_width) -> GridShader&;
+    auto set_grid_divisions(int grid_divisions) -> GridShader&;
 
-    auto set_shading(gvs::Shading const& shading) -> GridShader&;
     auto set_id(unsigned const& id) -> GridShader&;
     auto set_time(float time_secs) -> GridShader&;
 
 private:
     int projection_from_world_uniform_location_ = -1;
 
-    int coloring_uniform_location_      = -1;
-    int uniform_color_uniform_location_ = -1;
-
-    int shading_uniform_location_         = -1;
-    int light_direction_uniform_location_ = -1;
-    int light_color_uniform_location_     = -1;
-    int ambient_scale_uniform_location_   = -1;
+    int color_uniform_location_          = -1;
+    int grid_width_uniform_location_     = -1;
+    int grid_divisions_uniform_location_ = -1;
 
     int id_uniform_location_        = -1;
     int time_secs_uniform_location_ = -1;

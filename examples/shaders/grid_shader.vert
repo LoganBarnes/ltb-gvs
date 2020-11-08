@@ -26,14 +26,9 @@
 in int gl_VertexID;
 
 uniform mat4  projection_from_world = mat4(1.f);
-uniform int   grid_width            = 100;
-uniform float grid_scale            = 0.1f;
+uniform float grid_width            = 10.f;
+uniform int   grid_divisions        = 0;
 uniform float time_secs             = 0.f;
-
-layout(location = 0) out vec3 world_position;
-layout(location = 1) out vec3 world_normal;
-layout(location = 2) out vec2 texture_coordinates;
-
 
 out gl_PerVertex
 {
@@ -42,9 +37,11 @@ out gl_PerVertex
 
 ivec2 grid_index(in int index_1d)
 {
+    int width = grid_divisions + 2;
+
     ivec2 index_2d;
-    index_2d.y = index_1d / grid_width;
-    index_2d.x = index_1d - (grid_width * index_2d.y);
+    index_2d.y = index_1d / width;
+    index_2d.x = index_1d - (width * index_2d.y);
     return index_2d;
 }
 
@@ -52,18 +49,14 @@ void main()
 {
     ivec2 index_2d = grid_index(gl_VertexID);
 
+    vec2 tex_coords  = vec2(index_2d) / float(grid_divisions + 1);
 
-    texture_coordinates = vec2(index_2d);
-
-    world_position.xy   = texture_coordinates - grid_width * 0.5f;
-    world_position.xy   *= grid_scale;
-
-    world_position.z    = -5.f;
-    world_position.z    += cos(time_secs + world_position.x);
-    world_position.z    += sin(time_secs + world_position.y);
-    world_position.z    *= 0.2f;
-
-    world_normal        = vec3(0.f, 0.f, 1.f);
+    vec3 world_position;
+    world_position.xy  = tex_coords * grid_width - grid_width * 0.5f;
+    world_position.z   = -10.f;
+    world_position.z  += cos(time_secs + tex_coords.x * 10.f);
+    world_position.z  += sin(time_secs + tex_coords.y * 10.f);
+    world_position.z  *= 0.2f;
 
     gl_Position = projection_from_world * vec4(world_position, 1.f);
 }

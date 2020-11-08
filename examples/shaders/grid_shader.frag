@@ -20,37 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#pragma once
 
-// project
-#include "ltb/gvs/core/custom_renderable.hpp"
-#include "ltb/gvs/core/types.hpp"
+// version will be inserted automagically
 
-// external
-#include <Magnum/SceneGraph/Drawable.h>
+/*
+ * Uniforms
+ */
+uniform vec3  color   = { 1.f, 0.9f, 0.7f };
+uniform float opacity = 1.f;
 
-namespace ltb::gvs {
+uniform uint id = 0;
 
-class OpenglRenderable : public CustomRenderable {
-public:
-    ~OpenglRenderable() override = 0;
+layout(location = 0) out vec4 out_color;
+layout(location = 1) out uint out_id;
 
-    // CustomRenderable start
-    auto configure_gui(DisplayInfo* display_info) -> bool override = 0;
-    // CustomRenderable end
-
-    virtual auto init_gl_types(Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>& object,
-                               Magnum::SceneGraph::DrawableGroup3D*                                    group,
-                               unsigned intersect_id) -> void
-        = 0;
-
-    [[nodiscard]] virtual auto drawable() const -> Magnum::SceneGraph::Drawable3D* = 0;
-
-    virtual auto set_display_info(DisplayInfo const& display_info) -> void = 0;
-
-    virtual auto resize(Magnum::Vector2i const& viewport) -> void = 0;
-};
-
-inline OpenglRenderable::~OpenglRenderable() = default;
-
-} // namespace ltb::gvs
+void main()
+{
+    out_id    = id;
+    out_color = vec4(color, opacity);
+}

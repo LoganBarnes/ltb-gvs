@@ -28,5 +28,9 @@ namespace gvs {
 class Scene;
 class SceneUpdateHandler;
 
+struct GeometryInfo;
+struct SceneItemInfo;
+struct DisplayInfo;
+
 } // namespace gvs
 } // namespace ltb

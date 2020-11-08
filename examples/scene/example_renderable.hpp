@@ -23,7 +23,7 @@
 #pragma once
 
 // project
-#include "general_shader.hpp"
+#include "grid_shader.hpp"
 #include "ltb/gvs/display/backends/opengl_renderable.hpp"
 #include "ltb/util/duration.hpp"
 
@@ -42,9 +42,11 @@ public:
     // gvs::OpenGLRenderable start
     ~ExampleRenderable() override;
 
-    auto init(Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>& object,
-              Magnum::SceneGraph::DrawableGroup3D*                                    group,
-              unsigned                                                                intersect_id) -> void override;
+    auto configure_gui(gvs::DisplayInfo* display_info) -> bool override;
+
+    auto init_gl_types(Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>& object,
+                       Magnum::SceneGraph::DrawableGroup3D*                                    group,
+                       unsigned intersect_id) -> void override;
 
     [[nodiscard]] auto drawable() const -> Magnum::SceneGraph::Drawable3D* override;
 
@@ -58,8 +60,6 @@ public:
 private:
     class ExampleDrawable;
 
-    GridShader                       shader_;
-    Magnum::GL::Mesh                 mesh_;
     std::shared_ptr<ExampleDrawable> drawable_;
 };
 

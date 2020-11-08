@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "general_shader.hpp"
+#include "grid_shader.hpp"
 
 // external
 #include <Corrade/Containers/Reference.h>
@@ -40,8 +40,8 @@ GridShader::GridShader() {
     Magnum::GL::Shader vert{Magnum::GL::Version::GL450, Magnum::GL::Shader::Type::Vertex};
     Magnum::GL::Shader frag{Magnum::GL::Version::GL450, Magnum::GL::Shader::Type::Fragment};
 
-    vert.addSource(rs.get("general_shader.vert"));
-    frag.addSource(rs.get("general_shader.frag"));
+    vert.addSource(rs.get("grid_shader.vert"));
+    frag.addSource(rs.get("grid_shader.frag"));
 
     auto vert_ref = Corrade::Containers::Reference<Magnum::GL::Shader>(vert);
     auto frag_ref = Corrade::Containers::Reference<Magnum::GL::Shader>(frag);
@@ -54,13 +54,9 @@ GridShader::GridShader() {
 
     projection_from_world_uniform_location_ = uniformLocation("projection_from_world");
 
-    coloring_uniform_location_      = uniformLocation("coloring");
-    uniform_color_uniform_location_ = uniformLocation("uniform_color");
-
-    shading_uniform_location_         = uniformLocation("shading");
-    light_direction_uniform_location_ = uniformLocation("light_direction");
-    light_color_uniform_location_     = uniformLocation("light_color");
-    ambient_scale_uniform_location_   = uniformLocation("ambient_scale");
+    color_uniform_location_          = uniformLocation("color");
+    grid_width_uniform_location_     = uniformLocation("grid_width");
+    grid_divisions_uniform_location_ = uniformLocation("grid_divisions");
 
     id_uniform_location_        = uniformLocation("id");
     time_secs_uniform_location_ = uniformLocation("time_secs");
@@ -71,18 +67,18 @@ auto GridShader::set_projection_from_world_matrix(Magnum::Matrix4 const& project
     return *this;
 }
 
-auto GridShader::set_coloring(gvs::Coloring const& coloring) -> GridShader& {
-    setUniform(coloring_uniform_location_, std::underlying_type_t<gvs::Coloring>(coloring));
+auto GridShader::set_color(Magnum::Color3 const& color) -> GridShader& {
+    setUniform(color_uniform_location_, color);
     return *this;
 }
 
-auto GridShader::set_uniform_color(Magnum::Color3 const& color) -> GridShader& {
-    setUniform(uniform_color_uniform_location_, color);
+auto GridShader::set_grid_width(float grid_width) -> GridShader& {
+    setUniform(grid_width_uniform_location_, grid_width);
     return *this;
 }
 
-auto GridShader::set_shading(gvs::Shading const& shading) -> GridShader& {
-    setUniform(shading_uniform_location_, std::underlying_type_t<gvs::Shading>(shading));
+auto GridShader::set_grid_divisions(int grid_divisions) -> GridShader& {
+    setUniform(grid_divisions_uniform_location_, grid_divisions);
     return *this;
 }
 

@@ -112,7 +112,7 @@ OpenglBackend::OpenglItem::OpenglItem(SceneId                      id,
                                       OpenglRenderable*            ogl_renderable)
     : scene_id(id), intersect_id(id_for_intersect), data(ogl_renderable), object(obj) {
     auto* renderable = std::get<OpenglRenderable*>(data);
-    renderable->init(*object, drawables, id_for_intersect);
+    renderable->init_gl_types(*object, drawables, id_for_intersect);
 }
 
 auto OpenglBackend::OpenglItem::drawable() const -> SceneGraph::Drawable3D* {
