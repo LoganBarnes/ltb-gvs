@@ -22,7 +22,7 @@
 ##########################################################################################
 FetchContent_Declare(ltb_imgui_dl
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG docking
+        GIT_TAG 06e87014f25ee2ac75661cff624dd2ef0a9b62ea # docking
         )
 FetchContent_Declare(ltb_magnum_integration_dl
         GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
